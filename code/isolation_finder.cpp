@@ -22,7 +22,6 @@
  * SOFTWARE.
  */
 
-
 #include "isolation_finder.h"
 #include "coordinate_system.h"
 #include "easylogging++.h"
@@ -186,7 +185,7 @@ IsolationRecord IsolationFinder::findIsolation(const Tile *tile,
   // any distance in the longitude (x) direction.  This compensates for
   // lines of longitude getting closer as latitude increases.  The value
   // of the factor is the cosine of the latitude of the row.
-  float *lngDistanceScaleForRow = (float *) malloc(sizeof(float) * tile->height());
+  float *lngDistanceScaleForRow = new float[ tile->height()];
   for (int y = 0; y < tile->height(); ++y) {
     LatLng point = mCoordinateSystem->getLatLng(Offsets(0, y));
     lngDistanceScaleForRow[y] = cosf(degToRad(point.latitude()));
@@ -346,7 +345,7 @@ IsolationRecord IsolationFinder::findIsolation(const Tile *tile,
     record.distance = seedLocation.distance(record.closestHigherGround);
   }
 
-  delete lngDistanceScaleForRow;
+  delete [] lngDistanceScaleForRow;
   return record;
 }
 
