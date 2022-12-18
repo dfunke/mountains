@@ -61,6 +61,30 @@ bool IsolationResults::save(const string &directory, float lat, float lng) const
   return true;
 }
 
+bool IsolationResults::saveSl(const string &directory, float minLat, float minLng, float maxLat, float maxLng) const {
+  char filename[PATH_MAX];
+  // TODO: Maybe support sub-degree tiles one day, if anyone cares
+  sprintf(filename, "all-isolations-%02d-%03d-to-%02d-%03d.txt",
+          static_cast<int>(minLat), static_cast<int>(minLng), static_cast<int>(maxLat), static_cast<int>(maxLng));
+    
+  string path = directory + "/" + filename;
+  FILE *file = fopen(path.c_str(), "w");
+  if (file == nullptr) {
+    printf("Couldn't open file %s for writing\n", path.c_str());
+    return false;
+  }
+
+  for (auto it : mResults) {
+    fprintf(file, "%.4f,%.4f,%.2f,%.4f,%.4f,%.4f\n",
+            it.peak.latitude(), it.peak.longitude(), it.peakElevation,
+            it.higher.latitude(), it.higher.longitude(),
+            it.isolationKm);
+  }
+  
+  fclose(file);
+  return true;
+}
+
 IsolationResults *IsolationResults::loadFromFile(const string &directory, float lat, float lng) {
   string filename = directory + "/" + filenameForCoordinates(lat, lng);
   FILE *file = fopen(filename.c_str(), "r");

@@ -26,17 +26,21 @@
 #include "tile.h"
 #include "util.h"
 #include "easylogging++.h"
+#include "file_format.h"
 
 #include <stdio.h>
 #include <string>
 
 using std::string;
 
-static const int HGT_TILE_SIZE = 1201;
 static const int16 HGT_NODATA_ELEVATION = -32768;
 
 static uint16 swapByteOrder16(uint16 us) {
   return (us >> 8) | (us << 8);
+}
+
+HgtLoader::HgtLoader(FileFormat format) {
+  mFormat = format;
 }
 
 Tile *HgtLoader::loadTile(const std::string &directory, float minLat, float minLng) {
@@ -57,7 +61,7 @@ Tile *HgtLoader::loadTile(const std::string &directory, float minLat, float minL
     return nullptr;
   }
   
-  int num_samples = HGT_TILE_SIZE * HGT_TILE_SIZE;
+  int num_samples = mFormat.rawSamplesAcross() * mFormat.rawSamplesAcross();
   
   int16 *inbuf = (int16 *) malloc(sizeof(int16) * num_samples);
   
@@ -79,8 +83,7 @@ Tile *HgtLoader::loadTile(const std::string &directory, float minLat, float minL
         samples[i] = static_cast<Elevation>(elevation);
       }
     }
-
-    retval = new Tile(HGT_TILE_SIZE, HGT_TILE_SIZE, samples);
+    retval = new Tile(mFormat.rawSamplesAcross(), mFormat.rawSamplesAcross(), samples, mFormat);
   }
 
   free(inbuf);

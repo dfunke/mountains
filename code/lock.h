@@ -25,7 +25,7 @@
 #ifndef _LOCK_H_
 #define _LOCK_H_
 
-#ifdef PLATFORM_LINUX
+#ifdef __linux__
 #include <pthread.h>
 
 class Lock {
@@ -52,7 +52,7 @@ private:
 
 #endif
 
-#ifdef PLATFORM_WINDOWS
+#ifdef _WIN32
 #include <windows.h>
 
 class Lock {

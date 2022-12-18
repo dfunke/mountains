@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+#include "isolation_finder_sl/isolation_sl_processor.h"
+
 #include "coordinate_system.h"
 #include "isolation_task.h"
 #include "point_map.h"
@@ -64,7 +66,8 @@ int main(int argc, char **argv) {
 
   float minIsolation = 1;
   int numThreads = 1;
-  
+  bool sweepline = false;
+
   // Parse options
   START_EASYLOGGINGPP(argc, argv);
   int ch;
@@ -73,7 +76,7 @@ int main(int argc, char **argv) {
     {"v", required_argument, nullptr, 0},
     {nullptr, 0, 0, 0},
   };
-  while ((ch = getopt_long(argc, argv, "i:m:o:t:", long_options, nullptr)) != -1) {
+  while ((ch = getopt_long(argc, argv, "i:m:o:t:s", long_options, nullptr)) != -1) {
     switch (ch) {
     case 'i':
       terrain_directory = optarg;
@@ -89,6 +92,9 @@ int main(int argc, char **argv) {
 
     case 't':
       numThreads = atoi(optarg);
+      break;
+    case 's':
+      sweepline = true;
       break;
     }
   }
@@ -111,36 +117,43 @@ int main(int argc, char **argv) {
   }
 
   // TODO: Maybe support other file formats in the future?
-  FileFormat fileFormat(FileFormat::Value::HGT);
+  FileFormat fileFormat(FileFormat::Value::HGT3);
   BasicTileLoadingPolicy policy(terrain_directory, fileFormat);
   const int CACHE_SIZE = 50;
   auto cache = std::make_unique<TileCache>(&policy, CACHE_SIZE);
 
   VLOG(2) << "Using " << numThreads << " threads";
-  
-  auto threadPool = std::make_unique<ThreadPool>(numThreads);
-  int num_tiles_processed = 0;
-  vector<std::future<bool>> results;
-  for (auto lat = (float) floor(bounds[0]); lat < ceil(bounds[1]); lat += 1) {
-     for (auto lng = (float) floor(bounds[2]); lng < ceil(bounds[3]); lng += 1) {
-       std::shared_ptr<CoordinateSystem> coordinateSystem(
-         fileFormat.coordinateSystemForOrigin(lat, lng));
-       
-      IsolationTask *task = new IsolationTask(
-        cache.get(), output_directory, bounds, minIsolation);
-      results.push_back(threadPool->enqueue([=] {
-            return task->run(lat, lng, *coordinateSystem);
-          }));
+
+  if (sweepline) {
+    IsolationSlProcessor *processor = new IsolationSlProcessor(cache.get());
+    IsolationResults res = processor->findIsolations(numThreads, bounds, minIsolation);
+    res.saveSl(output_directory, bounds[0], bounds[1], bounds[2], bounds[3]);
+  } else {
+    auto threadPool = std::make_unique<ThreadPool>(numThreads);
+    int num_tiles_processed = 0;
+    vector<std::future<bool>> results;
+    for (auto lat = (float) floor(bounds[0]); lat < ceil(bounds[1]); lat += 1) {
+      for (auto lng = (float) floor(bounds[2]); lng < ceil(bounds[3]); lng += 1) {
+        std::shared_ptr<CoordinateSystem> coordinateSystem(
+          fileFormat.coordinateSystemForOrigin(lat, lng));
+        
+        IsolationTask *task = new IsolationTask(
+          cache.get(), output_directory, bounds, minIsolation);
+        results.push_back(threadPool->enqueue([=] {
+              return task->run(lat, lng, *coordinateSystem);
+            }));
+      }
     }
+
+    for (auto && result : results) {
+      if (result.get()) {
+        num_tiles_processed += 1;
+      }
+    }
+      
+    printf("Tiles processed = %d\n", num_tiles_processed);
   }
 
-  for (auto && result : results) {
-    if (result.get()) {
-      num_tiles_processed += 1;
-    }
-  }
-    
-  printf("Tiles processed = %d\n", num_tiles_processed);
 
   return 0;
 }

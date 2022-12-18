@@ -126,3 +126,18 @@ std::vector<LatLng> LatLng::GetBoundingBoxForCap(float distance_meters) const {
    box.push_back(LatLng(radToDeg(maxLat), radToDeg(maxLon)));
    return box;
 }
+
+vec3 LatLng::toCartesian() const {
+  vec3 res;
+  res.x = cos(degToRad(mLatitude)) * cos(degToRad(mLongitude));
+  res.y = cos(degToRad(mLatitude)) * sin(degToRad(mLongitude));
+  res.z = sin(degToRad(mLatitude));
+  // res is normalized
+  return res;
+}
+
+LatLng::LatLng(vec3 cartesian) {
+  // assert catesian is normlized
+  mLatitude = radToDeg(asin(cartesian.z));
+  mLongitude = radToDeg(atan2(cartesian.y, cartesian.x));
+}

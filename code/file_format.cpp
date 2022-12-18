@@ -37,7 +37,8 @@ int FileFormat::rawSamplesAcross() const {
   case Value::NED13_ZIP:  return 10812;
   case Value::NED1_ZIP:   return 3612;
   case Value::NED19:      return 8112;
-  case Value::HGT:        return 1201;
+  case Value::HGT3:        return 1201;
+  case Value::HGT1:       return 3603;
   case Value::THREEDEP_1M:  return 10012;
   default:
     // In particular, fail on GLO, because this number is variable with latitude.
@@ -51,7 +52,8 @@ int FileFormat::inMemorySamplesAcross() const {
   case Value::NED13_ZIP:  return 10801;
   case Value::NED1_ZIP:   return 3601;
   case Value::NED19:      return 8101;
-  case Value::HGT:        return 1201;
+  case Value::HGT3:        return 1201;
+  case Value::HGT1:       return 3603;
   case Value::THREEDEP_1M:  return 10001;
   case Value::GLO30:      return 3601;
   default:
@@ -66,7 +68,8 @@ float FileFormat::degreesAcross() const {
   case Value::NED13_ZIP:  return 1.0f;
   case Value::NED1_ZIP:   return 1.0f;
   case Value::NED19:      return 0.25f;
-  case Value::HGT:        return 1.0f;
+  case Value::HGT3:        return 1.0f;
+  case Value::HGT1:       return 1.0f;
   case Value::GLO30:      return 1.0f;
   case Value::THREEDEP_1M:
     // This is a misnomer, as these tiles are in UTM coordinates.  The "degrees" across
@@ -87,7 +90,8 @@ CoordinateSystem *FileFormat::coordinateSystemForOrigin(float lat, float lng, in
   case Value::NED13_ZIP:  // fall through
   case Value::NED1_ZIP:   
   case Value::NED19:      
-  case Value::HGT:        
+  case Value::HGT3:
+  case Value::HGT1:
   case Value::GLO30: {
     // The -1 removes overlap with neighbors
     int samplesPerDegreeLat = static_cast<int>((inMemorySamplesAcross() - 1) / degreesAcross());
@@ -116,7 +120,8 @@ CoordinateSystem *FileFormat::coordinateSystemForOrigin(float lat, float lng, in
 
 FileFormat *FileFormat::fromName(const string &name) {
   const std::map<string, FileFormat> fileFormatNames = {
-    { "SRTM",      Value::HGT, },
+    { "SRTM3",      Value::HGT1, },
+    { "SRTM1",     Value::HGT1, },
     { "NED1-ZIP",  Value::NED1_ZIP, },
     { "NED13-ZIP", Value::NED13_ZIP, },
     { "NED19",     Value::NED19, },

@@ -30,12 +30,13 @@
 #define _TILE_H_
 
 #include "primitives.h"
+#include "file_format.h"
 
 class Tile {
 public:
 
   // Tile takes ownership of samples, which will be deallocated later via free().
-  Tile(int width, int height, Elevation *samples);
+  Tile(int width, int height, Elevation *samples, FileFormat format);
   ~Tile();
   
   int width() const { return mWidth; }
@@ -44,6 +45,7 @@ public:
   bool isInExtents(int x, int y) const {
     return (x >= 0) && (x < mWidth) && (y >= 0) && (y < mHeight);
   }
+
   bool isInExtents(Offsets offsets) const {
     return isInExtents(offsets.x(), offsets.y());
   }
@@ -64,6 +66,10 @@ public:
     return mMaxElevation;
   }
 
+  FileFormat format() const {
+    return mFormat;
+  }
+
   // Flip elevations so that depressions and mountains are swapped.
   // No-data values are left unchanged.
   void flipElevations();
@@ -77,6 +83,8 @@ private:
   int mWidth;
   int mHeight;
 
+  FileFormat mFormat;
+
   Elevation mMaxElevation;
   
   Elevation *mSamples;
@@ -86,6 +94,5 @@ private:
 
   Elevation computeMaxElevation() const;
 };
-
 
 #endif  // _TILE_H_

@@ -26,6 +26,9 @@
 #define _LATLNG_H_
 
 #include <vector>
+#include <glm/vec3.hpp>
+
+using glm::vec3;
 
 class LatLng {
 public:
@@ -43,6 +46,8 @@ public:
   LatLng(const LatLng &other) {
     *this = other;
   }
+  LatLng(vec3 cartesian);
+
 
   void operator=(const LatLng &other) {
     mLatitude = other.mLatitude;
@@ -51,6 +56,24 @@ public:
 
   float latitude() const { return mLatitude; }
   float longitude() const { return mLongitude; }
+  
+  // Return latLng as normalized vec3 in cartesian space.
+  vec3 toCartesian() const;
+
+  float get(bool getLatitude) const {
+	if (getLatitude) {
+		return mLatitude;
+	}
+	return mLongitude;
+  }
+
+  void set(bool setLatitude, float val) {
+	if (setLatitude) {
+		mLatitude = val;
+		return;
+	}
+	mLongitude = val;
+  }
 
   // Distance in meters
   float distance(const LatLng &other) const;
@@ -61,6 +84,14 @@ public:
   // Initial bearing to point in radians
   float bearingTo(const LatLng &that) const;
 
+  bool operator==(const LatLng &that) const {
+	return mLatitude == that.mLatitude && mLongitude == that.mLongitude;
+  }
+
+	void updateLatLng(const LatLng &that) {
+		mLatitude = that.mLatitude;
+		mLongitude = that.mLongitude;
+	}
   /**
 	 * <p>Computes the bounding coordinates of all points on the surface
 	 * of a sphere that have a great circle distance to the point represented

@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
 
   Elevation minProminence = 100;
   int numThreads = 1;
-  FileFormat fileFormat = FileFormat(FileFormat::Value::HGT);
+  FileFormat fileFormat = FileFormat(FileFormat::Value::HGT3);
 
   // Parse options
   START_EASYLOGGINGPP(argc, argv);

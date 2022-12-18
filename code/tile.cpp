@@ -25,6 +25,7 @@
 #include "tile.h"
 #include "math_util.h"
 #include "util.h"
+#include "file_format.h"
 
 #include "easylogging++.h"
 
@@ -32,10 +33,11 @@
 #include <assert.h>
 #include <stdlib.h>
 
-Tile::Tile(int width, int height, Elevation *samples) {
+Tile::Tile(int width, int height, Elevation *samples, FileFormat format) {
   mWidth = width;
   mHeight = height;
   mSamples = samples;
+  mFormat = format;
   
   mMaxElevation = 0;
 

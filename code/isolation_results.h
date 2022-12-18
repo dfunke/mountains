@@ -32,6 +32,12 @@
 #include "primitives.h"
 #include <string>
 #include <vector>
+struct IsolationResult {
+  LatLng peak;
+  LatLng higher;
+  Elevation peakElevation;
+  float isolationKm;    
+};
 
 class IsolationResults {
 public:
@@ -42,17 +48,13 @@ public:
 
   bool save(const std::string &directory, float lat, float lng) const;
 
+  bool saveSl(const std::string &directory, float minLat, float minLng, float maxLat, float maxLng) const;
+
   static IsolationResults *loadFromFile(const std::string &directory, float lat, float lng);
 
+    std::vector<IsolationResult> mResults;
+
 private:
-  struct IsolationResult {
-    LatLng peak;
-    LatLng higher;
-    Elevation peakElevation;
-    float isolationKm;    
-  };
-  
-  std::vector<IsolationResult> mResults;
   
   static std::string filenameForCoordinates(float lat, float lng);
 };

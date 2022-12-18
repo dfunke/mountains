@@ -109,7 +109,7 @@ Tile *FltLoader::loadFromFltFile(const string &directory, float minLat, float mi
   fclose(infile);
 
   if (samples != nullptr) {
-    retval = new Tile(tileSideLength, tileSideLength, samples);
+    retval = new Tile(tileSideLength, tileSideLength, samples, mFormat);
   }
 
   return retval;  

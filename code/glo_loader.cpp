@@ -127,7 +127,7 @@ Tile *GloLoader::loadTile(const std::string &directory, float minLat, float minL
     }
   }
   
-  Tile *tile = new Tile(outputWidth, outputHeight, samples);
+  Tile *tile = new Tile(outputWidth, outputHeight, samples, *FileFormat::fromName("GLO30"));
 
   delete [] inbuf;
   return tile;  

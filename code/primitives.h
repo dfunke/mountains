@@ -43,6 +43,8 @@ typedef int32 Coord;
 class Offsets {
 public:
   typedef uint64 Value;
+
+  Offsets() {mValue = 0;}
   
   Offsets(Coord x, Coord y) {
     mValue = (((uint64) y) << (8 * sizeof(Coord))) | ((uint64) x);

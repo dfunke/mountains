@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.0)
 
 project(mountains,
     VERSION 1.0
@@ -78,6 +78,16 @@ add_library(
 	code/utm_coordinate_system.cpp
 )
 
+# External dependencies for sweepline-isolation-finder
+
+# glm
+include_directories(external/glm)
+
+#tbb
+include(external/tbb/cmake/TBBBuild.cmake)
+tbb_build(TBB_ROOT external/tbb CONFIG_DIR TBB_DIR)
+find_package(TBB REQUIRED)
+
 add_executable(
     isolation
 	code/easylogging++.cc
@@ -91,6 +101,16 @@ add_executable(
 	code/tile.cpp 
 	code/tile_cache.cpp 
 	code/tile_loading_policy.cpp
+	code/isolation_finder_sl/cell_memory_manager.cpp
+	code/isolation_finder_sl/cell.cpp
+	code/isolation_finder_sl/concurrent_isolation_results.cpp
+	code/isolation_finder_sl/isolation_finder_sl.cpp
+	code/isolation_finder_sl/isolation_sl_processor.cpp
+	code/isolation_finder_sl/sweepline_datastruct_naive.cpp
+	code/isolation_finder_sl/sweepline_datastruct_quadtree_dynamic.cpp
+	code/isolation_finder_sl/sweepline_datastruct.cpp
+	code/isolation_finder_sl/sweepline_primitives.cpp
+	code/isolation_finder_sl/tile_cell.cpp
 )
 
 target_link_libraries(
@@ -98,6 +118,7 @@ target_link_libraries(
 	pointlib 
 	loaderlib 
 	coordlib
+	TBB::tbb
 )
 
 add_executable(
