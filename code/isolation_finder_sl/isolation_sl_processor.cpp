@@ -31,6 +31,7 @@ using maxheap = std::priority_queue<T, vector<T>, decltype(&compare)>;
 IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
                                                       float bounds[],
                                                       float mMinIsolationKm) {
+  FileFormat fileFormat(FileFormat::Value::HGT3);
   int latMax = (int)ceil(bounds[1]);
   int lngMax = (int)ceil(bounds[3]);
   int latMin = (int)floor(bounds[0]);
@@ -47,7 +48,7 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
   for (int j = lngMin; j < lngMax; ++j) {
     for (int i = latMin; i < latMax; ++i) {
       IsolationFinderSl *finder =
-          new IsolationFinderSl(mCache, mSearchTree, i, j);
+          new IsolationFinderSl(mCache, mSearchTree, i, j, fileFormat);
       pFinders->push_back(finder);
     }
   }
@@ -67,7 +68,7 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
   int i = 0;
   vector<std::future<IsolationResults>> futureResults;
   vector<IsolationResults> results;
-  std::cout << "Start exact calculations" << std::endl;
+  //std::cout << "Start exact calculations" << std::endl;
   maxheap<IsolationResult> q(&compare);
   // Start exact calculations
   for (auto finder : finders) {
@@ -83,7 +84,7 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
     }
     newResults.mResults.clear();
   }
-  std::cout << "Start merging" << std::endl;
+  //std::cout << "Start merging" << std::endl;
   //   Merge results
   IsolationResults finalResults;
   TileCell newRoot(latMin, lngMin, latMax - latMin, lngMax - lngMin);
@@ -99,7 +100,7 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
   }
   delete mSearchTree;
   delete threadPool;
-  std::cout << "Sort final results by isolation" << std::endl;
+  //std::cout << "Sort final results by isolation" << std::endl;
   std::sort(finalResults.mResults.begin(), finalResults.mResults.end(),
             [](IsolationResult const &lhs, IsolationResult const &rhs) {
               return lhs.isolationKm > rhs.isolationKm;
