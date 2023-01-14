@@ -26,7 +26,7 @@ endif
 LIBS =
 
 # Disable easylogging++ logging to a file by default
-CCOMMONFLAGS = -DPLATFORM_LINUX -Wall -Werror -Wno-unused-variable -std=c++14 \
+CCOMMONFLAGS = -DPLATFORM_LINUX -Werror -Wno-unused-variable -std=c++14 \
 	-DELPP_NO_DEFAULT_LOG_FILE -DELPP_THREAD_SAFE -pthread
 CNORMALFLAGS = $(CCOMMONFLAGS) -O3 -ltbb
 CDEBUGFLAGS = $(CCOMMONFLAGS) -g -ltbb
@@ -69,6 +69,7 @@ ISOLATION_OBJS = \
 	${OUTDIR}/cell_memory_manager.o \
 	${OUTDIR}/cell.o \
 	${OUTDIR}/concurrent_isolation_results.o \
+	$(OUTDIR)/ilp_search_area_tree.o \
 	${OUTDIR}/isolation_finder_sl.o \
 	${OUTDIR}/isolation_sl_processor.o \
 	${OUTDIR}/sweepline_datastruct_naive.o \

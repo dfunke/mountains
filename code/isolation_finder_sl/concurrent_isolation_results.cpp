@@ -4,11 +4,10 @@
 
 #include <tbb/concurrent_vector.h>
 
-void ConcurrentIsolationResults::addResult(const LatLng &peakLocation, int elevation, const LatLng &higherLocation, float isolationKm) {
+void ConcurrentIsolationResults::addResult(const LatLng &peakLocation, int elevation, float isolationKm) {
   IsolationResult result;
   result.peak = peakLocation;
   result.peakElevation = elevation;
-  result.higher = higherLocation;
   result.isolationKm = isolationKm;
   mResults.push_back(result);
 }
