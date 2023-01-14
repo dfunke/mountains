@@ -1,20 +1,22 @@
 #ifndef _ISOLATION_SL_PROCESSOR_H_
 #define _ISOLATION_SL_PROCESSOR_H_
 
-#include "../tile_cache.h"
 #include "../isolation_results.h"
-#include "tile_cell.h"
+#include "../tile_cache.h"
+#include "ilp_search_area_tree.h"
 
 using std::vector;
 
 class IsolationSlProcessor {
 public:
-    explicit IsolationSlProcessor(TileCache *cache);
-    IsolationResults findIsolations(int numThreads, float bounds[], float mMinIsolationKm);
+  explicit IsolationSlProcessor(TileCache *cache);
+  IsolationResults findIsolations(int numThreads, float bounds[],
+                                  float mMinIsolationKm);
+
 private:
-    TileCache *mCache;
-    vector<IsolationResults> mBuckets;
-    TileCell *mTileTreeHead;
+  TileCache *mCache;
+  vector<IsolationResults> mBuckets;
+  ILPSearchAreaTree *mSearchTree;
 };
 
 #endif // _ISOLATION_SL_PROCESSOR_H_

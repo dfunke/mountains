@@ -34,26 +34,24 @@
 #include "tile_cell.h"
 #include "../tile.h"
 #include "../coordinate_system.h"
+#include "ilp_search_area_tree.h"
 
 #include <memory>
 
 
-using std::vector;
-
 class IsolationFinderSl {
 public:
-    explicit IsolationFinderSl(TileCache *tileCache, TileCell *tileCellTree, int minLat, int minLng, FileFormat format);
+    explicit IsolationFinderSl(TileCache *tileCache, ILPSearchAreaTree *ilpSearchTree, int minLat, int minLng, FileFormat format);
     ~IsolationFinderSl();
-    
     void fillPeakBuckets(float minIsolationKm);
     IsolationResults run(float minIsolationKm);
     
-    
+    bool nullPtrTile = false;
 private:
   
   SlEvent *mEventQueue;
   
-  TileCell *mTileCellTree;
+  ILPSearchAreaTree *mIlpSearchTree;
 
   std::size_t currSize = 0;
   TileCache *mTileCache;
@@ -71,7 +69,7 @@ private:
 
   void setup(const Tile* tile, const ConcurrentIsolationResults* prevResults);
 
-  void addPeakToBucket(const LatLng &peakLocation, int elevation, const LatLng &higherLocation, float isolationKm);
+  void addPeakToBucket(const LatLng &peakLocation, int elevation, float isolationKm);
 
   IsolationResults runSweepline(float mMinIsolationKm, bool fast);
 
