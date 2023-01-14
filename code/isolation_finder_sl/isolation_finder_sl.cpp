@@ -98,6 +98,7 @@ void IsolationFinderSl::setup(const Tile *tile,
     // skipVal = tile->width() / (tile->metersPerSample() * 4);
     //  Reduce to
     skipVal = mFormat.inMemorySamplesAcross() / (mFormat.degreesAcross() * 500);
+    //skipVal = 3;
     PeakFinder pfinder(tile);
     peaks = pfinder.findPeaks();
     // Get distance-scale from tile
@@ -107,10 +108,9 @@ void IsolationFinderSl::setup(const Tile *tile,
         LatLng point = mCoordinateSystem->getLatLng(Offsets(0, y));
         mLngDistanceScale[y] = cosf(degToRad(point.latitude()));
       }
-      mEventQueue =
-          new SlEvent[((width - 2) / skipVal) * ((height - 2) / skipVal) +
-                      peaks.size()];
     }
+    int queueSize = ((width - 2) / skipVal) * ((height - 2) / skipVal) + peaks.size();
+    mEventQueue = new SlEvent[queueSize];
   }
 
   // On SRTM 1 pixel overlapp
@@ -181,7 +181,7 @@ void IsolationFinderSl::setup(const Tile *tile,
   // std::cout << "Peaks: " << peaks.size() << std::endl;
 
   // Sort using height value
-  std::stable_sort(mEventQueue, mEventQueue + idx,
+  std::sort(mEventQueue, mEventQueue + idx,
                    [this](SlEvent const &lhs, SlEvent const &rhs) {
                      return lhs.getElev() > rhs.getElev();
                    });
@@ -312,6 +312,7 @@ void IsolationFinderSl::fillPeakBuckets(float mMinIsolationKm) {
   setup(tile, nullptr);
   delete tile;
   runSweepline(mMinIsolationKm, true);
+  return;
 }
 
 IsolationResults IsolationFinderSl::run(float mMinIsolationKm) {
