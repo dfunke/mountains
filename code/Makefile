@@ -28,9 +28,9 @@ LIBS =
 # Disable easylogging++ logging to a file by default
 CCOMMONFLAGS = -DPLATFORM_LINUX -Wall -Werror -Wno-unused-variable -std=c++14 \
 	-DELPP_NO_DEFAULT_LOG_FILE -DELPP_THREAD_SAFE -pthread
-CNORMALFLAGS = $(CCOMMONFLAGS) -O3
-CDEBUGFLAGS = $(CCOMMONFLAGS) -g
-LINKCOMMONFLAGS = -pthread
+CNORMALFLAGS = $(CCOMMONFLAGS) -O3 -ltbb
+CDEBUGFLAGS = $(CCOMMONFLAGS) -g -ltbb
+LINKCOMMONFLAGS = -pthread -ltbb
 LINKNORMALFLAGS = $(LINKCOMMONFLAGS)
 LINKDEBUGFLAGS = $(LINKCOMMONFLAGS)
 
@@ -66,6 +66,16 @@ COORDLIB_OBJS = \
 ISOLATION_OBJS = \
 	$(OUTDIR)/easylogging++.o \
 	$(OUTDIR)/file_format.o \
+	${OUTDIR}/cell_memory_manager.o \
+	${OUTDIR}/cell.o \
+	${OUTDIR}/concurrent_isolation_results.o \
+	${OUTDIR}/isolation_finder_sl.o \
+	${OUTDIR}/isolation_sl_processor.o \
+	${OUTDIR}/sweepline_datastruct_naive.o \
+	${OUTDIR}/sweepline_datastruct_quadtree_dynamic.o \
+	${OUTDIR}/sweepline_datastruct.o \
+	${OUTDIR}/sweepline_primitives.o \
+	${OUTDIR}/tile_cell.o \
 	$(OUTDIR)/isolation.o \
 	$(OUTDIR)/isolation_finder.o \
 	$(OUTDIR)/isolation_results.o \
@@ -155,6 +165,9 @@ $(OUTDIR)/compute_parents: $(COMPUTE_PARENTS_OBJS)
 	$(LINK) $^ $(LIBS) -o $@ $(LINKFLAGS)
 
 $(OUTDIR)/%.o : $(SOURCEDIR)/%.cpp
+	$(CC) $(CFLAGS) -I $(SOURCEDIR) -o $@ -c $< 
+
+$(OUTDIR)/%.o : $(SOURCEDIR)/isolation_finder_sl/%.cpp
 	$(CC) $(CFLAGS) -I $(SOURCEDIR) -o $@ -c $< 
 
 $(OUTDIR)/%.o : $(SOURCEDIR)/%.cc

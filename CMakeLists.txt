@@ -6,6 +6,11 @@ project(mountains,
     LANGUAGES CXX
 )
 
+set( CMAKE_C_FLAGS_DEBUG "" CACHE STRING "" )       
+set( CMAKE_CXX_FLAGS_DEBUG "" CACHE STRING "" )
+set( CMAKE_C_FLAGS_RELEASE "" CACHE STRING "" )
+set( CMAKE_CXX_FLAGS_RELEASE "" CACHE STRING "" )
+
 set(
 	BUILD_TARGETS
 	isolation
@@ -32,6 +37,7 @@ set (
 	-DELPP_THREAD_SAFE 
 	-pthread
 )
+
 set(
     POINTLIB_OBJS 
 	code/latlng.cpp
@@ -84,9 +90,10 @@ add_library(
 include_directories(external/glm)
 
 #tbb
-include(external/tbb/cmake/TBBBuild.cmake)
-tbb_build(TBB_ROOT external/tbb CONFIG_DIR TBB_DIR)
-find_package(TBB REQUIRED)
+# include(external/tbb/cmake/TBBBuild.cmake)
+#list(APPEND CMAKE_MODULE_PATH "external/tbb/cmake/")
+# tbb_build(TBB_ROOT external/tbb CONFIG_DIR TBB_DIR)
+#find_package(tbb REQUIRED)
 
 add_executable(
     isolation
@@ -118,7 +125,8 @@ target_link_libraries(
 	pointlib 
 	loaderlib 
 	coordlib
-	TBB::tbb
+	tbb
+	pthread
 )
 
 add_executable(
@@ -145,6 +153,7 @@ target_link_libraries(
 	pointlib 
 	loaderlib 
 	coordlib
+	pthread
 )
 
 add_executable(
