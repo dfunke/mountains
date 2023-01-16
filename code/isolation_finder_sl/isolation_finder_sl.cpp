@@ -181,7 +181,7 @@ void IsolationFinderSl::setup(const Tile *tile,
   // std::cout << "Peaks: " << peaks.size() << std::endl;
 
   // Sort using height value
-  std::sort(mEventQueue, mEventQueue + idx,
+  std::stable_sort(mEventQueue, mEventQueue + idx,
                    [this](SlEvent const &lhs, SlEvent const &rhs) {
                      return lhs.getElev() > rhs.getElev();
                    });

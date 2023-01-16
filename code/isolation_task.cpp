@@ -107,4 +107,5 @@ bool IsolationTask::run(float lat, float lng, const CoordinateSystem &coordinate
   }
 
   return results.save(mOutputDir, lat, lng);
+  return true;
 }

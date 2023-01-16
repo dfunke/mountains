@@ -90,6 +90,60 @@ ISOLATION_OBJS = \
 	$(POINTLIB) \
 	$(COORDLIB) \
 
+SPEEDTESTING_OBJS = \
+	$(OUTDIR)/easylogging++.o \
+	$(OUTDIR)/file_format.o \
+	${OUTDIR}/cell_memory_manager.o \
+	${OUTDIR}/cell.o \
+	${OUTDIR}/concurrent_isolation_results.o \
+	$(OUTDIR)/ilp_search_area_tree.o \
+	${OUTDIR}/isolation_finder_sl.o \
+	${OUTDIR}/isolation_sl_processor.o \
+	${OUTDIR}/sweepline_datastruct_naive.o \
+	${OUTDIR}/sweepline_datastruct_quadtree_dynamic.o \
+	${OUTDIR}/sweepline_datastruct.o \
+	${OUTDIR}/sweepline_primitives.o \
+	${OUTDIR}/tile_cell.o \
+	$(OUTDIR)/speedtesting.o \
+	$(OUTDIR)/isolation_finder.o \
+	$(OUTDIR)/isolation_results.o \
+	$(OUTDIR)/isolation_task.o \
+	$(OUTDIR)/peak_finder.o \
+	$(OUTDIR)/point_map.o \
+	$(OUTDIR)/tile.o \
+	$(OUTDIR)/tile_cache.o \
+	$(OUTDIR)/tile_loading_policy.o \
+	$(LOADERLIB) \
+	$(POINTLIB) \
+	$(COORDLIB) \
+
+CHECK_TILE_OBJS = \
+	$(OUTDIR)/easylogging++.o \
+	$(OUTDIR)/file_format.o \
+	${OUTDIR}/cell_memory_manager.o \
+	${OUTDIR}/cell.o \
+	${OUTDIR}/concurrent_isolation_results.o \
+	$(OUTDIR)/ilp_search_area_tree.o \
+	${OUTDIR}/isolation_finder_sl.o \
+	${OUTDIR}/isolation_sl_processor.o \
+	${OUTDIR}/sweepline_datastruct_naive.o \
+	${OUTDIR}/sweepline_datastruct_quadtree_dynamic.o \
+	${OUTDIR}/sweepline_datastruct.o \
+	${OUTDIR}/sweepline_primitives.o \
+	${OUTDIR}/tile_cell.o \
+	$(OUTDIR)/check_tile.o \
+	$(OUTDIR)/isolation_finder.o \
+	$(OUTDIR)/isolation_results.o \
+	$(OUTDIR)/isolation_task.o \
+	$(OUTDIR)/peak_finder.o \
+	$(OUTDIR)/point_map.o \
+	$(OUTDIR)/tile.o \
+	$(OUTDIR)/tile_cache.o \
+	$(OUTDIR)/tile_loading_policy.o \
+	$(LOADERLIB) \
+	$(POINTLIB) \
+	$(COORDLIB) \
+
 PROMINENCE_OBJS = \
 	$(OUTDIR)/divide_tree.o \
 	$(OUTDIR)/domain_map.o \
@@ -139,7 +193,7 @@ COMPUTE_PARENTS_OBJS = \
 
 
 all : makedirs $(OUTDIR)/isolation $(OUTDIR)/prominence $(OUTDIR)/merge_divide_trees \
-	 $(OUTDIR)/filter_points $(OUTDIR)/compute_parents
+	 $(OUTDIR)/filter_points $(OUTDIR)/compute_parents $(OUTDIR)/speedtesting $(OUTDIR)/check_tile
 
 $(POINTLIB) : $(POINTLIB_OBJS)
 	$(AR) $@ $^ 
@@ -151,6 +205,12 @@ $(COORDLIB): $(COORDLIB_OBJS)
 	$(AR) $@ $^ 
 
 $(OUTDIR)/isolation: $(ISOLATION_OBJS)
+	$(LINK) $^ $(LIBS) -o $@ $(LINKFLAGS)
+
+$(OUTDIR)/speedtesting: $(SPEEDTESTING_OBJS)
+	$(LINK) $^ $(LIBS) -o $@ $(LINKFLAGS)
+
+$(OUTDIR)/check_tile: $(CHECK_TILE_OBJS)
 	$(LINK) $^ $(LIBS) -o $@ $(LINKFLAGS)
 
 $(OUTDIR)/prominence: $(PROMINENCE_OBJS)
