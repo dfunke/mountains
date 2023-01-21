@@ -22,48 +22,22 @@
  * SOFTWARE.
  */
 
-#ifndef _PIXEL_ARRAY_H_
-#define _PIXEL_ARRAY_H_
+#ifndef _FABDEM_LOADER_H_
+#define _FABDEM_LOADER_H_
 
-#include "tile.h"
+#include "tile_loader.h"
 
-// A 2D array of integer values
 
-template<typename Pixel> class PixelArray {
+// Load a FABDEM tif tile.  This is similar to the format used by the
+// Copernicus GLO30 DEM, except that tiles have been resampled so that
+// tiles have the same width at all latitudes.
+
+class FabdemLoader : public TileLoader {
 public:
-  PixelArray(int width, int height) :
-    mWidth(width),
-    mHeight(height) {
-      // Initialize to empty
-      mPixels = new Pixel[mWidth * mHeight]();
-  }
-  
-  ~PixelArray() {
-    delete [] mPixels;
-  }
-
-  static const Pixel EmptyPixel = 0;
-
-  Pixel get(int x, int y) const {
-    return mPixels[y * mWidth + x];
-  }
-  
-  void set(int x, int y, Pixel value) {
-    mPixels[y * mWidth + x] = value;
-  }
-
-  // Set count pixels horizontally starting at (x, y) to the given value
-  void setRange(int x, int y, Pixel value, int count) {
-    Pixel *ptr = mPixels + y * mWidth + x;
-    for (int i = 0; i < count; ++i) {
-      *ptr++ = value;
-    }
-  }
+  // minLat and minLng name the SW corner of the tile, in degrees
+  virtual Tile *loadTile(const std::string &directory, float minLat, float minLng);
 
 private:
-  int mWidth;
-  int mHeight;
-  Pixel *mPixels;
 };
 
-#endif  // _PIXEL_ARRAY_H_
+#endif  // _FABDEM_LOADER_H_

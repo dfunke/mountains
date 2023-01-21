@@ -55,7 +55,9 @@ int FileFormat::inMemorySamplesAcross() const {
   case Value::HGT3:        return 1201;
   case Value::HGT1:       return 3603;
   case Value::THREEDEP_1M:  return 10001;
-  case Value::GLO30:      return 3601;
+  case Value::GLO30: // Fall through
+  case Value::FABDEM:
+    return 3601;
   default:
     LOG(ERROR) << "Couldn't compute tile size of unknown file format";
     exit(1);
@@ -70,7 +72,9 @@ float FileFormat::degreesAcross() const {
   case Value::NED19:      return 0.25f;
   case Value::HGT3:        return 1.0f;
   case Value::HGT1:       return 1.0f;
-  case Value::GLO30:      return 1.0f;
+  case Value::GLO30:  // Fall through
+  case Value::FABDEM:
+    return 1.0f;
   case Value::THREEDEP_1M:
     // This is a misnomer, as these tiles are in UTM coordinates.  The "degrees" across
     // means one x or y unit per tile (where each tile is 10000m in UTM).
@@ -92,7 +96,8 @@ CoordinateSystem *FileFormat::coordinateSystemForOrigin(float lat, float lng, in
   case Value::NED19:      
   case Value::HGT3:
   case Value::HGT1:
-  case Value::GLO30: {
+  case Value::GLO30:
+  case Value::FABDEM: {
     // The -1 removes overlap with neighbors
     int samplesPerDegreeLat = static_cast<int>((inMemorySamplesAcross() - 1) / degreesAcross());
     int samplesPerDegreeLng = static_cast<int>((inMemorySamplesAcross() - 1) / degreesAcross());
@@ -126,6 +131,7 @@ FileFormat *FileFormat::fromName(const string &name) {
     { "NED13-ZIP", Value::NED13_ZIP, },
     { "NED19",     Value::NED19, },
     { "GLO30",     Value::GLO30, },
+    { "FABDEM",    Value::FABDEM, },
     { "3DEP-1M",   Value::THREEDEP_1M, },
   };
 

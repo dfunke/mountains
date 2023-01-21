@@ -22,30 +22,23 @@
  * SOFTWARE.
  */
 
-#include "hgt_loader.h"
+#include "fabdem_loader.h"
 #include "tile.h"
 #include "util.h"
-#include "easylogging++.h"
-#include "file_format.h"
 
+#include "easylogging++.h"
+
+#include <math.h>
 #include <stdio.h>
 #include <string>
 
 using std::string;
 
-static const int16 HGT_NODATA_ELEVATION = -32768;
+static const float COPERNICUS_NODATA_ELEVATION = -32767.0f;
 
-static uint16 swapByteOrder16(uint16 us) {
-  return (us >> 8) | (us << 8);
-}
-
-HgtLoader::HgtLoader(FileFormat format) {
-  mFormat = format;
-}
-
-Tile *HgtLoader::loadTile(const std::string &directory, float minLat, float minLng) {
+Tile *FabdemLoader::loadTile(const std::string &directory, float minLat, float minLng) {
   char buf[100];
-  snprintf(buf, sizeof(buf), "%c%02d%c%03d.hgt",
+  snprintf(buf, sizeof(buf), "%c%02d%c%03d_FABDEM_V1-0.flt",
            (minLat >= 0) ? 'N' : 'S',
            abs(static_cast<int>(minLat)),
            (minLng >= 0) ? 'E' : 'W',
@@ -60,34 +53,44 @@ Tile *HgtLoader::loadTile(const std::string &directory, float minLat, float minL
     VLOG(3) << "Failed to open file " << filename;
     return nullptr;
   }
+
+  const int inputWidth = 3600;
+  const int inputHeight = 3600;
+  int num_raw_samples = inputWidth * inputHeight;
   
-  int num_samples = mFormat.rawSamplesAcross() * mFormat.rawSamplesAcross();
+  float *inbuf = new float[num_raw_samples];
   
-  int16 *inbuf = (int16 *) malloc(sizeof(int16) * num_samples);
-  
-  Tile *retval = nullptr;
-  
-  int samples_read = static_cast<int>(fread(inbuf, sizeof(int16), num_samples, infile));
-  if (samples_read != num_samples) {
+  int num_read = static_cast<int>(fread(inbuf, sizeof(float), num_raw_samples, infile));
+  fclose(infile);
+  if (num_read != num_raw_samples) {
     fprintf(stderr, "Couldn't read tile file: %s, got %d samples expecting %d\n",
-            filename.c_str(), samples_read, num_samples);
-    free(inbuf);
-  } else {
-    Elevation *samples = (Elevation *) malloc(sizeof(Elevation) * num_samples);
-    // SRTM data is in big-endian order; convert to Elevation
-    for (int i = 0; i < num_samples; ++i) {
-      int16 elevation = swapByteOrder16(inbuf[i]);
-      if (elevation == HGT_NODATA_ELEVATION) {
-        samples[i] = Tile::NODATA_ELEVATION;
-      } else {
-        samples[i] = static_cast<Elevation>(elevation);
-      }
-    }
-    retval = new Tile(mFormat.rawSamplesAcross(), mFormat.rawSamplesAcross(), samples, mFormat);
+            filename.c_str(), num_read, num_raw_samples);
+    delete [] inbuf;
+    return nullptr;
   }
 
-  free(inbuf);
-  fclose(infile);
+  // Overwrites samples array in-place
+  for (int i = 0; i < inputHeight; ++i) {
+    for (int j = 0; j < inputWidth; ++j) {
+      int index = i * inputWidth + j;
+      float sample = inbuf[index];
 
-  return retval;
+      // Some source data appears to be corrupt
+      if (isnan(sample)) {
+        VLOG(1) << "Got NaN pixel at " << i << " " << j;
+        sample = COPERNICUS_NODATA_ELEVATION;
+      }
+      
+      // Convert Copernicus NODATA to our NODATA
+      if (fabs(sample - COPERNICUS_NODATA_ELEVATION) < 0.01) {
+        inbuf[index] = Tile::NODATA_ELEVATION;
+      } else {
+        inbuf[index] = sample;
+      }
+    }
+  }
+  
+  Tile *tile = new Tile(inputWidth, inputHeight, inbuf, FileFormat::Value::FABDEM);
+
+  return tile;  
 }

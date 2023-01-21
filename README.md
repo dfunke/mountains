@@ -120,6 +120,12 @@ usage: run_glo_prominence.py [-h] [--tile_dir TILE_DIR]
                              min_lat max_lat min_lng max_lng
 ```
 
+#### FABDEM
+
+[FABDEM](https://data.bris.ac.uk/data/dataset/25wfy0f9ukoge2gs7a5mqpq2j7) (Forest And Buildings removed Copernicus DEM) is a version of the GLO30 data that has been modified by machine
+learning techniques to remove trees and buildings, leaving the bare earth.  To process FABDEM, use the same ```run_glo_prominence```
+Python script as with GLO30, giving the additional argument ```--format FABDEM```.
+
 #### USGS 1m terrain ("3DEP" = 3D Elevation Program)
 
 This LIDAR-based data is high resolution, but has spotty coverage.  This is raw LIDAR data converted
@@ -156,6 +162,7 @@ These X and Y coordinates also correspond to the naming of the tiles.
 | SRTM   | 90m        | global   | lat/lng |[Link](viewfinderpanoramas.com) |
 | NED1   | 30m        | US, Canada, Mexico | lat/lng | [Link](https://prd-tnm.s3.amazonaws.com/index.html?prefix=StagedProducts/Elevation/1/) |
 | GLO-30 | 30m        | global minus Azerbaijan and Armenia | lat/lng | [Link](https://registry.opendata.aws/copernicus-dem/) |
+| FABDEM | 30m        | GLO-30 minus < -60°S and > 80°N | lat/lng | [Link](https://data.bris.ac.uk/data/dataset/25wfy0f9ukoge2gs7a5mqpq2j7) |
 | NED13  | 10m        | US       | lat/lng | [Link](https://prd-tnm.s3.amazonaws.com/index.html?prefix=StagedProducts/Elevation/13)|
 | NED19  | 3m         | partial US | lat/lng | [Link](https://prd-tnm.s3.amazonaws.com/index.html?prefix=StagedProducts/Elevation/19) |
 | 3DEP1m | 1m         | partial US | UTM | [Link](https://prd-tnm.s3.amazonaws.com/index.html?prefix=StagedProducts/Elevation/1m/Projects/) |
@@ -204,11 +211,7 @@ too large to be merged or to load into Earth.  Use the pruned versions
 (identified by "pruned" in their filenames).
 
 Next, merge the resultant pruned divide trees into a single, larger divide
-tree.  If there are thousands of input files, it will be much faster
-to do this in multiple stages.  At the final stage, when you no longer
-need to do any merging, specify the "-f" flag to remove runoffs.  This
-will get rid of "junk" peaks around the edges, but you will not be able
-to further merge the resultant divide tree.
+tree.  Large merges can be done in parallel with multiple threads. 
 
 ```
 merge_divide_trees output_file_prefix input_file [...]
@@ -218,7 +221,13 @@ merge_divide_trees output_file_prefix input_file [...]
   Options:
   -f                Finalize output tree: delete all runoffs and then prune
   -m min_prominence Minimum prominence threshold for output, default = 100
+  -t num_threads    Number of threads to use, default = 1
 ```
+
+Specify the "-f" flag to get final output when you no longer need to perform
+any further merges.  (In previous versions, merge_divide_tree was serial, and it made sense to 
+merge in multiple stages, specifying -f only at the last stage.  Now you
+can generally merge everything in one parallel step.)
 
 The output is a dvt file with the merged divide tree, and a text file
 with prominence values.  If desired, the text file can be filtered to
@@ -258,7 +267,7 @@ latitude,longitude,elevation,key saddle latitude,key saddle longitude,prominence
 
 The units of elevation and prominence are the same as the input terrain data.
 
-A zip file with our prominence results for the world is [here](https://drive.google.com/file/d/0B3icWNhBosDXZmlEWldSLWVGOE0/view?usp=share_link&resourcekey=0-TZC_OGOqI5TFdfPE77Yl3g), with elevations in feet.
+A zip file with our prominence results for the world is [here](https://drive.google.com/file/d/1HnMIZemDu3MgyCu7Fdy-VJOsiXTN5sYW/view?usp=share_link), with elevations in meters, down to 100 feet (30.48m) of prominence.  A visualization of the results is [here](http://everymountainintheworld.com).
 
 ## Prominence parents and line parents
 
