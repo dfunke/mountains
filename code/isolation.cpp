@@ -70,6 +70,26 @@ int main(int argc, char **argv) {
 
   // Parse options
   START_EASYLOGGINGPP(argc, argv);
+
+  if (argc < 4) {
+    usage();
+  }
+  // Get first 4 options directly to avoid negative-numbers
+  // being used as options
+  argc -= optind;
+  argv += optind;
+  float bounds[4];
+  for (int i = 0; i < 4; ++i) {
+    char *endptr;
+    bounds[i] = strtof(argv[i], &endptr);
+    if (*endptr != 0) {
+      printf("Couldn't parse argument %d as number: %s\n", i + 1, argv[i]);
+      usage();
+    }
+  }
+  argc -= 3;
+  argv += 3;
+
   int ch;
   // Swallow --v that's parsed by the easylogging library
   const struct option long_options[] = {
@@ -96,23 +116,6 @@ int main(int argc, char **argv) {
     case 's':
       sweepline = true;
       break;
-    }
-  }
-
-  argc -= optind;
-  argv += optind;
-
-  if (argc < 4) {
-    usage();
-  }
-
-  float bounds[4];
-  for (int i = 0; i < 4; ++i) {
-    char *endptr;
-    bounds[i] = strtof(argv[i], &endptr);
-    if (*endptr != 0) {
-      printf("Couldn't parse argument %d as number: %s\n", i + 1, argv[i]);
-      usage();
     }
   }
 
