@@ -359,7 +359,7 @@ IsolationRecord IsolationFinder::checkNeighboringTile(float lat, float lng, cons
   if (mCache->getMaxElevation(lat, lng, &maxElevation) && elev > maxElevation) {
     return IsolationRecord();
   }
-  FileFormat format(FileFormat::Value::HGT);
+  FileFormat format(FileFormat::Value::HGT3);
   // Look in neighbor for nearest higher ground to close point
   CoordinateSystem *tileCoordinateSystem = format.coordinateSystemForOrigin(lat, lng);
 
