@@ -195,6 +195,8 @@ IsolationResults IsolationFinderSl::runSweepline(float mMinIsolationKm,
   // int counter = 0;
   // int level = 1;
   IsolationResults results;
+  int toMuchCount = 0;
+  bool atLeastOneInserted = false;
   // SweeplineDatastruct *sld = new SweeplineDatastructNaive(1200, 1200,
   // LatLng(maxLat, maxLng), LatLng(minLat, minLng));
   SweeplineDatastruct *sld;
@@ -231,6 +233,9 @@ IsolationResults IsolationFinderSl::runSweepline(float mMinIsolationKm,
   for (std::size_t i = 0; i < currSize; ++i) {
     SlEvent *node = &mEventQueue[i];
     if (node->isPeak()) {
+      if (!atLeastOneInserted) {
+        toMuchCount++;
+      }
       LatLng peakLoc = *node;
       IsolationRecord record = sld->calcPeak(node);
 
@@ -270,6 +275,7 @@ IsolationResults IsolationFinderSl::runSweepline(float mMinIsolationKm,
         // result.
       }
     } else {
+      atLeastOneInserted = true;
       sld->insert(node);
     }
     // if ((mFormat == FileFormat::HGT_DEM3 && counter % 3333 == 0) || (mFormat
@@ -282,6 +288,9 @@ IsolationResults IsolationFinderSl::runSweepline(float mMinIsolationKm,
     //     }
     // }
     // counter++;
+  }
+  if (!fast) {
+    std::cout << this->mMinLat << "," << this->mMinLng << "," << toMuchCount << std::endl;
   }
   delete sld;
   delete[] mEventQueue;

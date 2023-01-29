@@ -26,6 +26,7 @@
 
 #include "divide_tree.h"
 #include "island_tree.h"
+#include "ThreadPool.h"
 
 #include "easylogging++.h"
 #include "getopt_internal.h"
@@ -45,6 +46,7 @@ static void usage() {
   printf("  -f                Finalize output tree: delete all runoffs and then prune\n");
   printf("  -m min_prominence Minimum prominence threshold for output\n");
   printf("                    in same units as divide tree, default = 100\n");
+  printf("  -t num_threads    Number of threads to use, default = 1\n");
   exit(1);
 }
 
@@ -80,6 +82,7 @@ int main(int argc, char **argv) {
   Elevation minProminence = 100;
   bool finalize = false;
   bool flipElevations = false;
+  int numThreads = 1;
 
   // Parse options
   START_EASYLOGGINGPP(argc, argv);
@@ -91,7 +94,7 @@ int main(int argc, char **argv) {
     {"v", required_argument, nullptr, 0},
     {nullptr, 0, 0, 0},
   };
-  while ((ch = getopt_long(argc, argv, "afm:", long_options, nullptr)) != -1) {
+  while ((ch = getopt_long(argc, argv, "afm:t:", long_options, nullptr)) != -1) {
     switch (ch) {
     case 'a':
       flipElevations = true;
@@ -104,6 +107,10 @@ int main(int argc, char **argv) {
     case 'm':
       minProminence = static_cast<Elevation>(atof(optarg));
       break;
+
+    case 't':
+      numThreads = atoi(optarg);
+      break;      
     }
   }
   argc -= optind;
@@ -113,29 +120,55 @@ int main(int argc, char **argv) {
     usage();
   }
 
-  string outputFilename = argv[0];
-  DivideTree *divideTree = nullptr;
+  VLOG(1) << "Using " << numThreads << " threads";
+  
+  // Load all the initial trees
+  vector<DivideTree *> trees;
   for (int arg = 1; arg < argc; ++arg) {
     string inputFilename = argv[arg];
     VLOG(1) << "Loading tree from " << inputFilename;
-    
     DivideTree *newTree = DivideTree::readFromFile(inputFilename);
     if (newTree == nullptr) {
       LOG(ERROR) << "Failed to load divide tree from " << inputFilename;
       return 1;
     }
-
-    if (divideTree == nullptr) {
-      divideTree = newTree;
-    } else {
-      mergeTrees(divideTree, newTree);
-      delete newTree;
-    }
-
-    // Nuke any basin saddles created during merge
-    divideTree->compact();
+    trees.push_back(newTree);
   }
 
+  // Merge pairwise, like a binary tree of trees.  This is much faster
+  // than merging incrementally into a single tree when the number of trees
+  // is large (e.g. 3x faster for all of Australia).
+  auto threadPool = std::make_unique<ThreadPool>(numThreads);
+  while (trees.size() > 1) {
+    vector<std::future<DivideTree *>> results;
+    VLOG(1) << "Starting merge pass, # of remaining trees = " << trees.size();
+    for (int i = 0; i < (int) trees.size() / 2; ++i) {
+      results.push_back(threadPool->enqueue([=] {
+            mergeTrees(trees[2 * i], trees[2 * i + 1]);
+
+            // Nuke any basin saddles created during merge
+            trees[2 * i]->compact();
+
+            delete trees[2 * i + 1];
+            return trees[2 * i];
+          }));
+    }
+
+    vector<DivideTree *> newTrees;
+    for (auto && result : results) {
+      newTrees.push_back(result.get());
+    }
+    
+    // One leftover tree?
+    if (trees.size() % 2 == 1) {
+      newTrees.push_back(trees.back());
+    }
+
+    trees = newTrees;
+  }
+    
+  DivideTree *divideTree = trees[0];
+  
   //
   // Build island tree, compute prominence
   //
@@ -158,6 +191,7 @@ int main(int argc, char **argv) {
   VLOG(1) << "Writing outputs";
   
   // Write .dvt
+  string outputFilename = argv[0];
   if (!divideTree->writeToFile(outputFilename + ".dvt")) {
     LOG(ERROR) << "Failed to write merged divide tree to " << outputFilename;
   }
