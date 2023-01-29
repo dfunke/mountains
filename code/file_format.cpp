@@ -72,7 +72,7 @@ float FileFormat::degreesAcross() const {
   case Value::NED19:      return 0.25f;
   case Value::HGT3:        return 1.0f;
   case Value::HGT1:       return 1.0f;
-  case Value::GLO30:      return 1.0f;
+  case Value::GLO30:  // Fall through
   case Value::FABDEM:
     return 1.0f;
   case Value::THREEDEP_1M:
