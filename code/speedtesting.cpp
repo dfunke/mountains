@@ -175,20 +175,6 @@ int setupSrtmFolder(float *bounds, TileCache *cache)
                 {
                     std::cout << "copiing DEM-File" << std::endl;
                 }
-                // calculate max elevation
-                char buf[100];
-                sprintf(buf, "%c%02d%c%03d-maxelev.txt",
-                        (lat >= 0) ? 'N' : 'S',
-                        abs(lat),
-                        (lng >= 0) ? 'E' : 'W',
-                        abs(lng));
-                string fileName(buf);
-                fileName = "ln -s " + baseFolder + "/" + fileName + " " + testFolder;
-                success = system(fileName.c_str());
-                if (success < 0)
-                {
-                    std::cout << "linking maxelev file" << std::endl;
-                }
                 counter++;
             }
         }
