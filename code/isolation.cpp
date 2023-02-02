@@ -38,6 +38,7 @@
 #include <stdlib.h>
 #include <cmath>
 #include <set>
+#include <chrono>
 
 using std::ceil;
 using std::floor;
@@ -127,6 +128,7 @@ int main(int argc, char **argv) {
 
   VLOG(2) << "Using " << numThreads << " threads";
 
+  std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
   if (sweepline) {
     IsolationSlProcessor *processor = new IsolationSlProcessor(cache.get());
     IsolationResults res = processor->findIsolations(numThreads, bounds, minIsolation);
@@ -157,6 +159,9 @@ int main(int argc, char **argv) {
     printf("Tiles processed = %d\n", num_tiles_processed);
   }
 
+  std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
+  std::cout << "Isolation-finder time: " << time_span.count() << std::endl;
 
   return 0;
 }

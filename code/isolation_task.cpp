@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <memory>
 #include <set>
+#include <chrono>
 
 using std::set;
 using std::string;
@@ -48,6 +49,8 @@ IsolationTask::IsolationTask(TileCache *cache, const string &output_dir,
 }
 
 bool IsolationTask::run(float lat, float lng, const CoordinateSystem &coordinateSystem) {
+  std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
+
   // Load the main tile manually; cache could delete it if we allow it to be cached
   std::unique_ptr<Tile> tile(mCache->loadWithoutCaching(lat, lng, coordinateSystem));
   if (tile.get() == nullptr) {
@@ -75,7 +78,7 @@ bool IsolationTask::run(float lat, float lng, const CoordinateSystem &coordinate
   float minLng = mBounds[2];
   float maxLng = mBounds[3];
   
-  printf("Processing tile %.1f %.1f\n", lat, lng);
+  //printf("Processing tile %.1f %.1f\n", lat, lng);
 
   VLOG(1) << "Found " << peaks.size() << " peaks";
 
@@ -105,7 +108,9 @@ bool IsolationTask::run(float lat, float lng, const CoordinateSystem &coordinate
       results.addResult(peak, tile->get(offset), higher, -1);
     }
   }
-
-  return results.save(mOutputDir, lat, lng);
+  std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
+  std::cout << lat << "," << lng << "," << time_span.count() << std::endl;
+  //return results.save(mOutputDir, lat, lng);
   return true;
 }
