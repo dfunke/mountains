@@ -310,6 +310,7 @@ void IsolationFinderSl::fillPeakBuckets(float mMinIsolationKm) {
   mWidth = tile->width();
   mHeight = tile->height();
   setup(tile, nullptr);
+  tile->saveAsImage(mMinLat, mMinLng);
   delete tile;
   runSweepline(mMinIsolationKm, true);
   return;

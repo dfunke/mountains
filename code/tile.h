@@ -42,6 +42,8 @@ public:
   int width() const { return mWidth; }
   int height() const { return mHeight; }
 
+  void saveAsImage(float minLat, float minLng);
+
   bool isInExtents(int x, int y) const {
     return (x >= 0) && (x < mWidth) && (y >= 0) && (y < mHeight);
   }
