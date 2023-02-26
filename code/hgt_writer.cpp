@@ -3,6 +3,12 @@
 
 #include <string>
 
+static const int16 HGT_NODATA_ELEVATION = -32768;
+
+static uint16 swapByteOrder16(uint16 us) {
+  return (us >> 8) | (us << 8);
+}
+
 using std::string;
 void HgtWriter::writeTile(const std::string &directory, float minLat,
                           float minLng, Tile *t) {
@@ -24,33 +30,25 @@ void HgtWriter::writeTile(const std::string &directory, float minLat,
   int16 *outbuf = (int16 *)malloc(sizeof(int16) * num_samples);
 
   for (int i = 0; i < num_samples; ++i) {
-    int16 elev = static_cast<int16>(t->get(i / t->width(), i % t->width()));
-    //int16 elevation = swapByteOrder16(inbuf[i]);
-    if (elevation == HGT_NODATA_ELEVATION) {
-      samples[i] = Tile::NODATA_ELEVATION;
+    int x = i % t->width();
+    int y = i / t->width();
+    // std::cout << x << " " << y << " " << y * t->width() + x  << std::endl;
+    Elevation elev = t->get(x, y);
+    if (elev == Tile::NODATA_ELEVATION) {
+      outbuf[i] = swapByteOrder16(HGT_NODATA_ELEVATION);
     } else {
-      samples[i] = static_cast<Elevation>(elevation);
+      outbuf[i] = swapByteOrder16(elev);
     }
   }
 
-  Tile *retval = nullptr;
-
   std::size_t samples_write =
       fwrite(outbuf, sizeof(int16), num_samples, outfile);
-  if (samples_read != num_samples) {
+  if (samples_write != num_samples) {
     fprintf(stderr,
-            "Couldn't read tile file: %s, got %d samples expecting %d\n",
-            filename.c_str(), samples_read, num_samples);
-    free(inbuf);
-  } else {
-    Elevation *samples = (Elevation *)malloc(sizeof(Elevation) * num_samples);
-    // SRTM data is in big-endian order; convert to Elevation
-    retval = new Tile(mFormat.rawSamplesAcross(), mFormat.rawSamplesAcross(),
-                      samples, mFormat);
+            "Couldn't write tile file: %s, got %d samples expecting %d\n",
+            filename.c_str(), samples_write, num_samples);
+    free(outbuf);
   }
-
-  free(inbuf);
-  fclose(infile);
-
-  return retval;
+  free(outbuf);
+  fclose(outfile);
 }

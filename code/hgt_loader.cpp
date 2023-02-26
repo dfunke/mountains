@@ -77,6 +77,9 @@ Tile *HgtLoader::loadTile(const std::string &directory, float minLat, float minL
     // SRTM data is in big-endian order; convert to Elevation
     for (int i = 0; i < num_samples; ++i) {
       int16 elevation = swapByteOrder16(inbuf[i]);
+      if (static_cast<int16>(swapByteOrder16(elevation)) != inbuf[i]) {
+        std::cout << "Not same: " << swapByteOrder16(elevation) << ", " << inbuf[i] << std::endl;
+      }
       if (elevation == HGT_NODATA_ELEVATION) {
         samples[i] = Tile::NODATA_ELEVATION;
       } else {

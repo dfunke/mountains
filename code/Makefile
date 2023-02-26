@@ -145,6 +145,18 @@ CHECK_TILE_OBJS = \
 	$(POINTLIB) \
 	$(COORDLIB) \
 
+HGT_RES_INC_OBJECTS = \
+	$(OUTDIR)/easylogging++.o \
+	$(OUTDIR)/file_format.o \
+	$(OUTDIR)/tile.o \
+	$(OUTDIR)/tile_cache.o \
+	$(OUTDIR)/tile_loading_policy.o \
+	$(OUTDIR)/hgt_writer.o \
+	$(OUTDIR)/hgt_ingcrease_res.o \
+	$(LOADERLIB) \
+	$(POINTLIB) \
+	$(COORDLIB) \
+
 PROMINENCE_OBJS = \
 	$(OUTDIR)/divide_tree.o \
 	$(OUTDIR)/domain_map.o \
@@ -193,8 +205,7 @@ COMPUTE_PARENTS_OBJS = \
 	$(COORDLIB) \
 
 
-all : makedirs $(OUTDIR)/isolation $(OUTDIR)/prominence $(OUTDIR)/merge_divide_trees \
-	 $(OUTDIR)/filter_points $(OUTDIR)/compute_parents $(OUTDIR)/speedtesting $(OUTDIR)/check_tile
+all : makedirs $(OUTDIR)/hgt_ingcrease_res
 
 $(POINTLIB) : $(POINTLIB_OBJS)
 	$(AR) $@ $^ 
@@ -212,6 +223,9 @@ $(OUTDIR)/speedtesting: $(SPEEDTESTING_OBJS)
 	$(LINK) $^ $(LIBS) -o $@ $(LINKFLAGS)
 
 $(OUTDIR)/check_tile: $(CHECK_TILE_OBJS)
+	$(LINK) $^ $(LIBS) -o $@ $(LINKFLAGS)
+
+$(OUTDIR)/hgt_ingcrease_res: $(HGT_RES_INC_OBJECTS)
 	$(LINK) $^ $(LIBS) -o $@ $(LINKFLAGS)
 
 $(OUTDIR)/prominence: $(PROMINENCE_OBJS)

@@ -91,7 +91,8 @@ Tile *FabdemLoader::loadTile(const std::string &directory, float minLat, float m
     }
   }
   
-  Tile *tile = new Tile(inputWidth, inputHeight, inbuf, FileFormat::Value::FABDEM);
+  //Tile *tile = new Tile(inputWidth, inputHeight, inbuf, FileFormat::Value::FABDEM);
+  Tile *tile;
 
   return tile;  
 }
