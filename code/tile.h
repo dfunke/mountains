@@ -70,6 +70,8 @@ public:
     return mFormat;
   }
 
+  void saveAsImage(std::string dir, float lat, float lng);
+
   // Flip elevations so that depressions and mountains are swapped.
   // No-data values are left unchanged.
   void flipElevations();
