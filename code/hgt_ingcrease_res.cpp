@@ -38,10 +38,11 @@ Tile *incRes(Tile* base, FileFormat oldFormat, FileFormat newFormat) {
             Elevation x2y1 = base->get(x2, y1);
             Elevation x1y2 = base->get(x1, y2);
             Elevation x2y2 = base->get(x2, y2);
-            Elevation e1 = (x - x1) * x1y1 + (1-x - x1) * x2y1;
-            Elevation e2 = (x - x1) * x1y2 + (1-x - x1) * x2y2;
-            Elevation erg = (y - y1) * e1 + (1-y -y1) * e2;
-            samples[j * newFormat.rawSamplesAcross() + i] = erg;
+            Elevation e1 = (x - x1) * x1y1 + (1- x + x1) * x2y1;
+            Elevation e2 = (x - x1) * x1y2 + (1-x + x1) * x2y2;
+            Elevation erg = (y - y1) * e1 + (1-y + y1) * e2;
+            int idx = j * newFormat.rawSamplesAcross() + i;
+            samples[idx] = erg;
         }
     }
     Tile *erg = new Tile(newFormat.rawSamplesAcross(), newFormat.rawSamplesAcross(), samples, newFormat);
@@ -64,12 +65,16 @@ int main(int argc, char **argv)
     Tile *higherRes = incRes(t, fileFormat, higherFormat);
     higherRes->saveAsImage("/home/pc/tmp", 46, 9);
 
-    HgtWriter writer(higherFormat);
-    writer.writeTile(saveFolder.c_str(), 46, 9, higherRes);
+    HgtWriter writer(fileFormat);
+    writer.writeTile(saveFolder.c_str(), 46, 9, t);
     
     // Compare tiles
-    BasicTileLoadingPolicy policy2(saveFolder.c_str(),fileFormat);
+    /*
+     BasicTileLoadingPolicy policy2(saveFolder.c_str(),fileFormat);
     TileCache *cache2 = new TileCache(&policy2, 0);
+    Tile *t2 = cache2->loadWithoutCaching(46, 9, *coordinateSystem);
+    
+    
     Tile *t2 = cache2->loadWithoutCaching(46, 9, *coordinateSystem);
     for (int i = 0; i < t->width(); i++) {
         for (int j = 0; j < t->height(); j++) {
@@ -80,6 +85,9 @@ int main(int argc, char **argv)
             }
         }
     }
+    delete t2;
+    */
+    delete t;
     return 0;
 }
 
