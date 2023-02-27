@@ -28,17 +28,20 @@ Tile *incRes(Tile* base, FileFormat oldFormat, FileFormat newFormat) {
     Elevation *samples = (Elevation *) malloc(sizeof(Elevation) * num_samples);
     for (int j = 0; j < newFormat.rawSamplesAcross(); j++) {
         for (int i = 0; i < newFormat.rawSamplesAcross(); i++) {
-            int idx = j * newFormat.rawSamplesAcross() + i;
-
             float x = i / ratio;
             float y = j / ratio;
             int x1 = floor(x);
             int x2 = ceil(x);
             int y1 = floor(y);
             int y2 = ceil(y);
-            Elevation e1 = (x - x1) * base->get(x1, y1) + (1-x - x1) * base->get(x2, y1);
-            Elevation e2 = (x - x1) * base->get(x1, y2) + (1-x - x1) * base->get(x2, y2);
-            samples[idx] = (y - y1) * e1 + (1-y -y1) * e2;
+            Elevation x1y1 = base->get(x1, y1);
+            Elevation x2y1 = base->get(x2, y1);
+            Elevation x1y2 = base->get(x1, y2);
+            Elevation x2y2 = base->get(x2, y2);
+            Elevation e1 = (x - x1) * x1y1 + (1-x - x1) * x2y1;
+            Elevation e2 = (x - x1) * x1y2 + (1-x - x1) * x2y2;
+            Elevation erg = (y - y1) * e1 + (1-y -y1) * e2;
+            samples[j * newFormat.rawSamplesAcross() + i] = erg;
         }
     }
     Tile *erg = new Tile(newFormat.rawSamplesAcross(), newFormat.rawSamplesAcross(), samples, newFormat);
@@ -56,26 +59,27 @@ int main(int argc, char **argv)
     TileCache *cache = new TileCache(&policy, 0);
     CoordinateSystem *coordinateSystem = fileFormat.coordinateSystemForOrigin(46.f, 9.f);
     Tile *t = cache->loadWithoutCaching(46, 9, *coordinateSystem);
+    t->saveAsImage("/home/pc/tmp", 45, 9);
     FileFormat higherFormat(FileFormat::Value::HGT1);
     Tile *higherRes = incRes(t, fileFormat, higherFormat);
+    higherRes->saveAsImage("/home/pc/tmp", 46, 9);
 
     HgtWriter writer(higherFormat);
     writer.writeTile(saveFolder.c_str(), 46, 9, higherRes);
     
     // Compare tiles
-    /*
     BasicTileLoadingPolicy policy2(saveFolder.c_str(),fileFormat);
     TileCache *cache2 = new TileCache(&policy2, 0);
     Tile *t2 = cache2->loadWithoutCaching(46, 9, *coordinateSystem);
     for (int i = 0; i < t->width(); i++) {
         for (int j = 0; j < t->height(); j++) {
             Offsets o(i,j);
-            if (t->get(o) != t2->get(o)) {
+            if (t->get(i, j) != t2->get( 3*i, 3*j)) {
                 std::cout << "Diff at: " << i <<", "  << j << " t1: " << t->get(o) << " t2: " << t2->get(o) << std::endl;
                 
             }
         }
-    }*/
+    }
     return 0;
 }
 
