@@ -15,7 +15,10 @@
 
 using std::vector;
 
-IsolationSlProcessor::IsolationSlProcessor(TileCache *cache) { mCache = cache; }
+IsolationSlProcessor::IsolationSlProcessor(TileCache *cache, FileFormat format) { 
+  mCache = cache; 
+  mFormat = format;
+}
 
 bool compare(IsolationResult const &el, IsolationResult const &er) {
   // Sort by peak possition
@@ -31,7 +34,6 @@ using maxheap = std::priority_queue<T, vector<T>, decltype(&compare)>;
 IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
                                                       float bounds[],
                                                       float mMinIsolationKm) {
-  FileFormat fileFormat(FileFormat::Value::HGT3);
   int latMax = (int)ceil(bounds[1]);
   int lngMax = (int)ceil(bounds[3]);
   int latMin = (int)floor(bounds[0]);
@@ -48,7 +50,7 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
   for (int j = lngMin; j < lngMax; ++j) {
     for (int i = latMin; i < latMax; ++i) {
       IsolationFinderSl *finder =
-          new IsolationFinderSl(mCache, mSearchTree, i, j, fileFormat);
+          new IsolationFinderSl(mCache, mSearchTree, i, j, mFormat);
       pFinders->push_back(finder);
     }
   }
