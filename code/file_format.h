@@ -36,6 +36,7 @@ public:
   enum class Value {
     HGT3,  // SRTM (90m, 3 arcsecond)
     HGT1, // SRTM (30m, 1 arcsecond)
+    HGT04, // HGT (12m, 0.4 arcsecond)
     NED19,     // FLT file containing NED 1/9 arcsecond data
     NED13_ZIP, // ZIP file containing FLT NED 1/3 arcsecond data
     NED1_ZIP,  // ZIP file containing FLT NED 1 arcsecond data
