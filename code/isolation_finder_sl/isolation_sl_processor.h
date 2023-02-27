@@ -9,7 +9,7 @@ using std::vector;
 
 class IsolationSlProcessor {
 public:
-  explicit IsolationSlProcessor(TileCache *cache);
+  explicit IsolationSlProcessor(TileCache *cache, FileFormat format);
   IsolationResults findIsolations(int numThreads, float bounds[],
                                   float mMinIsolationKm);
 
@@ -17,6 +17,7 @@ private:
   TileCache *mCache;
   vector<IsolationResults> mBuckets;
   ILPSearchAreaTree *mSearchTree;
+  FileFormat mFormat;
 };
 
 #endif // _ISOLATION_SL_PROCESSOR_H_

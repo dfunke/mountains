@@ -57,12 +57,14 @@ static void usage() {
   printf("  -m min_isolation Minimum isolation threshold for output, default = 1km\n");
   printf("  -o directory     Directory for output data\n");
   printf("  -t num_threads   Number of threads, default = 1\n");
+  printf("  -f format        Tile format. Possible formats: SRTM3, SRTM1, SRTM04\n");
   exit(1);
 }
 
 int main(int argc, char **argv) {
   string terrain_directory(".");
   string output_directory(".");
+  string file_format_name("SRTM3");
 
   float minIsolation = 1;
   int numThreads = 1;
@@ -79,6 +81,7 @@ int main(int argc, char **argv) {
   argc -= optind;
   argv += optind;
   float bounds[4];
+  
   for (int i = 0; i < 4; ++i) {
     char *endptr;
     bounds[i] = strtof(argv[i], &endptr);
@@ -96,22 +99,22 @@ int main(int argc, char **argv) {
     {"v", required_argument, nullptr, 0},
     {nullptr, 0, 0, 0},
   };
-  while ((ch = getopt_long(argc, argv, "i:m:o:t:s", long_options, nullptr)) != -1) {
+  while ((ch = getopt_long(argc, argv, "i:m:o:t:f:s", long_options, nullptr)) != -1) {
     switch (ch) {
     case 'i':
       terrain_directory = optarg;
       break;
-
     case 'm':
       minIsolation = (float) atof(optarg);
       break;
-
     case 'o':
       output_directory = optarg;
       break;
-
     case 't':
       numThreads = atoi(optarg);
+      break;
+    case 'f':
+      file_format_name = optarg;
       break;
     case 's':
       sweepline = true;
@@ -120,15 +123,19 @@ int main(int argc, char **argv) {
   }
 
   // TODO: Maybe support other file formats in the future?
-  FileFormat fileFormat(FileFormat::Value::HGT3);
-  BasicTileLoadingPolicy policy(terrain_directory, fileFormat);
+  FileFormat *fileFormat = FileFormat::fromName(file_format_name);
+  if (fileFormat == nullptr) {
+    printf("Did not recognize format %s\n", file_format_name);
+    return 1;
+  }
+  BasicTileLoadingPolicy policy(terrain_directory, *fileFormat);
   const int CACHE_SIZE = 50;
   auto cache = std::make_unique<TileCache>(&policy, CACHE_SIZE);
 
   VLOG(2) << "Using " << numThreads << " threads";
 
   if (sweepline) {
-    IsolationSlProcessor *processor = new IsolationSlProcessor(cache.get());
+    IsolationSlProcessor *processor = new IsolationSlProcessor(cache.get(), *fileFormat);
     IsolationResults res = processor->findIsolations(numThreads, bounds, minIsolation);
     res.saveSl(output_directory, bounds[0], bounds[1], bounds[2], bounds[3]);
   } else {
@@ -138,7 +145,7 @@ int main(int argc, char **argv) {
     for (auto lat = (float) floor(bounds[0]); lat < ceil(bounds[1]); lat += 1) {
       for (auto lng = (float) floor(bounds[2]); lng < ceil(bounds[3]); lng += 1) {
         std::shared_ptr<CoordinateSystem> coordinateSystem(
-          fileFormat.coordinateSystemForOrigin(lat, lng));
+          fileFormat->coordinateSystemForOrigin(lat, lng));
         
         IsolationTask *task = new IsolationTask(
           cache.get(), output_directory, bounds, minIsolation);

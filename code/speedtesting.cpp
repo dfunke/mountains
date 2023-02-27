@@ -280,7 +280,7 @@ int conductSpeedComparrisonTests() {
                 }
                 else
                 {
-                    IsolationSlProcessor *finder = new IsolationSlProcessor(cache);
+                    IsolationSlProcessor *finder = new IsolationSlProcessor(cache, fileFormat);
                     IsolationResults res = finder->findIsolations(threads, bounds, 1);
                 }
                 delete cache;
@@ -361,7 +361,7 @@ int testCaseWithDem1Data() {
             }
             else
             {
-                IsolationSlProcessor *finder = new IsolationSlProcessor(cache);
+                IsolationSlProcessor *finder = new IsolationSlProcessor(cache, fileFormat);
                 IsolationResults res = finder->findIsolations(threads, bounds, 1);
             }
             delete cache;
