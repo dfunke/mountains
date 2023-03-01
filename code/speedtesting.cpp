@@ -224,7 +224,7 @@ int conductSpeedComparrisonTests() {
     using namespace std::chrono;
     int threads = 1;
     bool old = false;
-    FileFormat fileFormat(FileFormat::Value::HGT3);
+    FileFormat fileFormat(FileFormat::Value::HGT1);
     BasicTileLoadingPolicy policy(testFolder.c_str(),fileFormat);
     const int CACHE_SIZE = 50;
     auto setupCache = std::make_unique<TileCache>(&policy, CACHE_SIZE);
