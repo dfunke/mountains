@@ -45,7 +45,7 @@ void HgtWriter::writeTile(const std::string &directory, float minLat,
       fwrite(outbuf, sizeof(int16), num_samples, outfile);
   if (samples_write != num_samples) {
     fprintf(stderr,
-            "Couldn't write tile file: %s, got %d samples expecting %d\n",
+            "Couldn't write tile file: %s, got %ld samples expecting %d\n",
             filename.c_str(), samples_write, num_samples);
     free(outbuf);
   }
