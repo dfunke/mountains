@@ -31,15 +31,15 @@ using std::ceil;
 using std::floor;
 using std::string;
 
-//static const string baseFolder = "/data02/funke/SRTM/viewfinderpanoramas.org/dem3";
-//static const string baseFolderDem1 = "/data02/funke/SRTM/viewfinderpanoramas.org/dem1";
-//static const string testFolder = "/home/huening/SRTM";
-//static const string testResultFile = "/home/huening/multi-threading-all-new.txt";
+static const string baseFolder = "/data02/funke/SRTM/viewfinderpanoramas.org/dem3";
+static const string baseFolderDem1 = "/data02/funke/SRTM/viewfinderpanoramas.org/dem1";
+static const string testFolder = "/home/huening/SRTM";
+static const string testResultFile = "/home/huening/testresults-old-without-lake-superior.txt";
 
-static const string baseFolder = "/home/pc/Data2/SRTM-DEM3";
-static const string baseFolderDem1 = "/home/pc/Data2/SRTM-DEM1";
-static const string testFolder = "/home/pc/SRTM";
-static const string testResultFile = "/home/pc/tmp/testresults.txt";
+//static const string baseFolder = "/home/pc/Data2/SRTM-DEM3";
+//static const string baseFolderDem1 = "/home/pc/Data2/SRTM-DEM1";
+//static const string testFolder = "/home/pc/SRTM";
+//static const string testResultFile = "/home/pc/tmp/testresults.txt";
 
 struct TestCase
 {
@@ -241,11 +241,12 @@ int conductSpeedComparrisonTests() {
 
         for (int j = 0; j < 1; j++)
         {
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 1; i++)
             {
                 if (i == 0)
                 {
-                    old = rand() % 2;
+                    //old = rand() % 2;
+                    old = true;
                 }
                 else
                 {
