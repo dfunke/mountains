@@ -123,19 +123,20 @@ int main(int argc, char **argv) {
   }
 
   // TODO: Maybe support other file formats in the future?
-  FileFormat *fileFormat = FileFormat::fromName(file_format_name);
-  if (fileFormat == nullptr) {
+  FileFormat *fileFormatPtr = FileFormat::fromName(file_format_name);
+  if (fileFormatPtr == nullptr) {
     printf("Did not recognize format %s\n", file_format_name);
     return 1;
   }
-  BasicTileLoadingPolicy policy(terrain_directory, *fileFormat);
+  FileFormat fileFormat = *fileFormatPtr;
+  BasicTileLoadingPolicy policy(terrain_directory, fileFormat);
   const int CACHE_SIZE = 50;
   auto cache = std::make_unique<TileCache>(&policy, CACHE_SIZE);
 
   VLOG(2) << "Using " << numThreads << " threads";
 
   if (sweepline) {
-    IsolationSlProcessor *processor = new IsolationSlProcessor(cache.get(), *fileFormat);
+    IsolationSlProcessor *processor = new IsolationSlProcessor(cache.get(), fileFormat);
     IsolationResults res = processor->findIsolations(numThreads, bounds, minIsolation);
     res.saveSl(output_directory, bounds[0], bounds[1], bounds[2], bounds[3]);
   } else {
@@ -145,12 +146,12 @@ int main(int argc, char **argv) {
     for (auto lat = (float) floor(bounds[0]); lat < ceil(bounds[1]); lat += 1) {
       for (auto lng = (float) floor(bounds[2]); lng < ceil(bounds[3]); lng += 1) {
         std::shared_ptr<CoordinateSystem> coordinateSystem(
-          fileFormat->coordinateSystemForOrigin(lat, lng));
+          fileFormat.coordinateSystemForOrigin(lat, lng));
         
         IsolationTask *task = new IsolationTask(
           cache.get(), output_directory, bounds, minIsolation);
         results.push_back(threadPool->enqueue([=] {
-              return task->run(lat, lng, *coordinateSystem);
+              return task->run(lat, lng, *coordinateSystem, fileFormat);
             }));
       }
     }

@@ -37,7 +37,7 @@ using std::string;
 //static const string testResultFile = "/home/huening/multi-threading-all-new.txt";
 
 static const string baseFolder = "/home/pc/Data2/SRTM-DEM3";
-static const string baseFolderDem1 = "/home/pc/Data2/SRTM-DEM1";
+static const string baseFolderDem1 = "/home/pc/SRTM-DEM1";
 static const string testFolder = "/home/pc/SRTM";
 static const string testResultFile = "/home/pc/tmp/testresults.txt";
 
@@ -265,7 +265,7 @@ int conductSpeedComparrisonTests() {
                                 fileFormat.coordinateSystemForOrigin(lat + 0.f, lng + 0.f));
                             IsolationTask *task = new IsolationTask(cache, "~/tmp", bounds, 1);
                             results.push_back(threadPool->enqueue([=]
-                                                                  { return task->run(lat, lng, *coordinateSystem); }));
+                                                                  { return task->run(lat, lng, *coordinateSystem, fileFormat); }));
                         }
                     }
                     int num_tiles_processed = 0;
@@ -310,7 +310,7 @@ int testCaseWithDem1Data() {
     using namespace std::chrono;
     int threads = 1;
     bool old = false;
-    FileFormat fileFormat(FileFormat::Value::HGT3);
+    FileFormat fileFormat(FileFormat::Value::HGT1);
     BasicTileLoadingPolicy policy(testFolder.c_str(),fileFormat);
     const int CACHE_SIZE = 50;
     PointMap *peakbagger_peaks = new PointMap();
@@ -346,7 +346,7 @@ int testCaseWithDem1Data() {
                             fileFormat.coordinateSystemForOrigin(lat + 0.f, lng + 0.f));
                         IsolationTask *task = new IsolationTask(cache, "~/tmp", bounds, 1);
                         results.push_back(threadPool->enqueue([=]
-                                                              { return task->run(lat, lng, *coordinateSystem); }));
+                                                              { return task->run(lat, lng, *coordinateSystem, fileFormat); }));
                     }
                 }
                 int num_tiles_processed = 0;
@@ -389,6 +389,7 @@ int testCaseWithDem1Data() {
 int main(int argc, char **argv)
 {
     START_EASYLOGGINGPP(argc, argv);
-    return conductSpeedComparrisonTests();
+    //return conductSpeedComparrisonTests();
+    return testCaseWithDem1Data();
     //return testSpecificArea();
 }
