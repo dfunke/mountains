@@ -10,7 +10,7 @@ using std::vector;
 class IsolationSlProcessor {
 public:
   explicit IsolationSlProcessor(TileCache *cache, FileFormat format);
-  IsolationResults findIsolations(int numThreads, float bounds[],
+  double findIsolations(int numThreads, float bounds[],
                                   float mMinIsolationKm);
 
 private:

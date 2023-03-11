@@ -125,7 +125,7 @@ int main(int argc, char **argv) {
   // TODO: Maybe support other file formats in the future?
   FileFormat *fileFormat = FileFormat::fromName(file_format_name);
   if (fileFormat == nullptr) {
-    printf("Did not recognize format %s\n", file_format_name);
+    printf("Did not recognize format %s\n", file_format_name.c_str());
     return 1;
   }
   BasicTileLoadingPolicy policy(terrain_directory, *fileFormat);
@@ -136,8 +136,8 @@ int main(int argc, char **argv) {
 
   if (sweepline) {
     IsolationSlProcessor *processor = new IsolationSlProcessor(cache.get(), *fileFormat);
-    IsolationResults res = processor->findIsolations(numThreads, bounds, minIsolation);
-    res.saveSl(output_directory, bounds[0], bounds[1], bounds[2], bounds[3]);
+    //IsolationResults res = processor->findIsolations(numThreads, bounds, minIsolation);
+    //res.saveSl(output_directory, bounds[0], bounds[1], bounds[2], bounds[3]);
   } else {
     auto threadPool = std::make_unique<ThreadPool>(numThreads);
     int num_tiles_processed = 0;

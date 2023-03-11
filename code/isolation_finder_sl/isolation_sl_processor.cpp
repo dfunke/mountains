@@ -6,17 +6,20 @@
 #include "../tile_cache.h"
 #include "cell_memory_manager.h"
 #include "concurrent_isolation_results.h"
-#include "isolation_finder_sl.h"
 #include "ilp_search_area_tree.h"
+#include "isolation_finder_sl.h"
 
 #include <algorithm>
+#include <chrono>
 #include <unordered_set>
 #include <vector>
 
 using std::vector;
+using namespace std::chrono;
 
-IsolationSlProcessor::IsolationSlProcessor(TileCache *cache, FileFormat format) { 
-  mCache = cache; 
+IsolationSlProcessor::IsolationSlProcessor(TileCache *cache,
+                                           FileFormat format) {
+  mCache = cache;
   mFormat = format;
 }
 
@@ -31,20 +34,18 @@ bool compare(IsolationResult const &el, IsolationResult const &er) {
 template <typename T>
 using maxheap = std::priority_queue<T, vector<T>, decltype(&compare)>;
 
-IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
-                                                      float bounds[],
-                                                      float mMinIsolationKm) {
+double IsolationSlProcessor::findIsolations(int numThreads, float bounds[],
+                                            float mMinIsolationKm) {
+  double time = 0;
+  high_resolution_clock::time_point t1 = high_resolution_clock::now();
   int latMax = (int)ceil(bounds[1]);
   int lngMax = (int)ceil(bounds[3]);
   int latMin = (int)floor(bounds[0]);
   int lngMin = (int)floor(bounds[2]);
-  mSearchTree=
+  mSearchTree =
       new ILPSearchAreaTree(latMin, lngMin, latMax - latMin, lngMax - lngMin);
-  ThreadPool *threadPool = new ThreadPool(numThreads);
-  vector<std::future<void>> voidFutures;
-  // Create Buckets and build TileTree
   vector<IsolationFinderSl *> finders;
-  //std::cout << "Start building tile-tree" << std::endl;
+  // std::cout << "Start building tile-tree" << std::endl;
   vector<IsolationFinderSl *> *pFinders = &finders;
   // create finders
   for (int j = lngMin; j < lngMax; ++j) {
@@ -54,40 +55,49 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
       pFinders->push_back(finder);
     }
   }
-
+  high_resolution_clock::time_point t2 = high_resolution_clock::now();
+  duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+  time = time_span.count();
   // Fille Buckets step
+
   for (auto &finder : finders) {
-    voidFutures.push_back(threadPool->enqueue(
-        [=] { return finder->fillPeakBuckets(mMinIsolationKm); }));
+    Tile *tile = finder->getTile();
+    if (tile != nullptr) {
+      t1 = high_resolution_clock::now();
+      finder->fillPeakBuckets(mMinIsolationKm, tile);
+      t2 = high_resolution_clock::now();
+      time_span = duration_cast<duration<double>>(t2 - t1);
+      time += time_span.count();
+    }
   }
 
-  for (auto &&waitFor : voidFutures) {
-    waitFor.get();
-  }
-
+  t1 = high_resolution_clock::now();
   // Proccess all unbound peaks
   mSearchTree->proccessUnbound();
   int i = 0;
-  vector<std::future<IsolationResults>> futureResults;
   vector<IsolationResults> results;
-  //std::cout << "Start exact calculations" << std::endl;
+  // std::cout << "Start exact calculations" << std::endl;
   maxheap<IsolationResult> q(&compare);
+  t2 = high_resolution_clock::now();
+  time_span = duration_cast<duration<double>>(t2 - t1);
+  time += time_span.count();
   // Start exact calculations
   for (auto finder : finders) {
     if (!finder->nullPtrTile) {
-      futureResults.push_back(
-        threadPool->enqueue([=] { return finder->run(mMinIsolationKm); }));
+      Tile *t = finder->getTile();
+      t1 = high_resolution_clock::now();
+      IsolationResults res = finder->run(mMinIsolationKm, t);
+      for (IsolationResult &oneRes : res.mResults) {
+        q.emplace(oneRes);
+      }
+      t2 = high_resolution_clock::now();
+      time_span = duration_cast<duration<double>>(t2 - t1);
+      time += time_span.count();
     }
   }
-  for (auto &res : futureResults) {
-    IsolationResults newResults = res.get();
-    for (IsolationResult &oneResult : newResults.mResults) {
-      q.emplace(oneResult);
-    }
-    newResults.mResults.clear();
-  }
-  //std::cout << "Start merging" << std::endl;
-  //   Merge results
+  // std::cout << "Start merging" << std::endl;
+  //    Merge results
+  t1 = high_resolution_clock::now();
   IsolationResults finalResults;
   TileCell newRoot(latMin, lngMin, latMax - latMin, lngMax - lngMin);
   while (!q.empty()) {
@@ -101,39 +111,15 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
     }
   }
   delete mSearchTree;
-  delete threadPool;
-  //std::cout << "Sort final results by isolation" << std::endl;
+  // std::cout << "Sort final results by isolation" << std::endl;
   std::sort(finalResults.mResults.begin(), finalResults.mResults.end(),
             [](IsolationResult const &lhs, IsolationResult const &rhs) {
               return lhs.isolationKm > rhs.isolationKm;
             });
   IsolationResults finalFinalResults;
   // merge multiple detected peaks (with nearly same isolation)
-  if (finalResults.mResults.size() == 0) {
-    return finalResults;
-  }
-  // Filter out dublicates
-  // for (std::size_t i = 1; i < finalResults.mResults.size(); ++i)
-  //{
-  //    // Check if peaks are nearly identical
-  //    if (r.peak.distance(finalResults.mResults[i].peak) < 900)
-  //    {
-  //        // assume identical peak, use one with smaller isolation
-  //        if (finalResults.mResults[i].isolationKm < r.isolationKm)
-  //        {
-  //            r = finalResults.mResults[i];
-  //        }
-  //    }
-  //    else
-  //    {
-  //        finalFinalResults.mResults.push_back(r);
-  //        r = finalResults.mResults[i];
-  //    }
-  //    // Add last result
-  //    if (i == finalResults.mResults.size() - 1)
-  //    {
-  //        finalFinalResults.mResults.push_back(r);
-  //    }
-  //}
-  return finalResults;
+  t2 = high_resolution_clock::now();
+  time_span = duration_cast<duration<double>>(t2 - t1);
+  time += time_span.count();
+  return time;
 }

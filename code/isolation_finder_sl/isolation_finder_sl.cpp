@@ -297,6 +297,10 @@ void IsolationFinderSl::addPeakToBucket(const LatLng &peakLocation,
   delete isolationPoint;
 }
 
+Tile *IsolationFinderSl::getTile() {
+  return mTileCache->loadWithoutCaching(mMinLat, mMinLng, *mCoordinateSystem);
+}
+
 void IsolationFinderSl::fillPeakBuckets(float mMinIsolationKm) {
   Tile *tile =
       mTileCache->loadWithoutCaching(mMinLat, mMinLng, *mCoordinateSystem);
@@ -304,25 +308,35 @@ void IsolationFinderSl::fillPeakBuckets(float mMinIsolationKm) {
     nullPtrTile = true;
     return;
   }
+  fillPeakBuckets(mMinIsolationKm, tile);
+  delete tile;
+}
+
+void IsolationFinderSl::fillPeakBuckets(float mMinIsolationKm, Tile *tile) {
   mIlpSearchTree->registerTile(mMinLat, mMinLng, tile->maxElevation());
   mMaxLat = mMinLat + mFormat.degreesAcross();
   mMaxLng = mMinLng + mFormat.degreesAcross();
   mWidth = tile->width();
   mHeight = tile->height();
   setup(tile, nullptr);
-  delete tile;
   runSweepline(mMinIsolationKm, true);
   return;
 }
 
+
 IsolationResults IsolationFinderSl::run(float mMinIsolationKm) {
   Tile *tile =
       mTileCache->loadWithoutCaching(mMinLat, mMinLng, *mCoordinateSystem);
+  IsolationResults res = run(mMinIsolationKm, tile);
+  delete tile;
+  return res;
+}
+
+IsolationResults IsolationFinderSl::run(float mMinIsolationKm, Tile *tile) {
   ConcurrentIsolationResults *results =
       mIlpSearchTree->findBucket(mMinLat, mMinLng);
   setup(tile, results);
   delete results;
-  delete tile;
   return runSweepline(mMinIsolationKm, false);
 }
 
