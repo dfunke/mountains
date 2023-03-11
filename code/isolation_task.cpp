@@ -75,7 +75,7 @@ bool IsolationTask::run(float lat, float lng, const CoordinateSystem &coordinate
   float minLng = mBounds[2];
   float maxLng = mBounds[3];
   
-  printf("Processing tile %.1f %.1f\n", lat, lng);
+  //printf("Processing tile %.1f %.1f\n", lat, lng);
 
   VLOG(1) << "Found " << peaks.size() << " peaks";
 
@@ -106,6 +106,6 @@ bool IsolationTask::run(float lat, float lng, const CoordinateSystem &coordinate
     }
   }
 
-  return results.save(mOutputDir, lat, lng);
+  //return results.save(mOutputDir, lat, lng);
   return true;
 }

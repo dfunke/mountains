@@ -179,7 +179,7 @@ int conductSpeedComparrisonTests() {
   using namespace std::chrono;
   int threads = 1;
   bool old = false;
-  FileFormat fileFormat(FileFormat::Value::HGT04);
+  FileFormat fileFormat(FileFormat::Value::HGT1);
   BasicTileLoadingPolicy policy(testFolder.c_str(), fileFormat);
   const int CACHE_SIZE = 50;
   auto setupCache = std::make_unique<TileCache>(&policy, CACHE_SIZE);
@@ -196,10 +196,10 @@ int conductSpeedComparrisonTests() {
               << bounds[2] << " " << bounds[3] << " " << std::endl;
 
     for (int j = 0; j < 1; j++) {
-      for (int i = 0; i < 1; i++) {
+      for (int i = 0; i < 2; i++) {
         if (i == 0) {
-          // old = rand() % 2;
-          old = false;
+          old = rand() % 2;
+          //old = false;
         } else {
           old = !old;
         }
@@ -217,7 +217,7 @@ int conductSpeedComparrisonTests() {
               IsolationTask *task =
                   new IsolationTask(cache, "~/tmp", bounds, 1);
               results.push_back(threadPool->enqueue(
-                  [=] { return task->run(lat, lng, *coordinateSystem); }));
+                  [=] { return task->run(lat, lng, *coordinateSystem, fileFormat); }));
             }
           }
           int num_tiles_processed = 0;

@@ -128,8 +128,7 @@ int main(int argc, char **argv) {
     printf("Did not recognize format %s\n", file_format_name.c_str());
     return 1;
   }
-  FileFormat fileFormat = *fileFormatPtr;
-  BasicTileLoadingPolicy policy(terrain_directory, fileFormat);
+  BasicTileLoadingPolicy policy(terrain_directory, *fileFormat);
   const int CACHE_SIZE = 50;
   auto cache = std::make_unique<TileCache>(&policy, CACHE_SIZE);
 
@@ -146,12 +145,12 @@ int main(int argc, char **argv) {
     for (auto lat = (float) floor(bounds[0]); lat < ceil(bounds[1]); lat += 1) {
       for (auto lng = (float) floor(bounds[2]); lng < ceil(bounds[3]); lng += 1) {
         std::shared_ptr<CoordinateSystem> coordinateSystem(
-          fileFormat.coordinateSystemForOrigin(lat, lng));
+          fileFormat->coordinateSystemForOrigin(lat, lng));
         
         IsolationTask *task = new IsolationTask(
           cache.get(), output_directory, bounds, minIsolation);
         results.push_back(threadPool->enqueue([=] {
-              return task->run(lat, lng, *coordinateSystem, fileFormat);
+              return task->run(lat, lng, *coordinateSystem, *fileFormat);
             }));
       }
     }
@@ -164,7 +163,5 @@ int main(int argc, char **argv) {
       
     printf("Tiles processed = %d\n", num_tiles_processed);
   }
-
-
   return 0;
 }
