@@ -26,6 +26,7 @@
 #ifndef _ISOLATION_TASK_H_
 #define _ISOLATION_TASK_H_
 
+#include "file_format.h"
 #include "tile_cache.h"
 
 #include <string>
@@ -39,7 +40,7 @@ public:
   // Returns true if a tile was processed, false if tile couldn't be loaded.
   // lat, lng define the tile to analyze.
   // Output is written to output_dir.
-  bool run(float lat, float lng, const CoordinateSystem &coordinateSystem);
+  bool run(float lat, float lng, const CoordinateSystem &coordinateSystem, const FileFormat format);
 
 private:
   TileCache *mCache;
