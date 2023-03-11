@@ -31,13 +31,13 @@ using std::ceil;
 using std::floor;
 using std::string;
 
-//static const string baseFolder =
-//    "/data02/funke/SRTM/viewfinderpanoramas.org/dem3";
-//static const string baseFolderDem1 =
-//    "/data02/funke/SRTM/viewfinderpanoramas.org/dem1";
-//static const string testFolder = "/home/huening/SRTM";
-//static const string testResultFile =
-//    "/home/huening/testresults-old-without-lake-superior.txt";
+// static const string baseFolder =
+//     "/data02/funke/SRTM/viewfinderpanoramas.org/dem3";
+// static const string baseFolderDem1 =
+//     "/data02/funke/SRTM/viewfinderpanoramas.org/dem1";
+// static const string testFolder = "/home/huening/SRTM";
+// static const string testResultFile =
+//     "/home/huening/testresults-old-without-lake-superior.txt";
 
 static const string baseFolder = "/home/pc/Data2/SRTM-DEM3";
 static const string baseFolderDem1 = "/home/pc/Data2/SRTM-DEM1";
@@ -179,7 +179,7 @@ int conductSpeedComparrisonTests() {
   using namespace std::chrono;
   int threads = 1;
   bool old = false;
-  FileFormat fileFormat(FileFormat::Value::HGT1);
+  FileFormat fileFormat(FileFormat::Value::HGT04);
   BasicTileLoadingPolicy policy(testFolder.c_str(), fileFormat);
   const int CACHE_SIZE = 50;
   auto setupCache = std::make_unique<TileCache>(&policy, CACHE_SIZE);
@@ -199,7 +199,7 @@ int conductSpeedComparrisonTests() {
       for (int i = 0; i < 1; i++) {
         if (i == 0) {
           // old = rand() % 2;
-          old = true;
+          old = false;
         } else {
           old = !old;
         }
@@ -242,8 +242,8 @@ int conductSpeedComparrisonTests() {
           oldTimes += time_span.count();
           std::cout << "old" << time_span.count() << std::endl;
         } else {
-          //times += time_span.count();
-          //std::cout << "new" << time_span.count() << std::endl;
+          // times += time_span.count();
+          // std::cout << "new" << time_span.count() << std::endl;
         }
       }
     }

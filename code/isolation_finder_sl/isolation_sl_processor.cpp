@@ -46,13 +46,13 @@ double IsolationSlProcessor::findIsolations(int numThreads, float bounds[],
       new ILPSearchAreaTree(latMin, lngMin, latMax - latMin, lngMax - lngMin);
   vector<IsolationFinderSl *> finders;
   // std::cout << "Start building tile-tree" << std::endl;
-  vector<IsolationFinderSl *> *pFinders = &finders;
+
   // create finders
   for (int j = lngMin; j < lngMax; ++j) {
     for (int i = latMin; i < latMax; ++i) {
       IsolationFinderSl *finder =
           new IsolationFinderSl(mCache, mSearchTree, i, j, mFormat);
-      pFinders->push_back(finder);
+      finders.push_back(finder);
     }
   }
   high_resolution_clock::time_point t2 = high_resolution_clock::now();
@@ -83,8 +83,9 @@ double IsolationSlProcessor::findIsolations(int numThreads, float bounds[],
   time += time_span.count();
   // Start exact calculations
   for (auto finder : finders) {
-    if (!finder->nullPtrTile) {
+    
       Tile *t = finder->getTile();
+      if (t != nullptr) {
       t1 = high_resolution_clock::now();
       IsolationResults res = finder->run(mMinIsolationKm, t);
       for (IsolationResult &oneRes : res.mResults) {

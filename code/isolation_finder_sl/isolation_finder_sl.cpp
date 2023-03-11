@@ -26,6 +26,7 @@
 
 using std::pair;
 using std::vector;
+static const std::size_t DEM04_LEAF_SIZE= 4952; // will create 7 levels
 static const std::size_t DEM1_LEAF_SIZE =
     3166; // 12967201 points in DEM1, leafeSize 3166 will create 6 level.
 static const std::size_t DEM3_LEAF_SIZE = 370; //  353
@@ -217,6 +218,12 @@ IsolationResults IsolationFinderSl::runSweepline(float mMinIsolationKm,
       break;
     case FileFormat::Value::HGT1:
       sld = new SweeplineDatastructQuadtreeStatic<DEM1_LEAF_SIZE>(
+          mMinLat, mMaxLat, mMinLng, mMaxLng,
+          (mWidth / skipVal) * (mHeight / skipVal),
+          [=](float lat, float lng) { return this->toOffsets(lat, lng); });
+      break;
+    case FileFormat::Value::HGT04:
+        sld = new SweeplineDatastructQuadtreeStatic<DEM04_LEAF_SIZE>(
           mMinLat, mMaxLat, mMinLng, mMaxLng,
           (mWidth / skipVal) * (mHeight / skipVal),
           [=](float lat, float lng) { return this->toOffsets(lat, lng); });

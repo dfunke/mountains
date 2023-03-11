@@ -61,8 +61,10 @@ Tile *incTileRes(Tile *base, FileFormat oldFormat, FileFormat newFormat) {
       float y = j / ratio;
       int x1 = floor(x);
       int x2 = ceil(x);
+      x2 = std::min(x2, oldFormat.rawSamplesAcross()-1);
       int y1 = floor(y);
       int y2 = ceil(y);
+      y2 = std::min(y2, oldFormat.rawSamplesAcross()-1);
       Elevation x1y1 = base->get(x1, y1);
       Elevation x2y1 = base->get(x2, y1);
       Elevation x1y2 = base->get(x1, y2);
