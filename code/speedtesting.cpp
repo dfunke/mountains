@@ -230,9 +230,7 @@ int conductSpeedComparrisonTests() {
         } else {
           IsolationSlProcessor *finder =
               new IsolationSlProcessor(cache, fileFormat);
-          double time = finder->findIsolations(threads, bounds, 1);
-          std::cout << "new" << time << std::endl;
-          times += time;
+          IsolationResults res = finder->findIsolations(threads, bounds, 1);
         }
         delete cache;
         high_resolution_clock::time_point t2 = high_resolution_clock::now();
@@ -242,8 +240,8 @@ int conductSpeedComparrisonTests() {
           oldTimes += time_span.count();
           std::cout << "old" << time_span.count() << std::endl;
         } else {
-          // times += time_span.count();
-          // std::cout << "new" << time_span.count() << std::endl;
+          times += time_span.count();
+          std::cout << "new" << time_span.count() << std::endl;
         }
       }
     }
