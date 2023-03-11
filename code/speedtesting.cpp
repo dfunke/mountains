@@ -205,6 +205,7 @@ int conductSpeedComparrisonTests() {
         }
         high_resolution_clock::time_point t1 = high_resolution_clock::now();
         TileCache *cache = new TileCache(&policy, CACHE_SIZE);
+        cache->resetLoadingTime();
         if (old) {
           ThreadPool *threadPool = new ThreadPool(threads);
           vector<std::future<bool>> results;
@@ -232,17 +233,20 @@ int conductSpeedComparrisonTests() {
               new IsolationSlProcessor(cache, fileFormat);
           IsolationResults res = finder->findIsolations(threads, bounds, 1);
         }
-        delete cache;
+        
         high_resolution_clock::time_point t2 = high_resolution_clock::now();
         duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
 
         if (old) {
-          oldTimes += time_span.count();
-          std::cout << "old" << time_span.count() << std::endl;
+          double time = time_span.count() - cache->getLoadingTime();
+          oldTimes += time;
+          std::cout << "old" << time << std::endl;
         } else {
-          times += time_span.count();
-          std::cout << "new" << time_span.count() << std::endl;
+          double time = time_span.count() - cache->getLoadingTime();
+          times += time;
+          std::cout << "new" << time << std::endl;
         }
+        delete cache;
       }
     }
     times = times / 1.0;

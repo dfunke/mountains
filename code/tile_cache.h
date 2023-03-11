@@ -52,9 +52,10 @@ public:
   // If we've ever loaded the tile with the given minimum lat/lng, set elev to its maximum
   // elevation and return true, otherwise return false.
   bool getMaxElevation(float lat, float lng, Elevation *elev);
-  
+  void resetLoadingTime() { mLoadingTime = 0; }
+  double getLoadingTime() { return mLoadingTime; }
 private:
-
+  double mLoadingTime;
   Lock mLock;
   lru_cache<int, Tile *> mCache;
   TileLoadingPolicy *mLoadingPolicy;
