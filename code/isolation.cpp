@@ -125,7 +125,7 @@ int main(int argc, char **argv) {
   // TODO: Maybe support other file formats in the future?
   FileFormat *fileFormat = FileFormat::fromName(file_format_name);
   if (fileFormat == nullptr) {
-    printf("Did not recognize format %s\n", file_format_name);
+    printf("Did not recognize format %s\n", file_format_name.c_str());
     return 1;
   }
   BasicTileLoadingPolicy policy(terrain_directory, *fileFormat);
