@@ -36,10 +36,11 @@
 using std::vector;
 
 IsolationFinder::IsolationFinder(TileCache *cache, const Tile *tile,
-                                 const CoordinateSystem &coordinateSystem) {
+                                 const CoordinateSystem &coordinateSystem, FileFormat format) {
   mTile = tile;
   mCache = cache;
   mCoordinateSystem = std::unique_ptr<CoordinateSystem>(coordinateSystem.clone());
+  mFormat = format;
 }
 
 IsolationRecord IsolationFinder::findIsolation(Offsets peak) const {
@@ -359,9 +360,8 @@ IsolationRecord IsolationFinder::checkNeighboringTile(float lat, float lng, cons
   if (mCache->getMaxElevation(lat, lng, &maxElevation) && elev > maxElevation) {
     return IsolationRecord();
   }
-  FileFormat format(FileFormat::Value::HGT3);
   // Look in neighbor for nearest higher ground to close point
-  CoordinateSystem *tileCoordinateSystem = format.coordinateSystemForOrigin(lat, lng);
+  CoordinateSystem *tileCoordinateSystem = mFormat.coordinateSystemForOrigin(lat, lng);
 
   Tile *neighbor = mCache->getOrLoad(lat, lng, *tileCoordinateSystem);
   if (neighbor != nullptr) {

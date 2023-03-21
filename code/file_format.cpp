@@ -38,8 +38,8 @@ int FileFormat::rawSamplesAcross() const {
   case Value::NED1_ZIP:   return 3612;
   case Value::NED19:      return 8112;
   case Value::HGT3:        return 1201;
-  case Value::HGT1:       return 3603;
-  case Value::HGT04:       return 9007;
+  case Value::HGT1:       return 3601;
+  case Value::HGT04:       return 9001;
   case Value::THREEDEP_1M:  return 10012;
   default:
     // In particular, fail on GLO, because this number is variable with latitude.
@@ -54,8 +54,8 @@ int FileFormat::inMemorySamplesAcross() const {
   case Value::NED1_ZIP:   return 3601;
   case Value::NED19:      return 8101;
   case Value::HGT3:        return 1201;
-  case Value::HGT1:       return 3603;
-  case Value::HGT04:       return 9007;
+  case Value::HGT1:       return 3601;
+  case Value::HGT04:       return 9001;
   case Value::THREEDEP_1M:  return 10001;
   case Value::GLO30: // Fall through
   case Value::FABDEM:
@@ -91,7 +91,7 @@ bool FileFormat::isUtm() const {
   return mValue == Value::THREEDEP_1M;
 }
 
-CoordinateSystem *FileFormat::coordinateSystemForOrigin(float lat, float lng, int utmZone) {
+CoordinateSystem *FileFormat::coordinateSystemForOrigin(float lat, float lng, int utmZone) const {
   switch (mValue) {
   case Value::NED13_ZIP:  // fall through
   case Value::NED1_ZIP:   
