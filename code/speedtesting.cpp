@@ -130,6 +130,11 @@ vector<TestCase> getUsTestCase() {
     return testCases;
 }
 
+
+TestCase getNorthAmerika() {
+    return TestCase(12,90,-168,-51,502);
+}
+
 bool fileExists(const char* fileName) {
     FILE *file;
    if (file = fopen(fileName, "r")) {
@@ -146,7 +151,7 @@ void writeToTestResults(std::size_t tileCount, double oldTime, double newTime) {
     outfile.close();
 }
 
-int setupSrtmFolder(float *bounds, TileCache *cache)
+int setupSrtmFolder(float *bounds)
 {
   int counter = 0;
     string cleanCommand = "rm " + testFolder + "/*";
@@ -236,7 +241,7 @@ int conductSpeedComparrisonTests() {
         // float bounds[4] = {34, (34.f + t/d), -118,(-118.f + t)};
         // float bounds[4] = {47, (47.f + t/d), 1,(1.f + t)};
 
-        setupSrtmFolder(bounds, setupCache.get());
+        setupSrtmFolder(bounds);
         std::cout << "Start Processing " << bounds[0] << " " << bounds[1] << " " << bounds[2] << " " << bounds[3] << " " << std::endl;
 
         for (int j = 0; j < 1; j++)
@@ -316,7 +321,7 @@ int testCaseWithDem1Data() {
     PointMap *peakbagger_peaks = new PointMap();
     TileCache *setupCache = new TileCache(&policy, CACHE_SIZE);
     float bounds[4] = {-90, 90, -180, 180};
-    setupSrtmFolder(bounds, setupCache);
+    setupSrtmFolder(bounds);
     addDem1ToTestFolder(bounds, setupCache);
     double times = 0;
     double oldTimes = 0;
@@ -390,6 +395,9 @@ int main(int argc, char **argv)
 {
     START_EASYLOGGINGPP(argc, argv);
     //return conductSpeedComparrisonTests();
-    return testCaseWithDem1Data();
+    //return testCaseWithDem1Data();
+    TestCase testCase = getNorthAmerika();
+    float bounds[4] = {testCase.minLat, testCase.maxLat, testCase.minLng, testCase.maxLng};
+    setupSrtmFolder(bounds);
     //return testSpecificArea();
 }
