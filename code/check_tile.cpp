@@ -61,6 +61,12 @@ Offsets toOffests(float latitude, float longitude, int width, int height) {
   return Offsets(x, y);
 }
 
+struct IsolationResultDiff {
+  IsolationResult r1;
+  IsolationResult r2;
+  float diff;
+};
+
 int compare() {
   IsolationResults *newRes =
       IsolationResults::loadFromFile("/home/pc/tmp", 1, 2);
@@ -72,6 +78,7 @@ int compare() {
   FileFormat fileFormat(FileFormat::Value::HGT3);
   BasicTileLoadingPolicy policy(terrain_directory.c_str(), fileFormat);
   TileCache *cache = new TileCache(&policy, 1);
+  std::vector<IsolationResultDiff> diffs;
 
   for (auto res : newRes->mResults) {
     if (res.isolationKm < 3) {
@@ -84,56 +91,36 @@ int compare() {
       if (oldRes->mResults[i].isolationKm < 3) {
         break;
       }
-      if (std::pow(oldRes->mResults[i].peak.latitude() - res.peak.latitude(),
-                   2) +
-              std::pow(oldRes->mResults[i].peak.longitude() -
-                           res.peak.longitude(),
-                       2) <
-          0.0005) {
+      if (oldRes->mResults[i].peak == res.peak) {
         foundOne = true;
         resInOld = oldRes->mResults[i];
-        if (std::abs(res.isolationKm - resInOld.isolationKm) < 1) {
-          break;
+        if (std::abs(res.isolationKm - resInOld.isolationKm) > 0) {
+          IsolationResultDiff resDiff;
+          resDiff.r1 = res;
+          resDiff.r2 = resInOld;
+          resDiff.diff = resInOld.isolationKm - res.isolationKm;
+          diffs.push_back(resDiff);
         }
-        if (std::abs(res.isolationKm - resInOld.isolationKm) > 1) {
-          std::shared_ptr<CoordinateSystem> coordinateSystemNew(
-              fileFormat.coordinateSystemForOrigin(
-                  std::floor(res.higher.latitude()),
-                  floor(res.higher.longitude())));
-          Tile *resHigherTile = cache->getOrLoad(
-              std::floor(res.higher.latitude()), floor(res.higher.longitude()),
-              *coordinateSystemNew);
-          std::shared_ptr<CoordinateSystem> coordinateSystemOld(
-              fileFormat.coordinateSystemForOrigin(
-                  floor(resInOld.higher.latitude()),
-                  floor(resInOld.higher.longitude())));
-          Tile *resOldHigherTile = cache->getOrLoad(
-              floor(res.higher.latitude()), floor(res.higher.longitude()),
-              *coordinateSystemOld);
-
-          char line[300];
-          sprintf(line,
-                  "%f,%f,%f,%f,%f,%f, %f,     %f,%f,%f,%f,%f,%f, %f,     %f",
-                  res.peak.latitude(), res.peak.longitude(), res.peakElevation,
-                  res.higher.latitude(), res.higher.longitude(),
-                  resHigherTile->get(toOffests(
-                      res.higher.latitude(), res.higher.longitude(),
-                      resHigherTile->width(), resHigherTile->height())),
-                  res.isolationKm, resInOld.peak.latitude(),
-                  resInOld.peak.longitude(), resInOld.peakElevation,
-                  resInOld.higher.latitude(), resInOld.higher.longitude(),
-                  resOldHigherTile->get(toOffests(
-                      resInOld.higher.latitude(), resInOld.higher.longitude(),
-                      resOldHigherTile->width(), resOldHigherTile->height())),
-                  resInOld.isolationKm, resInOld.isolationKm - res.isolationKm);
-          std::cout << line << std::endl;
-        }
+        break;
       }
     }
     if (!foundOne) {
       std::cout << "Did not find: " << res.peak.latitude() << " "
                 << res.peak.longitude() << std::endl;
     }
+  }
+  std::sort(diffs.begin(), diffs.end(),
+            [](IsolationResultDiff const &lhs, IsolationResultDiff const &rhs) {
+              return lhs.diff > rhs.diff;
+            });
+
+  for (auto &diff : diffs) {
+    printf("%f,%f,%f,%f,%f,  %f,%f,%f,%f,%f,  %f\n", diff.r1.peak.latitude(),
+           diff.r1.peak.longitude(), diff.r1.higher.latitude(),
+           diff.r1.higher.longitude(), diff.r1.isolationKm,
+           diff.r2.peak.latitude(), diff.r2.peak.longitude(),
+           diff.r2.higher.latitude(), diff.r2.higher.longitude(),
+           diff.r2.isolationKm, diff.diff);
   }
 
   return 0;
@@ -143,7 +130,7 @@ int main(int argc, char **argv) {
   START_EASYLOGGINGPP(argc, argv);
 
   return compare();
-  //return mergeOldResults();
+  // return mergeOldResults();
 
   int ch;
   string terrain_directory("/home/pc/Data2/SRTM-DEM3/");
