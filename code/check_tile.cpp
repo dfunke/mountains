@@ -64,6 +64,7 @@ Offsets toOffests(float latitude, float longitude, int width, int height) {
 struct IsolationResultDiff {
   IsolationResult r1;
   IsolationResult r2;
+  float ilpDistance;
   float diff;
 };
 
@@ -94,11 +95,12 @@ int compare() {
       if (oldRes->mResults[i].peak == res.peak) {
         foundOne = true;
         resInOld = oldRes->mResults[i];
-        if (std::abs(res.isolationKm - resInOld.isolationKm) > 0) {
-          IsolationResultDiff resDiff;
-          resDiff.r1 = res;
-          resDiff.r2 = resInOld;
-          resDiff.diff = resInOld.isolationKm - res.isolationKm;
+        IsolationResultDiff resDiff;
+        resDiff.r1 = res;
+        resDiff.r2 = resInOld;
+        resDiff.diff = resInOld.isolationKm - res.isolationKm;
+        if (resDiff.diff > 0.5 || resDiff.diff < -0.5) {
+          resDiff.ilpDistance = resInOld.higher.distanceEllipsoid(res.higher) / 1000;
           diffs.push_back(resDiff);
         }
         break;
@@ -113,16 +115,17 @@ int compare() {
             [](IsolationResultDiff const &lhs, IsolationResultDiff const &rhs) {
               return lhs.diff > rhs.diff;
             });
-
+  string filename = "/home/pc/tmp/peak_diffs.txt";
+  FILE *outFile = fopen(filename.c_str(), "w");
+  fprintf(outFile, "peakLat,peakLng,ilp1Lat,ilp1Lng,isolation1,ilp2Lat,ilp2Lng,isolation2,ilpDistance,diff\n");
   for (auto &diff : diffs) {
-    printf("%f,%f,%f,%f,%f,  %f,%f,%f,%f,%f,  %f\n", diff.r1.peak.latitude(),
-           diff.r1.peak.longitude(), diff.r1.higher.latitude(),
-           diff.r1.higher.longitude(), diff.r1.isolationKm,
-           diff.r2.peak.latitude(), diff.r2.peak.longitude(),
-           diff.r2.higher.latitude(), diff.r2.higher.longitude(),
-           diff.r2.isolationKm, diff.diff);
+    fprintf(outFile, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
+            diff.r1.peak.latitude(), diff.r1.peak.longitude(),
+            diff.r1.higher.latitude(), diff.r1.higher.longitude(),
+            diff.r1.isolationKm, diff.r2.higher.latitude(),
+            diff.r2.higher.longitude(), diff.r2.isolationKm, diff.ilpDistance, diff.diff);
   }
-
+  fclose(outFile);
   return 0;
 }
 

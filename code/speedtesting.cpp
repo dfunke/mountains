@@ -185,7 +185,7 @@ int conductSpeedComparrisonTests() {
   using namespace std::chrono;
   int threads = 1;
   bool old = false;
-  FileFormat fileFormat(FileFormat::Value::HGT1);
+  FileFormat fileFormat(FileFormat::Value::HGT3);
   BasicTileLoadingPolicy policy(testFolder.c_str(), fileFormat);
   const int CACHE_SIZE = 50;
   auto setupCache = std::make_unique<TileCache>(&policy, CACHE_SIZE);
@@ -197,7 +197,7 @@ int conductSpeedComparrisonTests() {
     // float bounds[4] = {34, (34.f + t/d), -118,(-118.f + t)};
     // float bounds[4] = {47, (47.f + t/d), 1,(1.f + t)};
 
-    int tileCount = setupSrtmFolder(bounds, true);
+    int tileCount = setupSrtmFolder(bounds, false);
     std::cout << "Start Processing " << bounds[0] << " " << bounds[1] << " "
               << bounds[2] << " " << bounds[3] << " " << std::endl;
 
