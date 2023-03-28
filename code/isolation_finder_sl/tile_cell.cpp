@@ -64,7 +64,7 @@ void TileCell::distributeToTiles(const LatLng &peakLocation, int elevation,
     }
     // If this tile is registered check max elev. Else just add and deal with to
     // big elevations later.
-    if (mMaxElev == INT16_MIN || elevation < mMaxElev) {
+    if (mMaxElev == INT16_MIN || elevation <= mMaxElev) {
       mBucket->addResult(peakLocation, elevation, *isolationKm);
     }
     return;
