@@ -197,7 +197,7 @@ int conductSpeedComparrisonTests() {
     // float bounds[4] = {34, (34.f + t/d), -118,(-118.f + t)};
     // float bounds[4] = {47, (47.f + t/d), 1,(1.f + t)};
 
-    setupSrtmFolder(bounds, true);
+    int tileCount = setupSrtmFolder(bounds, true);
     std::cout << "Start Processing " << bounds[0] << " " << bounds[1] << " "
               << bounds[2] << " " << bounds[3] << " " << std::endl;
 
@@ -253,8 +253,8 @@ int conductSpeedComparrisonTests() {
     }
     times = times / 1.0;
     oldTimes = oldTimes / 1.0;
-    std::cout << testCase.size << "," << oldTimes << "," << times << std::endl;
-    writeToTestResults(testCase.size, oldTimes, times);
+    std::cout << tileCount << "," << oldTimes << "," << times << std::endl;
+    writeToTestResults(tileCount, oldTimes, times);
   }
   return 0;
 }
