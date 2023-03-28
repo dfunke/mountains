@@ -130,17 +130,15 @@ vector<TestCase> getUsTestCase() {
   return testCases;
 }
 
-TestCase getNorthAmerika() {
-    return TestCase(12,90,-168,-51,502);
-}
+TestCase getNorthAmerika() { return TestCase(12, 90, -168, -51, 502); }
 
-bool fileExists(const char* fileName) {
-    FILE *file;
-   if (file = fopen(fileName, "r")) {
-      fclose(file);
-      return true;
-   }
-   return false;
+bool fileExists(const char *fileName) {
+  FILE *file;
+  if (file = fopen(fileName, "r")) {
+    fclose(file);
+    return true;
+  }
+  return false;
 }
 
 void writeToTestResults(std::size_t tileCount, double oldTime, double newTime) {
@@ -150,8 +148,7 @@ void writeToTestResults(std::size_t tileCount, double oldTime, double newTime) {
   outfile.close();
 }
 
-int setupSrtmFolder(float *bounds)
-{
+int setupSrtmFolder(float *bounds, bool dem1) {
   int counter = 0;
   string cleanCommand = "rm " + testFolder + "/*";
   int success = system(cleanCommand.c_str());
@@ -164,7 +161,11 @@ int setupSrtmFolder(float *bounds)
       sprintf(buf, "%c%02d%c%03d.hgt", (lat >= 0) ? 'N' : 'S', abs(lat),
               (lng >= 0) ? 'E' : 'W', abs(lng));
       string command(buf);
-      command = baseFolder + "/" + command;
+      if (dem1) {
+        command = baseFolderDem1 + "/" + command;
+      } else {
+        command = baseFolder + "/" + command;
+      }
       if (fileExists(command.c_str())) {
         command = "ln -s " + command + " " + testFolder;
         // command = "cp /home/pc/Data2/SRTM-DEM1/" + command + "
@@ -181,88 +182,81 @@ int setupSrtmFolder(float *bounds)
 }
 
 int conductSpeedComparrisonTests() {
-    using namespace std::chrono;
-    int threads = 1;
-    bool old = false;
-    FileFormat fileFormat(FileFormat::Value::HGT1);
-    BasicTileLoadingPolicy policy(testFolder.c_str(),fileFormat);
-    const int CACHE_SIZE = 50;
-    auto setupCache = std::make_unique<TileCache>(&policy, CACHE_SIZE);
-    for (auto testCase : getTestCases())
-    {
-        double times = 0;
-        double oldTimes = 0;
-        float bounds[4] = {testCase.minLat, testCase.maxLat, testCase.minLng, testCase.maxLng};
-        // float bounds[4] = {34, (34.f + t/d), -118,(-118.f + t)};
-        // float bounds[4] = {47, (47.f + t/d), 1,(1.f + t)};
+  using namespace std::chrono;
+  int threads = 1;
+  bool old = false;
+  FileFormat fileFormat(FileFormat::Value::HGT1);
+  BasicTileLoadingPolicy policy(testFolder.c_str(), fileFormat);
+  const int CACHE_SIZE = 50;
+  auto setupCache = std::make_unique<TileCache>(&policy, CACHE_SIZE);
+  for (auto testCase : getUsTestCase()) {
+    double times = 0;
+    double oldTimes = 0;
+    float bounds[4] = {testCase.minLat, testCase.maxLat, testCase.minLng,
+                       testCase.maxLng};
+    // float bounds[4] = {34, (34.f + t/d), -118,(-118.f + t)};
+    // float bounds[4] = {47, (47.f + t/d), 1,(1.f + t)};
 
-        setupSrtmFolder(bounds);
-        std::cout << "Start Processing " << bounds[0] << " " << bounds[1] << " " << bounds[2] << " " << bounds[3] << " " << std::endl;
+    setupSrtmFolder(bounds, true);
+    std::cout << "Start Processing " << bounds[0] << " " << bounds[1] << " "
+              << bounds[2] << " " << bounds[3] << " " << std::endl;
 
-        for (int j = 0; j < 1; j++)
-        {
-            for (int i = 0; i < 2; i++)
-            {
-                if (i == 0)
-                {
-                    old = rand() % 2;
-                }
-                else
-                {
-                    old = !old;
-                }
-                high_resolution_clock::time_point t1 = high_resolution_clock::now();
-                TileCache *cache = new TileCache(&policy, CACHE_SIZE);
-                if (old)
-                {
-                    ThreadPool *threadPool = new ThreadPool(threads);
-                    vector<std::future<bool>> results;
-                    for (int lat = (int)floor(bounds[0]); lat < (int)ceil(bounds[1]); ++lat)
-                    {
-                        for (int lng = (int)floor(bounds[2]); lng < (int)ceil(bounds[3]); ++lng)
-                        {
-                            std::shared_ptr<CoordinateSystem> coordinateSystem(
-                                fileFormat.coordinateSystemForOrigin(lat + 0.f, lng + 0.f));
-                            IsolationTask *task = new IsolationTask(cache, "~/tmp", bounds, 1);
-                            results.push_back(threadPool->enqueue([=]
-                                                                  { return task->run(lat, lng, *coordinateSystem, fileFormat); }));
-                        }
-                    }
-                    int num_tiles_processed = 0;
-                    for (auto &&result : results)
-                    {
-                        if (result.get())
-                        {
-                            num_tiles_processed += 1;
-                        }
-                    }
-                    delete threadPool;
-                }
-                else
-                {
-                    IsolationSlProcessor *finder = new IsolationSlProcessor(cache, fileFormat);
-                    IsolationResults res = finder->findIsolations(threads, bounds, 1);
-                }
-                delete cache;
-                high_resolution_clock::time_point t2 = high_resolution_clock::now();
-                duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-                
-                if (old) {
-                    oldTimes += time_span.count();
-                    std::cout << "old" << time_span.count() << std::endl;
-                } else {
-                    times += time_span.count();
-                    std::cout << "new" << time_span.count() << std::endl;
-                }
-            }
-
+    for (int j = 0; j < 1; j++) {
+      for (int i = 0; i < 2; i++) {
+        if (i == 0) {
+          old = rand() % 2;
+        } else {
+          old = !old;
         }
-        times = times / 1.0;
-        oldTimes = oldTimes / 1.0;
-        std::cout << testCase.size << "," << oldTimes << "," << times << std::endl;
-        writeToTestResults(testCase.size, oldTimes, times);
+        high_resolution_clock::time_point t1 = high_resolution_clock::now();
+        TileCache *cache = new TileCache(&policy, CACHE_SIZE);
+        if (old) {
+          ThreadPool *threadPool = new ThreadPool(threads);
+          vector<std::future<bool>> results;
+          for (int lat = (int)floor(bounds[0]); lat < (int)ceil(bounds[1]);
+               ++lat) {
+            for (int lng = (int)floor(bounds[2]); lng < (int)ceil(bounds[3]);
+                 ++lng) {
+              std::shared_ptr<CoordinateSystem> coordinateSystem(
+                  fileFormat.coordinateSystemForOrigin(lat + 0.f, lng + 0.f));
+              IsolationTask *task =
+                  new IsolationTask(cache, "~/tmp", bounds, 1);
+              results.push_back(threadPool->enqueue([=] {
+                return task->run(lat, lng, *coordinateSystem, fileFormat);
+              }));
+            }
+          }
+          int num_tiles_processed = 0;
+          for (auto &&result : results) {
+            if (result.get()) {
+              num_tiles_processed += 1;
+            }
+          }
+          delete threadPool;
+        } else {
+          IsolationSlProcessor *finder =
+              new IsolationSlProcessor(cache, fileFormat);
+          IsolationResults res = finder->findIsolations(threads, bounds, 1);
+        }
+        delete cache;
+        high_resolution_clock::time_point t2 = high_resolution_clock::now();
+        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+
+        if (old) {
+          oldTimes += time_span.count();
+          std::cout << "old" << time_span.count() << std::endl;
+        } else {
+          times += time_span.count();
+          std::cout << "new" << time_span.count() << std::endl;
+        }
+      }
     }
-    return 0;
+    times = times / 1.0;
+    oldTimes = oldTimes / 1.0;
+    std::cout << testCase.size << "," << oldTimes << "," << times << std::endl;
+    writeToTestResults(testCase.size, oldTimes, times);
+  }
+  return 0;
 }
 
 int main(int argc, char **argv) {
