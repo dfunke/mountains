@@ -132,7 +132,7 @@ int compare() {
 int main(int argc, char **argv) {
   START_EASYLOGGINGPP(argc, argv);
 
-  return compare();
+  //return compare();
   // return mergeOldResults();
 
   int ch;
@@ -156,7 +156,7 @@ int main(int argc, char **argv) {
   argv += 3;
   optind = 0;
 
-  Elevation elev = 0;
+  Elevation elev = -1;
   while ((ch = getopt(argc, argv, "i:e:")) != -1) {
     switch (ch) {
     case 'i':
@@ -166,6 +166,7 @@ int main(int argc, char **argv) {
       elev = atoi(optarg);
     }
   }
+
 
   int latMin = (int)floor(bounds[2]);
   int lngMin = (int)floor(bounds[3]);
@@ -177,6 +178,21 @@ int main(int argc, char **argv) {
   std::shared_ptr<CoordinateSystem> coordinateSystem(
       fileFormat.coordinateSystemForOrigin(latMin + 0.f, lngMin + 0.f));
 
+  if (elev < 0) {
+    float peakLat = floor(point.latitude());
+    float peakLng = floor(point.longitude());
+    std::shared_ptr<CoordinateSystem> peakCoordinateSystem(
+        fileFormat.coordinateSystemForOrigin(peakLat, peakLng));
+
+    Tile *peakTile = cache->loadWithoutCaching(peakLat, peakLng, *peakCoordinateSystem);
+    int x = (int)((point.longitude() - peakLng) * (1200));
+    int y = (int)(((peakLat + 1) - point.latitude()) * (1200));
+    Offsets peakOffsets(x,y);
+    elev = peakTile->get(peakOffsets);
+    LatLng latLng = peakCoordinateSystem->getLatLng(peakOffsets);
+    std::cout << "Peak elev:" << elev << std::endl;
+  }
+
   Tile *t = cache->loadWithoutCaching(latMin, lngMin, *coordinateSystem);
   float maxIsolation = 100000000;
   LatLng higherGround;
@@ -185,12 +201,13 @@ int main(int argc, char **argv) {
     std::cout << "Tile: " << latMin << " " << lngMin << std::endl;
     std::cout << t->maxElevation() << std::endl;
     // find
-    for (int lng = 0; lng < t->height() - 1; ++lng)
-      for (int lat = 0; lat < t->width() - 1; ++lat) {
-        if (t->get(Offsets(lat, lng)) > elev) {
-          if ((*coordinateSystem)
+    for (int lng = 0; lng < t->height()-1; ++lng)
+      for (int lat = 0; lat < t->width()-1; ++lat) {
+        if (t->get(Offsets(lat, lng)) >= elev) {
+          float checkIsolation = (*coordinateSystem)
                   .getLatLng(Offsets(lat, lng))
-                  .distanceEllipsoid(point) < maxIsolation) {
+                  .distanceEllipsoid(point);
+          if (checkIsolation > 100 && checkIsolation < maxIsolation) {
             maxIsolation = (*coordinateSystem)
                                .getLatLng(Offsets(lat, lng))
                                .distanceEllipsoid(point);
