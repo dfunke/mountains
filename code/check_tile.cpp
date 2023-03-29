@@ -70,9 +70,9 @@ struct IsolationResultDiff {
 
 int compare() {
   IsolationResults *newRes =
-      IsolationResults::loadFromFile("/home/pc/tmp", 1, 2);
+      IsolationResults::loadFromFile("/home/pc/results", 1, 2);
   IsolationResults *oldRes =
-      IsolationResults::loadFromFile("/home/pc/tmp", 1, 1);
+      IsolationResults::loadFromFile("/home/pc/results", 1, 1);
   std::cout << "Start calculation" << std::endl;
 
   string terrain_directory("/home/pc/Data2/SRTM-DEM3/");
@@ -115,7 +115,7 @@ int compare() {
             [](IsolationResultDiff const &lhs, IsolationResultDiff const &rhs) {
               return lhs.diff > rhs.diff;
             });
-  string filename = "/home/pc/tmp/peak_diffs.txt";
+  string filename = "/home/pc/results/peak_diffs.txt";
   FILE *outFile = fopen(filename.c_str(), "w");
   fprintf(outFile, "peakLat,peakLng,ilp1Lat,ilp1Lng,isolation1,ilp2Lat,ilp2Lng,isolation2,ilpDistance,diff\n");
   for (auto &diff : diffs) {
