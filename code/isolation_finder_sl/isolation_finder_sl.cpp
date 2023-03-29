@@ -113,6 +113,25 @@ void IsolationFinderSl::setup(const Tile *tile,
     mEventQueue = new SlEvent[queueSize];
   }
 
+
+
+  // Add peaks first, to guarantee > all inserted samples.
+  if (prevResults != nullptr) {
+    for (auto it = prevResults->mResults.cbegin();
+         it < prevResults->mResults.cend(); ++it) {
+      mEventQueue[idx].initialize(it->peakElevation, true, it->peak,
+                                  Offsets(0, 0));
+      ++idx;
+    }
+  } else {
+    // Add peaks
+    for (Offsets &peak : peaks) {
+      mEventQueue[idx].initialize(tile->get(peak), true,
+                                  mCoordinateSystem->getLatLng(peak), peak);
+      ++idx;
+    }
+  }
+
   // On SRTM 1 pixel overlapp
   for (int j = skipVal; j < height - skipVal; j += skipVal) {
     for (int i = skipVal; i < width - skipVal; i += skipVal) {
@@ -155,29 +174,6 @@ void IsolationFinderSl::setup(const Tile *tile,
       ++idx;
     }
   }
-
-  if (prevResults != nullptr) {
-
-    for (auto it = prevResults->mResults.cbegin();
-         it < prevResults->mResults.cend(); ++it) {
-      mEventQueue[idx].initialize(it->peakElevation, true, it->peak,
-                                  Offsets(0, 0));
-      ++idx;
-    }
-  } else {
-    // Add peaks
-    for (Offsets &peak : peaks) {
-      mEventQueue[idx].initialize(tile->get(peak), true,
-                                  mCoordinateSystem->getLatLng(peak), peak);
-      /*
-      if (mEventQueue[idx].getElev() < minPeakElev) {
-          minPeakElev = mEventQueue[idx].getElev();
-      }
-      */
-      ++idx;
-    }
-  }
-
   // std::cout << "Peaks: " << peaks.size() << std::endl;
 
   // Sort using height value

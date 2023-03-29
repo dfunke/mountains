@@ -173,7 +173,7 @@ int setupSrtmFolder(float *bounds)
             string command(buf);
             command = baseFolder + "/" + command;
             if (fileExists(command.c_str())) {
-                command = "ln -s " + command + " " + testFolder;
+                command = "cp " + command + " " + testFolder;
                 // command = "cp /home/pc/Data2/SRTM-DEM1/" + command + " /home/pc/SRTM/";
                 success = system(command.c_str());
                 if (success < 0)
