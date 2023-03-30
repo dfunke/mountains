@@ -72,7 +72,11 @@ inline float shortestDistanceToGreatCircleSegmet(const LatLng start, const LatLn
   }
   // Check if on line segment
   if (nearestLatitude > start.latitude() && nearestLatitude < end.latitude()) {
-    return searchDistance(point, nearest);
+    //return searchDistance(point, nearest);
+    float startDist = searchDistance(point, start);
+    float endDist = searchDistance(point, end);
+    float onCircleDist = searchDistance(point, nearest);
+    return std::min(startDist, std::min(endDist, onCircleDist));
   }
 
   float centerNearestLatitude = nearest.latitude() - centerLatitude;
