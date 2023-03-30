@@ -99,7 +99,7 @@ int compare() {
         resDiff.r1 = res;
         resDiff.r2 = resInOld;
         resDiff.diff = resInOld.isolationKm - res.isolationKm;
-        if (resDiff.diff > 0.5 || resDiff.diff < -0.5) {
+        if (resDiff.diff > 0 || resDiff.diff < 0) {
           resDiff.ilpDistance = resInOld.higher.distanceEllipsoid(res.higher) / 1000;
           diffs.push_back(resDiff);
         }
@@ -132,7 +132,7 @@ int compare() {
 int main(int argc, char **argv) {
   START_EASYLOGGINGPP(argc, argv);
 
-  return compare();
+  //return compare();
   // return mergeOldResults();
 
   int ch;
@@ -203,7 +203,7 @@ int main(int argc, char **argv) {
     // find
     for (int lng = 0; lng < t->height()-1; ++lng)
       for (int lat = 0; lat < t->width()-1; ++lat) {
-        if (t->get(Offsets(lat, lng)) >= elev) {
+        if (t->get(Offsets(lat, lng)) > elev) {
           float checkIsolation = (*coordinateSystem)
                   .getLatLng(Offsets(lat, lng))
                   .distanceEllipsoid(point);
