@@ -129,6 +129,7 @@ int main(int argc, char **argv) {
     return 1;
   }
   BasicTileLoadingPolicy policy(terrain_directory, *fileFormat);
+  policy.enableNeighborEdgeLoading(true);
   const int CACHE_SIZE = 50;
   auto cache = std::make_unique<TileCache>(&policy, CACHE_SIZE);
 

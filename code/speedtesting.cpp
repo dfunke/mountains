@@ -161,13 +161,9 @@ int setupSrtmFolder(float *bounds, bool dem1) {
       sprintf(buf, "%c%02d%c%03d.hgt", (lat >= 0) ? 'N' : 'S', abs(lat),
               (lng >= 0) ? 'E' : 'W', abs(lng));
       string command(buf);
-      if (dem1) {
-        command = baseFolderDem1 + "/" + command;
-      } else {
-        command = baseFolder + "/" + command;
-      }
+      command = baseFolder + "/" + command;
       if (fileExists(command.c_str())) {
-        command = "ln -s " + command + " " + testFolder;
+        command = "cp " + command + " " + testFolder;
         // command = "cp /home/pc/Data2/SRTM-DEM1/" + command + "
         // /home/pc/SRTM/";
         success = system(command.c_str());
@@ -179,6 +175,35 @@ int setupSrtmFolder(float *bounds, bool dem1) {
     }
   }
   return counter;
+}
+
+void addDem1ToTestFolder(float *bounds, TileCache *cache) {
+  for (int lat = (int)floor(bounds[0]); lat < (int)ceil(bounds[1]); ++lat) {
+    for (int lng = (int)floor(bounds[2]); lng < (int)ceil(bounds[3]); ++lng) {
+      char buf[100];
+      sprintf(buf, "%c%02d%c%03d.hgt", (lat >= 0) ? 'N' : 'S', abs(lat),
+              (lng >= 0) ? 'E' : 'W', abs(lng));
+      string command(buf);
+      command = baseFolderDem1 + "/" + command;
+      if (fileExists(command.c_str())) {
+        string rmcommand(buf);
+        command = "ln -sf " + command + " " + testFolder;
+        // command = "cp /home/pc/Data2/SRTM-DEM1/" + command + "
+        // /home/pc/SRTM/";
+        int success = system(command.c_str());
+        if (success < 0) {
+          std::cout << "Error linking DEM-File" << std::endl;
+        }
+        // calculate max elevation
+        char buf[100];
+        sprintf(buf, "%c%02d%c%03d-maxelev.txt", (lat >= 0) ? 'N' : 'S',
+                abs(lat), (lng >= 0) ? 'E' : 'W', abs(lng));
+        string fileName(buf);
+        fileName =
+            "ln -sf " + baseFolderDem1 + "/" + fileName + " " + testFolder;
+      }
+    }
+  }
 }
 
 int conductSpeedComparrisonTests() {
