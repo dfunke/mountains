@@ -214,7 +214,7 @@ int conductSpeedComparrisonTests() {
   BasicTileLoadingPolicy policy(testFolder.c_str(), fileFormat);
   const int CACHE_SIZE = 50;
   auto setupCache = std::make_unique<TileCache>(&policy, CACHE_SIZE);
-  for (auto testCase : getUsTestCase()) {
+  for (auto testCase : getTestCases()) {
     double times = 0;
     double oldTimes = 0;
     float bounds[4] = {testCase.minLat, testCase.maxLat, testCase.minLng,
@@ -226,10 +226,11 @@ int conductSpeedComparrisonTests() {
     std::cout << "Start Processing " << bounds[0] << " " << bounds[1] << " "
               << bounds[2] << " " << bounds[3] << " " << std::endl;
 
-    for (int j = 0; j < 1; j++) {
-      for (int i = 0; i < 2; i++) {
+    for (int j = 0; j < 3; j++) {
+      for (int i = 0; i < 1; i++) {
         if (i == 0) {
-          old = rand() % 2;
+          old = true;
+          //old = rand() % 2;
         } else {
           old = !old;
         }
@@ -276,8 +277,8 @@ int conductSpeedComparrisonTests() {
         }
       }
     }
-    times = times / 1.0;
-    oldTimes = oldTimes / 1.0;
+    times = times / 3.0;
+    oldTimes = oldTimes / 3.0;
     std::cout << tileCount << "," << oldTimes << "," << times << std::endl;
     writeToTestResults(tileCount, oldTimes, times);
   }
