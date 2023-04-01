@@ -47,7 +47,8 @@ public:
   Offsets() {mValue = 0;}
   
   Offsets(Coord x, Coord y) {
-    mValue = (((uint64) y) << (8 * sizeof(Coord))) | ((uint64) x);
+    mValue = (((uint64) y) << (8 * sizeof(Coord))) | (0x00000000ffffffff &((uint64) x));
+    //mValue = (((uint64) y) << (8 * sizeof(Coord))) | ((uint64) x);
   }
 
   explicit Offsets(Value value) {
