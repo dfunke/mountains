@@ -89,8 +89,11 @@ IsolationRecord IsolationFinder::findIsolation(Offsets peak) const {
       for (int lng = minx; lng <= maxx; ++lng) {
         // Deal with antimeridian: bring longitude back into range
         int neighborLng = lng;
-        if (neighborLng > 180) {
+        if (neighborLng >= 180) {
           neighborLng -= 360;
+        }
+        if (neighborLng < -180) {
+          neighborLng += 360;
         }
         
         // Skip any tile already checked
