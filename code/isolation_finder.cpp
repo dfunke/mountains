@@ -328,11 +328,15 @@ IsolationRecord IsolationFinder::findIsolation(const Tile *tile, const Coordinat
     
     foundHigherGroundLastTime = record.foundHigherGround;
     
-    // Old outer ring is new inner ring
-    innerleftx = outerleftx;
-    innerrightx = outerrightx;
-    innertopy = outertopy;
-    innerbottomy = outerbottomy;
+    // increase inner ring only if no higher ground was found
+    // Otherwise possible that peak search is not conducted
+    if (!record.foundHigherGround) {
+      // Old outer ring is new inner ring
+      innerleftx = outerleftx;
+      innerrightx = outerrightx;
+      innertopy = outertopy;
+      innerbottomy = outerbottomy;
+    }
 
     // Expand outer ring
     dy = static_cast<int>(ceilf(dy * successive_rectangle_ratio));
