@@ -19,8 +19,8 @@ inline float toLongitudeOnOtherSideOfSphere(float n)
 inline float searchDistance(const LatLng *p1, const LatLng p2)
 {
   // For now, more intelligent / faster method later
-  // return p1->distanceEllipsoid(p2);
-  return p1->distance(p2);
+  return p1->distanceEllipsoid(p2);
+  //return p1->distance(p2);
 }
 
 inline float fastSearchDistance(const Offsets p1, const Offsets p2, float *lngDistanceScale)
