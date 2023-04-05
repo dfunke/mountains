@@ -13,7 +13,7 @@
 using glm::vec3;
 using namespace std::chrono;
 
-static double calcTimes = 0;
+static double calcTimes;
 
 inline float toLongitudeOnOtherSideOfSphere(float n)
 {
@@ -26,14 +26,16 @@ inline float searchDistance(const LatLng *p1, const LatLng p2)
   // return p1->distanceEllipsoid(p2);
   high_resolution_clock::time_point t1 = high_resolution_clock::now();
   return p1->distance(p2);
-  calcTimes += duration_cast<nanoseconds>(high_resolution_clock::now() - t1).count();
+  high_resolution_clock::time_point t2 = high_resolution_clock::now();
+  calcTimes += duration_cast<nanoseconds>(t2 - t1).count();
 }
 
 inline float exactSearchDistance(const LatLng *p1, const LatLng p2)
 {
   high_resolution_clock::time_point t1 = high_resolution_clock::now();
   return p1->distanceEllipsoid(p2);
-  calcTimes += duration_cast<nanoseconds>(high_resolution_clock::now() - t1).count();
+  high_resolution_clock::time_point t2 = high_resolution_clock::now();
+  calcTimes += duration_cast<nanoseconds>(t2 - t1).count();
 }
 
 inline float fastSearchDistance(const Offsets p1, const Offsets p2, float *lngDistanceScale)
@@ -59,7 +61,8 @@ inline LatLng nearestPointOnGreatCircle(const LatLng start, const LatLng end, co
   vec3 C = glm::cross(A,B);
   C = glm::normalize(C);
   LatLng nearest(C);
-  calcTimes += duration_cast<nanoseconds>(high_resolution_clock::now() - t1).count();
+  high_resolution_clock::time_point t2 = high_resolution_clock::now();
+  calcTimes += duration_cast<nanoseconds>(t2 - t1).count();
   return nearest;
 }
 

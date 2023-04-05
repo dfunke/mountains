@@ -280,7 +280,7 @@ int conductSpeedComparrisonTests() {
     }
     times = times / 3.0;
     oldTimes = oldTimes / 3.0;
-    std::cout << tileCount << "," << oldTimes << "," << times << std::endl;
+    //std::cout << tileCount << "," << oldTimes << "," << times << std::endl;
     writeToTestResults(tileCount, oldTimes, times);
   }
   return 0;

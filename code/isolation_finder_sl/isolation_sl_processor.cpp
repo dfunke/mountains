@@ -38,6 +38,7 @@ using maxheap = std::priority_queue<T, vector<T>, decltype(&compare)>;
 IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
                                                       float bounds[],
                                                       float mMinIsolationKm) {
+  calcTimes = 0;
   high_resolution_clock::time_point t1 = high_resolution_clock::now();
   int latMax = (int)ceil(bounds[1]);
   int lngMax = (int)ceil(bounds[3]);
