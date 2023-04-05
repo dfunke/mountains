@@ -3,6 +3,7 @@
 //#include "math.h"
 
 #include "../isolation_finder.h"
+#include "spherical_math_util.h"
 
 #include <vector>    // std::vector
 #include <stdio.h>
@@ -43,7 +44,7 @@ IsolationRecord SweeplineDatastructQuadtreeDynamic::calcPeak(const SlEvent *node
   if (*currShortestDistance < MAXFLOAT) {
     ir.foundHigherGround = true;
     ir.closestHigherGround = *shortestPoint;
-    ir.distance = ir.closestHigherGround.distance(*node);
+    ir.distance = searchDistance(node, ir.closestHigherGround);
   }
   delete shortestPoint;
   delete currShortestDistance;

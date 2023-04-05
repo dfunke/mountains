@@ -61,18 +61,18 @@ struct TestCase {
 
 vector<TestCase> getTestCases() {
   vector<TestCase> testCases;
-  //testCases.push_back(TestCase(75, 90, 151, 180, 4));
-  //testCases.push_back(TestCase(74, 90, 149, 180, 9));
-  //testCases.push_back(TestCase(72, 90, 145, 180, 21));
-  //testCases.push_back(TestCase(71, 90, 145, 180, 35));
-  //testCases.push_back(TestCase(70, 90, 144, 180, 62));
-  //testCases.push_back(TestCase(68, 90, 142, 180, 151));
-  //testCases.push_back(TestCase(66, 90, 140, 180, 249));
-  //testCases.push_back(TestCase(61, 90, 132, 180, 550));
-  //testCases.push_back(TestCase(53, 90, 118, 180, 1025));
-  //testCases.push_back(TestCase(42, 90, 98, 180, 2027));
-  //testCases.push_back(TestCase(26, 90, 67, 180, 4094));
-  //testCases.push_back(TestCase(0, 90, 17, 180, 8245));
+  testCases.push_back(TestCase(75, 90, 151, 180, 4));
+  testCases.push_back(TestCase(74, 90, 149, 180, 9));
+  testCases.push_back(TestCase(72, 90, 145, 180, 21));
+  testCases.push_back(TestCase(71, 90, 145, 180, 35));
+  testCases.push_back(TestCase(70, 90, 144, 180, 62));
+  testCases.push_back(TestCase(68, 90, 142, 180, 151));
+  testCases.push_back(TestCase(66, 90, 140, 180, 249));
+  testCases.push_back(TestCase(61, 90, 132, 180, 550));
+  testCases.push_back(TestCase(53, 90, 118, 180, 1025));
+  testCases.push_back(TestCase(42, 90, 98, 180, 2027));
+  testCases.push_back(TestCase(26, 90, 67, 180, 4094));
+  testCases.push_back(TestCase(0, 90, 17, 180, 8245));
   testCases.push_back(TestCase(-55, 90, -91, 180, 16387));
   testCases.push_back(TestCase(-90, 90, -180, 180, 26095));
   return testCases;
@@ -223,13 +223,14 @@ int conductSpeedComparrisonTests() {
     // float bounds[4] = {47, (47.f + t/d), 1,(1.f + t)};
 
     int tileCount = setupSrtmFolder(bounds, false);
-    std::cout << "Start Processing " << bounds[0] << " " << bounds[1] << " "
-              << bounds[2] << " " << bounds[3] << " " << std::endl;
+    //std::cout << "Start Processing " << bounds[0] << " " << bounds[1] << " "
+    //          << bounds[2] << " " << bounds[3] << " " << std::endl;
+    std::cout << tileCount << ",";
 
-    for (int j = 0; j < 3; j++) {
+    for (int j = 0; j < 1; j++) {
       for (int i = 0; i < 1; i++) {
         if (i == 0) {
-          old = true;
+          old = false;
           //old = rand() % 2;
         } else {
           old = !old;
@@ -270,10 +271,10 @@ int conductSpeedComparrisonTests() {
 
         if (old) {
           oldTimes += time_span.count();
-          std::cout << "old" << time_span.count() << std::endl;
+          //std::cout << "old" << time_span.count() << std::endl;
         } else {
           times += time_span.count();
-          std::cout << "new" << time_span.count() << std::endl;
+          //std::cout << "new" << time_span.count() << std::endl;
         }
       }
     }

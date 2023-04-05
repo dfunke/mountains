@@ -126,7 +126,7 @@ public:
       Quad root;
       root.set(0, 0, mMinLat, mMaxLat, mMinLng, mMaxLng, 0); // min distance here not important!!
       findNearest(node, root, 0, mCellsSize, (mCellsSize - 1) / 3, &ir);
-      ir.distance = ir.closestHigherGround.distanceEllipsoid(*node);
+      ir.distance = exactSearchDistance(node, ir.closestHigherGround);
       return ir;
    }
 
@@ -416,7 +416,7 @@ private:
             {
                continue;
             }
-            float distance = toCheck->distance(*n);
+            float distance = searchDistance(toCheck, *n);
             if (!ir->foundHigherGround || ir->distance > distance)
             {
                ir->distance = distance;

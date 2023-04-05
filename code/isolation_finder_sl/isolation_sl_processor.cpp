@@ -8,12 +8,16 @@
 #include "concurrent_isolation_results.h"
 #include "isolation_finder_sl.h"
 #include "ilp_search_area_tree.h"
+#include "spherical_math_util.h"
 
 #include <algorithm>
 #include <unordered_set>
 #include <vector>
+#include <chrono>
+#include <iostream>
 
 using std::vector;
+using namespace std::chrono;
 
 IsolationSlProcessor::IsolationSlProcessor(TileCache *cache, FileFormat format) { 
   mCache = cache; 
@@ -34,6 +38,7 @@ using maxheap = std::priority_queue<T, vector<T>, decltype(&compare)>;
 IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
                                                       float bounds[],
                                                       float mMinIsolationKm) {
+  high_resolution_clock::time_point t1 = high_resolution_clock::now();
   int latMax = (int)ceil(bounds[1]);
   int lngMax = (int)ceil(bounds[3]);
   int latMin = (int)floor(bounds[0]);
@@ -135,5 +140,7 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
   //        finalFinalResults.mResults.push_back(r);
   //    }
   //}
+  double totalDuration = duration_cast<duration<double>>(high_resolution_clock::now() - t1).count();
+  std::cout << totalDuration << "," << calcTimes << std::endl;
   return finalResults;
 }
