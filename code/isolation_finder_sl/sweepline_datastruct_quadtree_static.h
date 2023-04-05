@@ -416,7 +416,7 @@ private:
             {
                continue;
             }
-            float distance = toCheck->distance(*n);
+            float distance = searchDistance(toCheck, *n);
             if (!ir->foundHigherGround || ir->distance > distance)
             {
                ir->distance = distance;
