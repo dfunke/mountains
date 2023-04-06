@@ -1,3 +1,4 @@
+
 #ifndef _SPHERICAL_MATH_UTIL_H_
 #define _SPHERICAL_MATH_UTIL_H_
 
@@ -9,11 +10,12 @@
 #include <glm/vec3.hpp>
 #include <glm/geometric.hpp>
 #include <chrono>
+#include <iostream>
 
 using glm::vec3;
 using namespace std::chrono;
 
-static double calcTimes;
+inline double calcTimes;
 
 inline float toLongitudeOnOtherSideOfSphere(float n)
 {
@@ -25,17 +27,21 @@ inline float searchDistance(const LatLng *p1, const LatLng p2)
   // For now, more intelligent / faster method later
   // return p1->distanceEllipsoid(p2);
   high_resolution_clock::time_point t1 = high_resolution_clock::now();
-  return p1->distance(p2);
+  float distance = p1->distance(p2);
   high_resolution_clock::time_point t2 = high_resolution_clock::now();
-  calcTimes += duration_cast<nanoseconds>(t2 - t1).count();
+  duration<double, std::milli> ms_double = t2 - t1;
+  calcTimes += ms_double.count();
+  return distance;
 }
 
 inline float exactSearchDistance(const LatLng *p1, const LatLng p2)
 {
   high_resolution_clock::time_point t1 = high_resolution_clock::now();
-  return p1->distanceEllipsoid(p2);
+  float distance =  p1->distanceEllipsoid(p2);
   high_resolution_clock::time_point t2 = high_resolution_clock::now();
-  calcTimes += duration_cast<nanoseconds>(t2 - t1).count();
+  duration<double, std::milli> ms_double = t2 - t1;
+  calcTimes += ms_double.count();
+  return distance;
 }
 
 inline float fastSearchDistance(const Offsets p1, const Offsets p2, float *lngDistanceScale)
@@ -62,7 +68,8 @@ inline LatLng nearestPointOnGreatCircle(const LatLng start, const LatLng end, co
   C = glm::normalize(C);
   LatLng nearest(C);
   high_resolution_clock::time_point t2 = high_resolution_clock::now();
-  calcTimes += duration_cast<nanoseconds>(t2 - t1).count();
+  duration<double, std::milli> ms_double = t2 - t1;
+  calcTimes += ms_double.count();
   return nearest;
 }
 

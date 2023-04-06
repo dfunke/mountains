@@ -142,6 +142,7 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
   //    }
   //}
   double totalDuration = duration_cast<duration<double>>(high_resolution_clock::now() - t1).count();
-  std::cout << totalDuration << "," << calcTimes << std::endl;
+  double timesSecond = calcTimes * 0.001;
+  std::cout << totalDuration << "," << timesSecond << "," << timesSecond / totalDuration << std::endl;
   return finalResults;
 }
