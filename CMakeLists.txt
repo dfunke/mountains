@@ -10,6 +10,8 @@ set( CMAKE_C_FLAGS_DEBUG "" CACHE STRING "" )
 set( CMAKE_CXX_FLAGS_DEBUG "" CACHE STRING "" )
 set( CMAKE_C_FLAGS_RELEASE "" CACHE STRING "" )
 set( CMAKE_CXX_FLAGS_RELEASE "" CACHE STRING "" )
+# list(APPEND CMAKE_MODULE_PATH "/opt/intel/oneapi/tbb/latest/lib/cmake/tbb/")
+# find_package(TBB REQUIRED)
 
 set(
 	BUILD_TARGETS
@@ -95,6 +97,9 @@ include_directories(external/glm)
 # tbb_build(TBB_ROOT external/tbb CONFIG_DIR TBB_DIR)
 #find_package(tbb REQUIRED)
 
+set( IPS2RA_DISABLE_PARALLEL "true")
+add_subdirectory(ips2ra)
+
 add_executable(
     isolation
 	code/easylogging++.cc
@@ -108,9 +113,11 @@ add_executable(
 	code/tile.cpp 
 	code/tile_cache.cpp 
 	code/tile_loading_policy.cpp
+	code/fabdem_loader.cpp
 	code/isolation_finder_sl/cell_memory_manager.cpp
 	code/isolation_finder_sl/cell.cpp
 	code/isolation_finder_sl/concurrent_isolation_results.cpp
+	code/isolation_finder_sl/ilp_search_area_tree.cpp
 	code/isolation_finder_sl/isolation_finder_sl.cpp
 	code/isolation_finder_sl/isolation_sl_processor.cpp
 	code/isolation_finder_sl/sweepline_datastruct_naive.cpp
@@ -121,12 +128,13 @@ add_executable(
 )
 
 target_link_libraries(
-	isolation
+	isolation PRIVATE
 	pointlib 
 	loaderlib 
 	coordlib
 	tbb
 	pthread
+	ips2ra
 )
 
 add_executable(
@@ -136,6 +144,7 @@ add_executable(
 	code/easylogging++.cc 
 	code/filter.cpp 
 	code/file_format.cpp 
+	code/fabdem_loader.cpp
 	code/island_tree.cpp 
 	code/kml_writer.cpp 
 	code/line_tree.cpp 

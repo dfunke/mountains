@@ -23,7 +23,6 @@
  */
 
 #include "fabdem_loader.h"
-#include "file_format.h"
 #include "tile.h"
 #include "util.h"
 

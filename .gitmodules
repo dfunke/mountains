@@ -4,3 +4,6 @@
 [submodule "external/tbb"]
 	path = external/tbb
 	url = https://github.com/blep/tbb.git
+[submodule "ips2ra"]
+	path = ips2ra
+	url = https://github.com/ips4o/ips2ra.git
