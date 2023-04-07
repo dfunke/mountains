@@ -34,7 +34,7 @@ ConcurrentIsolationResults *ILPSearchAreaTree::findBucket(int minLat,
 void ILPSearchAreaTree::registerTile(int minLat, int minLng,
                                      Elevation maxElev) {
   mTileEvents.push_back(SlEvent(maxElev, false, LatLng(static_cast<float>(minLat), static_cast<float>(minLng))));
-  //mRoot->registerTile(minLat, minLng, maxElev);
+  mRoot->registerTile(minLat, minLng, maxElev);
 }
 
 void ILPSearchAreaTree::proccessUnbound() {
@@ -44,8 +44,8 @@ void ILPSearchAreaTree::proccessUnbound() {
     queue[idx].initialize(res.peakElevation, true, res.peak, Offsets());
     idx++;
   }
-  for (auto &peak : mTileEvents) {
-    queue[idx] = peak;
+  for (auto &tile : mTileEvents) {
+    queue[idx] = tile;
     idx++;
   }
   std::stable_sort(queue, queue + idx,

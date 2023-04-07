@@ -252,6 +252,9 @@ IsolationResults IsolationFinderSl::runSweepline(float mMinIsolationKm,
     SlEvent *node = &mEventQueue[i];
     if (node->isPeak()) {
       LatLng peakLoc = *node;
+      if (abs(peakLoc.latitude() - 26.1017) < 0.001 && abs(peakLoc.longitude() - 8.4967) < 0.001) {
+        std::cout << "Got it" << std::endl;
+      }
       IsolationRecord record = sld->calcPeak(node);
 
       if (record.foundHigherGround) {

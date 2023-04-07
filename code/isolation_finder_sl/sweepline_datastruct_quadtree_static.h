@@ -119,7 +119,7 @@ public:
    IsolationRecord calcPeak(const SlEvent *node) override
    {
       IsolationRecord ir;
-      if (! mNodeOccupied[0])
+      if (! mNodeOccupied[0] && mMaxLevel > 0)
       {
          return ir;
       }
