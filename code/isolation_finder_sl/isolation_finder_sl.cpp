@@ -133,6 +133,12 @@ void IsolationFinderSl::setup(const Tile *tile,
       ++idx;
     }
   }
+  int peakIdx = idx;
+
+  if (peakIdx == 0) {
+    currSize = 0;
+    return;
+  }
 
   // On SRTM 1 pixel overlapp
   for (int j = skipVal; j < height - skipVal; j += skipVal) {
@@ -176,13 +182,29 @@ void IsolationFinderSl::setup(const Tile *tile,
       ++idx;
     }
   }
-  // std::cout << "Peaks: " << peaks.size() << std::endl;
 
-  // Sort using height value
-  ips4o::sort(mEventQueue, mEventQueue + idx,
-                   [this](SlEvent const &lhs, SlEvent const &rhs) {
+  // sort peaks
+  ips4o::sort(mEventQueue, mEventQueue + peakIdx - 1,
+                   [](SlEvent const &lhs, SlEvent const &rhs) {
                      return lhs.getElev() > rhs.getElev();
                    });
+  // sort events
+  ips4o::sort(mEventQueue + peakIdx, mEventQueue + idx,
+                   [](SlEvent const &lhs, SlEvent const &rhs) {
+                     return lhs.getElev() > rhs.getElev();
+                   });
+  // Merge peaks and events
+  std::inplace_merge(mEventQueue, mEventQueue + peakIdx, mEventQueue + idx,
+                   [](SlEvent const &lhs, SlEvent const &rhs) {
+                     return lhs.getElev() > rhs.getElev();
+                   });
+
+  // Sort using height value
+  //std::stable_sort(mEventQueue, mEventQueue + idx,
+  //std::stable_sort(mEventQueue, mEventQueue + idx,
+  //                 [](SlEvent const &lhs, SlEvent const &rhs) {
+  //                   return lhs.getElev() > rhs.getElev();
+  //                 });
 
   // saveTileAsImage(tile);
   currSize = idx;

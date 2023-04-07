@@ -10,6 +10,7 @@
 #include <glm/geometric.hpp>
 
 using glm::vec3;
+using std::abs;
 
 inline float toLongitudeOnOtherSideOfSphere(float n)
 {

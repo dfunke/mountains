@@ -137,7 +137,7 @@ TestCase getNorthAmerika() {
 
 bool fileExists(const char* fileName) {
     FILE *file;
-   if (file = fopen(fileName, "r")) {
+   if ( (file = fopen(fileName, "r")) ) {
       fclose(file);
       return true;
    }
@@ -229,7 +229,7 @@ int conductSpeedComparrisonTests() {
     using namespace std::chrono;
     int threads = 1;
     bool old = false;
-    FileFormat fileFormat(FileFormat::Value::HGT1);
+    FileFormat fileFormat(FileFormat::Value::HGT3);
     BasicTileLoadingPolicy policy(testFolder.c_str(),fileFormat);
     const int CACHE_SIZE = 50;
     auto setupCache = std::make_unique<TileCache>(&policy, CACHE_SIZE);
@@ -246,11 +246,12 @@ int conductSpeedComparrisonTests() {
 
         for (int j = 0; j < 1; j++)
         {
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 1; i++)
             {
                 if (i == 0)
                 {
-                    old = rand() % 2;
+                    old=false;
+                    //old = rand() % 2;
                 }
                 else
                 {
@@ -394,7 +395,7 @@ int testCaseWithDem1Data() {
 int main(int argc, char **argv)
 {
     START_EASYLOGGINGPP(argc, argv);
-    //return conductSpeedComparrisonTests();
+    return conductSpeedComparrisonTests();
     //return testCaseWithDem1Data();
     TestCase testCase = getNorthAmerika();
     float bounds[4] = {testCase.minLat, testCase.maxLat, testCase.minLng, testCase.maxLng};
