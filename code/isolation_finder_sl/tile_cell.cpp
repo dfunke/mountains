@@ -52,7 +52,7 @@ void TileCell::registerTile(int minLat, int minLng, Elevation maxElev) {
 }
 
 void TileCell::distributeToTiles(const LatLng &peakLocation, int elevation,
-                                 float *isolationKm) {
+                                 float isolationKm) {
   if (isLeaf()) {
     if (mBucket == nullptr) {
       mLock.lock();
@@ -65,7 +65,7 @@ void TileCell::distributeToTiles(const LatLng &peakLocation, int elevation,
     // If this tile is registered check max elev. Else just add and deal with to
     // big elevations later.
     if (mMaxElev == INT16_MIN || elevation <= mMaxElev) {
-      mBucket->addResult(peakLocation, elevation, *isolationKm);
+      mBucket->addResult(peakLocation, elevation, isolationKm);
     }
     return;
   }
@@ -80,91 +80,22 @@ void TileCell::distributeToTiles(const LatLng &peakLocation, int elevation,
       1000;
   if (shortestDistanceToSmaller < shortestDistanceToBigger) {
     // go first in smaller
-    if (*isolationKm > shortestDistanceToSmaller) {
+    if (isolationKm > shortestDistanceToSmaller) {
       mSmaller->distributeToTiles(peakLocation, elevation,
                                   isolationKm);
     }
-    if (*isolationKm > shortestDistanceToBigger) {
+    if (isolationKm > shortestDistanceToBigger) {
       mBigger->distributeToTiles(peakLocation, elevation,
                                  isolationKm);
     }
   } else {
     // go first in bigger
-    if (*isolationKm > shortestDistanceToBigger) {
+    if (isolationKm > shortestDistanceToBigger) {
       mBigger->distributeToTiles(peakLocation, elevation,
                                  isolationKm);
     }
-    if (*isolationKm > shortestDistanceToSmaller) {
+    if (isolationKm > shortestDistanceToSmaller) {
       mSmaller->distributeToTiles(peakLocation, elevation,
-                                  isolationKm);
-    }
-  }
-}
-
-void TileCell::findUpperBoundAndDistributeToTiles(const LatLng &peakLocation,
-                                           int elevation,
-                                           float *isolationKm) {
-  if (elevation > this->mMaxElev) {
-    return;
-  }
-  if (isLeaf()) {
-    if (mBucket == nullptr) {
-      mBucket = new ConcurrentIsolationResults();
-    }
-    if (*isolationKm < 0) {
-      // Max distance to tile is upper bound.
-      *isolationKm = maxDistanceToCell(peakLocation) / 1000;
-    }
-    mBucket->addResult(peakLocation, elevation, *isolationKm);
-    return;
-  }
-  if (elevation < mSmaller->mMaxElev && elevation < mBigger->mMaxElev) {
-    float shortestDistanceToSmaller =
-        shortestDistanceToQuadrillateral(&peakLocation, mSmaller->mTopLeft,
-                                         mSmaller->mBottomRight) /
-        1000;
-    float shortestDistanceToBigger =
-        shortestDistanceToQuadrillateral(&peakLocation, mBigger->mTopLeft,
-                                         mBigger->mBottomRight) /
-        1000;
-    if (shortestDistanceToSmaller < shortestDistanceToBigger) {
-      // go first in smaller
-      if (*isolationKm < 0 || *isolationKm > shortestDistanceToSmaller) {
-        mSmaller->findUpperBoundAndDistributeToTiles(peakLocation, elevation,
-                                     isolationKm);
-      }
-      if (*isolationKm < 0 || *isolationKm > shortestDistanceToBigger) {
-        mBigger->findUpperBoundAndDistributeToTiles(peakLocation, elevation,
-                                    isolationKm);
-      }
-    } else {
-      // go first in bigger
-      if (*isolationKm < 0 || *isolationKm > shortestDistanceToBigger) {
-        mBigger->findUpperBoundAndDistributeToTiles(peakLocation, elevation,
-                                    isolationKm);
-      }
-      if (*isolationKm < 0 || *isolationKm > shortestDistanceToSmaller) {
-        mSmaller->findUpperBoundAndDistributeToTiles(peakLocation, elevation,
-                                     isolationKm);
-      }
-    }
-
-  } else if (elevation < mSmaller->mMaxElev) {
-    float shortestDistanceToSmaller =
-        shortestDistanceToQuadrillateral(&peakLocation, mSmaller->mTopLeft,
-                                         mSmaller->mBottomRight) /
-        1000;
-    if (*isolationKm < 0 || *isolationKm > shortestDistanceToSmaller) {
-      mSmaller->findUpperBoundAndDistributeToTiles(peakLocation, elevation,
-                                   isolationKm);
-    }
-  } else if (elevation < mBigger->mMaxElev) {
-    float shortestDistanceToBigger =
-        shortestDistanceToQuadrillateral(&peakLocation, mBigger->mTopLeft,
-                                         mBigger->mBottomRight) /
-        1000;
-    if (*isolationKm < 0 || *isolationKm > shortestDistanceToBigger) {
-      mBigger->findUpperBoundAndDistributeToTiles(peakLocation, elevation,
                                   isolationKm);
     }
   }
