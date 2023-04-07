@@ -61,7 +61,7 @@ void ILPSearchAreaTree::proccessUnbound() {
     if (queue[i].isPeak()) {
       IsolationRecord nearestTile = sld->calcPeak(queue + i);
       if (!nearestTile.foundHigherGround) {
-        std::cout << "Did not find higher ground for: " << queue[i].latitude() << ", " << queue[i].longitude() << std::endl;
+        //std::cout << "Did not find higher ground for: " << queue[i].latitude() << ", " << queue[i].longitude() << std::endl;
         continue;
       }
       LatLng topLeft(std::floor(nearestTile.closestHigherGround.latitude()) + 1, 
