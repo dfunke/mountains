@@ -6,16 +6,16 @@ project(mountains,
     LANGUAGES CXX
 )
 
-SET (CMAKE_C_FLAGS_INIT                "-Werror -Wpedantic")
+SET (CMAKE_C_FLAGS_INIT                "-Werror -Wpedantic -std=c17")
 SET (CMAKE_C_FLAGS_DEBUG_INIT          "-g")
 SET (CMAKE_C_FLAGS_MINSIZEREL_INIT     "-Os -DNDEBUG")
-SET (CMAKE_C_FLAGS_RELEASE_INIT        "-O3 -DNDEBUG")
+SET (CMAKE_C_FLAGS_RELEASE_INIT        "-O3 -g -DNDEBUG")
 SET (CMAKE_C_FLAGS_RELWITHDEBINFO_INIT "-O2 -g")
 
-SET (CMAKE_CXX_FLAGS_INIT                "-Werror -Wpedantic")
+SET (CMAKE_CXX_FLAGS_INIT                "-Werror -Wpedantic -std=c++17")
 SET (CMAKE_CXX_FLAGS_DEBUG_INIT          "-g")
 SET (CMAKE_CXX_FLAGS_MINSIZEREL_INIT     "-Os -DNDEBUG")
-SET (CMAKE_CXX_FLAGS_RELEASE_INIT        "-O3 -DNDEBUG")
+SET (CMAKE_CXX_FLAGS_RELEASE_INIT        "-O3 -g -DNDEBUG")
 SET (CMAKE_CXX_FLAGS_RELWITHDEBINFO_INIT "-O2 -g")
 
 #string(REPLACE " -Werror" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
@@ -303,12 +303,12 @@ target_link_libraries(
 
 # Build libraries
 foreach(X IN LISTS BUILD_LIBS)
-	target_compile_features(${X} PUBLIC cxx_std_14)
+	target_compile_features(${X} PUBLIC cxx_std_17)
 	target_compile_options(${X} PUBLIC ${COMMONFLAGS})
 endforeach()
 
 # Build executables
 foreach(X IN LISTS BUILD_TARGETS)
-	target_compile_features(${X} PRIVATE cxx_std_14)
+	target_compile_features(${X} PRIVATE cxx_std_17)
 	target_compile_options(${X} PRIVATE ${COMMONFLAGS})
 endforeach()
