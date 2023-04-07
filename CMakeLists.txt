@@ -18,6 +18,23 @@ SET (CMAKE_CXX_FLAGS_MINSIZEREL_INIT     "-Os -DNDEBUG")
 SET (CMAKE_CXX_FLAGS_RELEASE_INIT        "-O3 -g -DNDEBUG")
 SET (CMAKE_CXX_FLAGS_RELWITHDEBINFO_INIT "-O2 -g")
 
+
+#tbb
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/external/comake-modules)
+find_package(TBB COMPONENTS tbbmalloc tbbmalloc_proxy tbb_preview)
+
+
+# External dependencies for sweepline-isolation-finder
+
+# glm
+include_directories(external/glm)
+
+
+# set( IPS2RA_DISABLE_PARALLEL "true")
+# include_directories(ips2ra/extern/tlx)
+set(IPS4O_DISABLE_PARALLEL "true")
+add_subdirectory(ips4o)
+
 #string(REPLACE " -Werror" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 #set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17" )
 
@@ -101,21 +118,6 @@ add_library(
 	code/utm_coordinate_system.cpp
 )
 
-# External dependencies for sweepline-isolation-finder
-
-# glm
-include_directories(external/glm)
-
-#tbb
-# include(external/tbb/cmake/TBBBuild.cmake)
-#list(APPEND CMAKE_MODULE_PATH "external/tbb/cmake/")
-# tbb_build(TBB_ROOT external/tbb CONFIG_DIR TBB_DIR)
-#find_package(tbb REQUIRED)
-
-# set( IPS2RA_DISABLE_PARALLEL "true")
-# include_directories(ips2ra/extern/tlx)
-set(IPS4O_DISABLE_PARALLEL "true")
-add_subdirectory(ips4o)
 
 add_executable(
     isolation
