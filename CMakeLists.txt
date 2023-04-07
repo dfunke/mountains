@@ -10,6 +10,9 @@ set( CMAKE_C_FLAGS_DEBUG "" CACHE STRING "" )
 set( CMAKE_CXX_FLAGS_DEBUG "" CACHE STRING "" )
 set( CMAKE_C_FLAGS_RELEASE "" CACHE STRING "" )
 set( CMAKE_CXX_FLAGS_RELEASE "" CACHE STRING "" )
+#list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/ips4o/extern/cmake-modules)
+#find_package(TBB REQUIRED)
+
 # list(APPEND CMAKE_MODULE_PATH "/opt/intel/oneapi/tbb/latest/lib/cmake/tbb/")
 # find_package(TBB REQUIRED)
 
@@ -97,8 +100,10 @@ include_directories(external/glm)
 # tbb_build(TBB_ROOT external/tbb CONFIG_DIR TBB_DIR)
 #find_package(tbb REQUIRED)
 
-set( IPS2RA_DISABLE_PARALLEL "true")
-add_subdirectory(ips2ra)
+# set( IPS2RA_DISABLE_PARALLEL "true")
+# include_directories(ips2ra/extern/tlx)
+set(IPS4O_DISABLE_PARALLEL "true")
+add_subdirectory(ips4o)
 
 add_executable(
     isolation
@@ -134,7 +139,7 @@ target_link_libraries(
 	coordlib
 	tbb
 	pthread
-	ips2ra
+	ips4o
 )
 
 add_executable(

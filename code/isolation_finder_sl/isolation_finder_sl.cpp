@@ -15,7 +15,7 @@
 #include "sweepline_datastruct_quadtree_dynamic.h"
 #include "sweepline_datastruct_quadtree_static.h"
 
-#include "ips2ra.hpp"
+#include "ips4o.hpp"
 
 #include <algorithm>
 #include <assert.h>
@@ -179,7 +179,7 @@ void IsolationFinderSl::setup(const Tile *tile,
   // std::cout << "Peaks: " << peaks.size() << std::endl;
 
   // Sort using height value
-  ips2ra::sort(mEventQueue, mEventQueue + idx,
+  ips4o::sort(mEventQueue, mEventQueue + idx,
                    [this](SlEvent const &lhs, SlEvent const &rhs) {
                      return lhs.getElev() > rhs.getElev();
                    });

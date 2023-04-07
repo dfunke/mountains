@@ -25,6 +25,18 @@ public:
   }
 
   bool equal(const SlEvent &e) const;
+  bool operator>(const SlEvent &other) {
+    return mElev > other.mElev;
+  }
+  bool operator<(const SlEvent &other) {
+    return mElev < other.mElev;
+  }
+  bool operator>=(const SlEvent &other) {
+    return mElev >= other.mElev;
+  }
+  bool operator<=(const SlEvent &other) {
+    return mElev <= other.mElev;
+  }
 
 private:
   Elevation mElev;
