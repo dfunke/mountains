@@ -15,7 +15,7 @@
 #include "sweepline_datastruct_quadtree_dynamic.h"
 #include "sweepline_datastruct_quadtree_static.h"
 
-#include "ips4o.hpp"
+#include "ips2ra.hpp"
 
 #include <algorithm>
 #include <assert.h>
@@ -100,7 +100,7 @@ void IsolationFinderSl::setup(const Tile *tile,
     // skipVal = tile->width() / (tile->metersPerSample() * 4);
     //  Reduce to
     skipVal = mFormat.inMemorySamplesAcross() / (mFormat.degreesAcross() * 500);
-    //skipVal = 3;
+    // skipVal = 3;
     PeakFinder pfinder(tile);
     peaks = pfinder.findPeaks();
     // Get distance-scale from tile
@@ -111,11 +111,10 @@ void IsolationFinderSl::setup(const Tile *tile,
         mLngDistanceScale[y] = cosf(degToRad(point.latitude()));
       }
     }
-    int queueSize = ((width - 2) / skipVal) * ((height - 2) / skipVal) + peaks.size();
+    int queueSize =
+        ((width - 2) / skipVal) * ((height - 2) / skipVal) + peaks.size();
     mEventQueue = new SlEvent[queueSize];
   }
-
-
 
   // Add peaks first, to guarantee > all inserted samples.
   if (prevResults != nullptr) {
@@ -184,24 +183,29 @@ void IsolationFinderSl::setup(const Tile *tile,
   }
 
   // sort peaks
-  ips4o::sort(mEventQueue, mEventQueue + peakIdx - 1,
-                   [](SlEvent const &lhs, SlEvent const &rhs) {
-                     return lhs.getElev() > rhs.getElev();
-                   });
+  ips2ra::sort(mEventQueue, mEventQueue + peakIdx - 1, [](SlEvent const &lhs) {
+    if (lhs.getElev() < 0) {
+      return (unsigned int)0;
+    }
+    return (unsigned int) lhs.getElev();
+  });
   // sort events
-  ips4o::sort(mEventQueue + peakIdx, mEventQueue + idx,
-                   [](SlEvent const &lhs, SlEvent const &rhs) {
-                     return lhs.getElev() > rhs.getElev();
-                   });
+  ips2ra::sort(mEventQueue + peakIdx, mEventQueue + idx,
+               [](SlEvent const &lhs) {
+                 if (lhs.getElev() < 0) {
+                   return (unsigned int)0;
+                 }
+    return (unsigned int) lhs.getElev();
+               });
   // Merge peaks and events
   std::inplace_merge(mEventQueue, mEventQueue + peakIdx, mEventQueue + idx,
-                   [](SlEvent const &lhs, SlEvent const &rhs) {
-                     return lhs.getElev() > rhs.getElev();
-                   });
+                     [](SlEvent const &lhs, SlEvent const &rhs) {
+                       return lhs.getElev() > rhs.getElev();
+                     });
 
   // Sort using height value
-  //std::stable_sort(mEventQueue, mEventQueue + idx,
-  //std::stable_sort(mEventQueue, mEventQueue + idx,
+  // std::stable_sort(mEventQueue, mEventQueue + idx,
+  // std::stable_sort(mEventQueue, mEventQueue + idx,
   //                 [](SlEvent const &lhs, SlEvent const &rhs) {
   //                   return lhs.getElev() > rhs.getElev();
   //                 });
