@@ -7,6 +7,10 @@ void SweeplineDatastruct::insert(SlEvent* node) {
     // pass
 }
 
+void SweeplineDatastruct::remove(const SlEvent* node) {
+    // pass
+}
+
 IsolationRecord SweeplineDatastruct::calcPeak(const SlEvent *node) {
     return IsolationRecord();
 }

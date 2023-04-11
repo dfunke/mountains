@@ -335,6 +335,8 @@ public:
       fclose(imageFile);
    }
 
+   void remove(const SlEvent *event) override {}
+
    std::function<Offsets(float lat, float lng)> mToOffsets;
 
 private:

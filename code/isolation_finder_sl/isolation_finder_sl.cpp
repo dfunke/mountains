@@ -94,24 +94,25 @@ void IsolationFinderSl::setup(const Tile *tile,
   if (prevResults != nullptr) {
     skipVal = 1;
     mEventQueue =
-        new SlEvent[((width - 2) / skipVal) * ((height - 2) / skipVal) +
+        new SlEvent[((width - 1) / skipVal) * ((height - 1) / skipVal) * 2 +
                     prevResults->size()];
   } else {
     // skipVal = tile->width() / (tile->metersPerSample() * 4);
-    //  Reduce to
-    skipVal = mFormat.inMemorySamplesAcross() / (mFormat.degreesAcross() * 500);
+    //  Reduce to about 500 px per degree across
+    skipVal = mFormat.inMemorySamplesAcross() / (mFormat.degreesAcross() * 100);
     //skipVal = 3;
     PeakFinder pfinder(tile);
     peaks = pfinder.findPeaks();
     // Get distance-scale from tile
     mLngDistanceScale = (float *)malloc(sizeof(float) * tile->height());
+    // Add peaks as peak events
     for (int y = skipVal; y < tile->height() - skipVal; y += skipVal) {
       for (int y = 0; y < tile->height(); ++y) {
         LatLng point = mCoordinateSystem->getLatLng(Offsets(0, y));
         mLngDistanceScale[y] = cosf(degToRad(point.latitude()));
       }
     }
-    int queueSize = ((width - 2) / skipVal) * ((height - 2) / skipVal) + peaks.size();
+    int queueSize = ((width - 2) / skipVal) * ((height - 2) / skipVal) * 2 + peaks.size();
     mEventQueue = new SlEvent[queueSize];
   }
 
@@ -121,14 +122,14 @@ void IsolationFinderSl::setup(const Tile *tile,
   if (prevResults != nullptr) {
     for (auto it = prevResults->mResults.cbegin();
          it < prevResults->mResults.cend(); ++it) {
-      mEventQueue[idx].initialize(it->peakElevation, true, it->peak,
+      mEventQueue[idx].initialize(it->peakElevation, EventType::PEAK, it->peak,
                                   Offsets(0, 0));
       ++idx;
     }
   } else {
     // Add peaks
     for (Offsets &peak : peaks) {
-      mEventQueue[idx].initialize(tile->get(peak), true,
+      mEventQueue[idx].initialize(tile->get(peak), EventType::PEAK,
                                   mCoordinateSystem->getLatLng(peak), peak);
       ++idx;
     }
@@ -141,8 +142,8 @@ void IsolationFinderSl::setup(const Tile *tile,
   }
 
   // On SRTM 1 pixel overlapp
-  for (int j = skipVal; j < height - skipVal; j += skipVal) {
-    for (int i = skipVal; i < width - skipVal; i += skipVal) {
+  for (int j = 0; j < height - skipVal; j += skipVal) {
+    for (int i = 0; i < width - skipVal; i += skipVal) {
       Offsets currentOffsets(i, j);
       // skip if smaller than minPeakElev
       /*
@@ -158,28 +159,13 @@ void IsolationFinderSl::setup(const Tile *tile,
 
       if (minSorrounding < tile->get(currentOffsets)) {
         mEventQueue[idx].initialize(
-            tile->get(currentOffsets), false,
+            tile->get(currentOffsets), EventType::ADD,
+            mCoordinateSystem->getLatLng(currentOffsets), currentOffsets);
+        mEventQueue[idx].initialize(
+            minSorrounding, EventType::REMOVE,
             mCoordinateSystem->getLatLng(currentOffsets), currentOffsets);
         ++idx;
       }
-    }
-  }
-
-  // Add top and left row if not fast
-  if (prevResults != nullptr) {
-    for (int i = 0; i < width; ++i) {
-      Offsets currOffsets(i, 0);
-      mEventQueue[idx].initialize(tile->get(currOffsets), false,
-                                  mCoordinateSystem->getLatLng(currOffsets),
-                                  currOffsets);
-      ++idx;
-    }
-    for (int i = 1; i < height; ++i) {
-      Offsets currOffsets(0, i);
-      mEventQueue[idx].initialize(tile->get(currOffsets), false,
-                                  mCoordinateSystem->getLatLng(currOffsets),
-                                  currOffsets);
-      ++idx;
     }
   }
 
@@ -250,8 +236,17 @@ IsolationResults IsolationFinderSl::runSweepline(float mMinIsolationKm,
   }
   for (std::size_t i = 0; i < currSize; ++i) {
     SlEvent *node = &mEventQueue[i];
-    if (node->isPeak()) {
-      LatLng peakLoc = *node;
+    switch (node->getType())
+    {
+    case ADD:
+      sld->insert(node);
+      break;
+    case REMOVE:
+    sld->remove(node);
+    break;
+    case PEAK:
+      {
+LatLng peakLoc = *node;
       IsolationRecord record = sld->calcPeak(node);
 
       if (record.foundHigherGround) {
@@ -289,8 +284,8 @@ IsolationResults IsolationFinderSl::runSweepline(float mMinIsolationKm,
         // Add not found higher ground peaks just to buckets, not to final
         // result.
       }
-    } else {
-      sld->insert(node);
+      }
+      break;
     }
     // if ((mFormat == FileFormat::HGT_DEM3 && counter % 3333 == 0) || (mFormat
     // == FileFormat::HGT_DEM1 && counter % 10000 == 0) )

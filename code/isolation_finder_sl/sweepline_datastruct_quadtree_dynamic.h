@@ -47,6 +47,8 @@ public:
   // A copy is not made; the point must live as long as the quadtree.
   void insert(SlEvent *n) override;
 
+  void remove(const SlEvent *n) override;
+
   IsolationRecord calcPeak(const SlEvent *node) override;
 
   void saveAsImage(int w, int h, int level, SlEvent **allNodes, int nodeSize);

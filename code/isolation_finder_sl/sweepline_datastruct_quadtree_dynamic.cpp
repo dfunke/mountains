@@ -27,9 +27,13 @@ SweeplineDatastructQuadtreeDynamic::~SweeplineDatastructQuadtreeDynamic() {
   delete []mPresetCells;
 }
 
-void SweeplineDatastructQuadtreeDynamic::insert(SlEvent *n)
+void SweeplineDatastructQuadtreeDynamic::insert(SlEvent *e)
 {
-  mRoot->insert(n);
+  mRoot->insert(e);
+}
+
+void SweeplineDatastructQuadtreeDynamic::remove(const SlEvent *e) {
+  mRoot->remove(e);
 }
 
 IsolationRecord SweeplineDatastructQuadtreeDynamic::calcPeak(const SlEvent *node)

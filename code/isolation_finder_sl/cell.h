@@ -29,6 +29,8 @@ struct Cell {
   bool isLeaf() const { return this->content != nullptr; }
   // Insert SlEvent to tree
   void insert(SlEvent *point);
+
+  void remove(const SlEvent *point);
   // Check if point is in cell
   bool isIn(const SlEvent *point) const;
   // Get the distance to the cell

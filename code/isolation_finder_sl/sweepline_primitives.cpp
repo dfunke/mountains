@@ -3,15 +3,15 @@
 #include "../latlng.h"
 
 
-SlEvent::SlEvent(Elevation elev, bool isPeak, LatLng latLng) : LatLng(latLng) {
+SlEvent::SlEvent(Elevation elev, EventType type, LatLng latLng) : LatLng(latLng) {
   mElev = elev;
-  mIsPeak = isPeak;
+  mType = type;
   mOffsets = Offsets(0,0);
 }
 
-void SlEvent::initialize(Elevation elev, bool isPeak, LatLng latLng, Offsets offsets) {
+void SlEvent::initialize(Elevation elev, EventType type, LatLng latLng, Offsets offsets) {
   mElev = elev;
-  mIsPeak = isPeak;
+  mType = type;
   mOffsets = offsets;
   updateLatLng(latLng);
 }
