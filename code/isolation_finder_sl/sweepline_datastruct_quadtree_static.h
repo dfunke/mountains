@@ -416,7 +416,7 @@ private:
             {
                continue;
             }
-            float distance = toCheck->distance(*n);
+            float distance = searchDistance(toCheck, *n);
             if (!ir->foundHigherGround || ir->distance > distance)
             {
                ir->distance = distance;
@@ -431,7 +431,7 @@ private:
       //  Create 4 Quads
       const int nBucket = bucketSize >> 2;
       const int nCunterSize = (counterSize - 1) >> 2;
-      Quad quads[4];
+      Quad *quads = new Quad[4];
 
       int quadsIdx = 0;
       const float midLatitude = (p.mMaxLat + p.mMinLat) / 2;
@@ -439,7 +439,6 @@ private:
 
       for (int i = 0; i < 4; ++i)
       {
-         int activeCounter = mCells[p.idx + i * nBucket].activeCounter;
          if ((nCunterSize > 0 && mNodeOccupied[p.counterIdx + 1 + i * nCunterSize]) || (nCunterSize == 0 && mCells[p.idx + i * nBucket].activeCounter > 0))
          {
             const float maxLat = (1 - i / 2) * p.mMaxLat + i / 2 * midLatitude;
@@ -464,6 +463,7 @@ private:
              findNearest(n, quads[i], level + 1, nBucket, nCunterSize, ir);
          }
       }
+      delete [] quads;
    }
 
    float mMinLng;

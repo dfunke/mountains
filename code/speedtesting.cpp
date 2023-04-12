@@ -32,12 +32,10 @@ using std::floor;
 using std::string;
 
 // static const string baseFolder =
-//     "/data02/funke/SRTM/viewfinderpanoramas.org/dem3";
-// static const string baseFolderDem1 =
-//     "/data02/funke/SRTM/viewfinderpanoramas.org/dem1";
-// static const string testFolder = "/home/huening/SRTM";
-// static const string testResultFile =
-//     "/home/huening/testresults-old-without-lake-superior.txt";
+// "/data02/funke/SRTM/viewfinderpanoramas.org/dem3"; static const string
+// baseFolderDem1 = "/data02/funke/SRTM/viewfinderpanoramas.org/dem1"; static
+// const string testFolder = "/home/huening/SRTM"; static const string
+// testResultFile = "/home/huening/multi-threading-all-new.txt";
 
 static const string baseFolder = "/home/pc/Data2/SRTM-DEM3";
 static const string baseFolderDem1 = "/home/pc/Data2/SRTM-DEM1";
@@ -61,18 +59,18 @@ struct TestCase {
 
 vector<TestCase> getTestCases() {
   vector<TestCase> testCases;
-  // testCases.push_back(TestCase(75, 90, 151, 180, 4));
-  // testCases.push_back(TestCase(74, 90, 149, 180, 9));
-  // testCases.push_back(TestCase(72, 90, 145, 180, 21));
-  // testCases.push_back(TestCase(71, 90, 145, 180, 35));
-  // testCases.push_back(TestCase(70, 90, 144, 180, 62));
-  // testCases.push_back(TestCase(68, 90, 142, 180, 151));
-  // testCases.push_back(TestCase(66, 90, 140, 180, 249));
-  // testCases.push_back(TestCase(61, 90, 132, 180, 550));
-  // testCases.push_back(TestCase(53, 90, 118, 180, 1025));
-  // testCases.push_back(TestCase(42, 90, 98, 180, 2027));
-  // testCases.push_back(TestCase(26, 90, 67, 180, 4094));
-  // testCases.push_back(TestCase(0, 90, 17, 180, 8245));
+  testCases.push_back(TestCase(75, 90, 151, 180, 4));
+  testCases.push_back(TestCase(74, 90, 149, 180, 9));
+  testCases.push_back(TestCase(72, 90, 145, 180, 21));
+  testCases.push_back(TestCase(71, 90, 145, 180, 35));
+  testCases.push_back(TestCase(70, 90, 144, 180, 62));
+  testCases.push_back(TestCase(68, 90, 142, 180, 151));
+  testCases.push_back(TestCase(66, 90, 140, 180, 249));
+  testCases.push_back(TestCase(61, 90, 132, 180, 550));
+  testCases.push_back(TestCase(53, 90, 118, 180, 1025));
+  testCases.push_back(TestCase(42, 90, 98, 180, 2027));
+  testCases.push_back(TestCase(26, 90, 67, 180, 4094));
+  testCases.push_back(TestCase(0, 90, 17, 180, 8245));
   testCases.push_back(TestCase(-55, 90, -91, 180, 16387));
   testCases.push_back(TestCase(-90, 90, -180, 180, 26095));
   return testCases;
@@ -134,7 +132,7 @@ TestCase getNorthAmerika() { return TestCase(12, 90, -168, -51, 502); }
 
 bool fileExists(const char *fileName) {
   FILE *file;
-  if (file = fopen(fileName, "r")) {
+  if ((file = fopen(fileName, "r"))) {
     fclose(file);
     return true;
   }
@@ -148,7 +146,7 @@ void writeToTestResults(std::size_t tileCount, double oldTime, double newTime) {
   outfile.close();
 }
 
-int setupSrtmFolder(float *bounds, bool dem1) {
+int setupSrtmFolder(float *bounds) {
   int counter = 0;
   string cleanCommand = "rm " + testFolder + "/*";
   int success = system(cleanCommand.c_str());
@@ -221,15 +219,14 @@ int conductSpeedComparrisonTests() {
                        testCase.maxLng};
     // float bounds[4] = {34, (34.f + t/d), -118,(-118.f + t)};
     // float bounds[4] = {47, (47.f + t/d), 1,(1.f + t)};
-
-    int tileCount = setupSrtmFolder(bounds, false);
+    setupSrtmFolder(bounds);
     std::cout << "Start Processing " << bounds[0] << " " << bounds[1] << " "
               << bounds[2] << " " << bounds[3] << " " << std::endl;
 
-    for (int j = 0; j < 3; j++) {
+    for (int j = 0; j < 1; j++) {
       for (int i = 0; i < 1; i++) {
         if (i == 0) {
-          old = true;
+          old = false;
           // old = rand() % 2;
         } else {
           old = !old;
@@ -277,10 +274,10 @@ int conductSpeedComparrisonTests() {
         }
       }
     }
-    times = times / 3.0;
-    oldTimes = oldTimes / 3.0;
-    std::cout << tileCount << "," << oldTimes << "," << times << std::endl;
-    writeToTestResults(tileCount, oldTimes, times);
+    times = times / 1.0;
+    oldTimes = oldTimes / 1.0;
+    std::cout << testCase.size << "," << oldTimes << "," << times << std::endl;
+    writeToTestResults(testCase.size, oldTimes, times);
   }
   return 0;
 }
@@ -288,5 +285,10 @@ int conductSpeedComparrisonTests() {
 int main(int argc, char **argv) {
   START_EASYLOGGINGPP(argc, argv);
   return conductSpeedComparrisonTests();
+  // return testCaseWithDem1Data();
+  TestCase testCase = getNorthAmerika();
+  float bounds[4] = {testCase.minLat, testCase.maxLat, testCase.minLng,
+                     testCase.maxLng};
+  setupSrtmFolder(bounds);
   // return testSpecificArea();
 }

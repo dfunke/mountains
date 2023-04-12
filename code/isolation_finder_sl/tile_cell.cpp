@@ -172,7 +172,7 @@ void TileCell::findUpperBoundAndDistributeToTiles(const LatLng &peakLocation,
 
 float TileCell::maxDistanceToCell(const LatLng &peak) const {
   return shortestDistanceToQuadrillateral(&peak, mTopLeft, mBottomRight) +
-         2 * searchDistance(&mTopLeft, mBottomRight);
+         searchDistance(&mTopLeft, mBottomRight);
 }
 
 ConcurrentIsolationResults *TileCell::findBucket(int minLat, int minLng) {
