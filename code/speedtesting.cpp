@@ -37,7 +37,7 @@ using std::string;
 // const string testFolder = "/home/huening/SRTM"; static const string
 // testResultFile = "/home/huening/multi-threading-all-new.txt";
 
-static const string baseFolder = "/home/pc/Data2/SRTM-DEM3";
+static const string baseFolder = "/home/pc/Data1/SRTM-DEM1";
 static const string baseFolderDem1 = "/home/pc/SRTM-DEM1";
 static const string testFolder = "/home/pc/SRTM";
 static const string testResultFile = "/home/pc/tmp/testresults.txt";
