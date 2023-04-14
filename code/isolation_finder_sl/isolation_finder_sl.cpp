@@ -91,6 +91,7 @@ void IsolationFinderSl::setup(const Tile *tile,
 
   int idx = 0;
   vector<Offsets> peaks;
+  int loopStartIdx = 0;
   if (prevResults != nullptr) {
     skipVal = 1;
     mEventQueue =
@@ -100,6 +101,7 @@ void IsolationFinderSl::setup(const Tile *tile,
     // skipVal = tile->width() / (tile->metersPerSample() * 4);
     //  Reduce to
     skipVal = mFormat.inMemorySamplesAcross() / (mFormat.degreesAcross() * 500);
+    loopStartIdx = skipVal;
     // skipVal = 3;
     PeakFinder pfinder(tile);
     peaks = pfinder.findPeaks();
@@ -112,7 +114,7 @@ void IsolationFinderSl::setup(const Tile *tile,
       }
     }
     int queueSize =
-        ((width - 1) / skipVal) * ((height - 1) / skipVal) * 2 + peaks.size();
+        ((width - 2) / skipVal) * ((height - 2) / skipVal) * 2 + peaks.size();
     mEventQueue = new SlEvent[queueSize];
   }
 
@@ -140,8 +142,8 @@ void IsolationFinderSl::setup(const Tile *tile,
   }
 
   // On SRTM 1 pixel overlapp
-  for (int j = 0; j < height - skipVal; j += skipVal) {
-    for (int i = 0; i < width - skipVal; i += skipVal) {
+  for (int j = loopStartIdx; j < height - skipVal; j += skipVal) {
+    for (int i = loopStartIdx; i < width - skipVal; i += skipVal) {
       Offsets currentOffsets(i, j);
       // skip if smaller than minPeakElev
       /*
