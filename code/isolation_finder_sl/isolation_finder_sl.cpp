@@ -72,13 +72,17 @@ inline Elevation getMinSorrounding(const Tile *tile, const Offsets offset,
   if (elev < minSorrounding && elev != tile->NODATA_ELEVATION) {
     minSorrounding = elev;
   }
-  elev = tile->get(Offsets(offset.x() - skipVal, offset.y()));
-  if (elev < minSorrounding && elev != tile->NODATA_ELEVATION) {
-    minSorrounding = elev;
+  if (offset.x() - skipVal >= 0) {
+    elev = tile->get(Offsets(offset.x() - skipVal, offset.y()));
+    if (elev < minSorrounding && elev != tile->NODATA_ELEVATION) {
+      minSorrounding = elev;
+    }
   }
-  elev = tile->get(Offsets(offset.x(), offset.y() - skipVal));
-  if (elev < minSorrounding && elev != tile->NODATA_ELEVATION) {
-    minSorrounding = elev;
+  if (offset.y() - skipVal >= 0) {
+    elev = tile->get(Offsets(offset.x(), offset.y() - skipVal));
+    if (elev < minSorrounding && elev != tile->NODATA_ELEVATION) {
+      minSorrounding = elev;
+    }
   }
   return minSorrounding;
 }
