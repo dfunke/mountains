@@ -194,42 +194,42 @@ target_link_libraries(
 	ips4o
 )
 
-add_executable(
-   check_tile 
-	code/easylogging++.cc
-	code/file_format.cpp 
-	code/check_tile.cpp 
-	code/isolation_finder.cpp 
-	code/isolation_results.cpp 
-	code/isolation_task.cpp 
-	code/peak_finder.cpp 
-	code/point_map.cpp 
-	code/tile.cpp 
-	code/tile_cache.cpp 
-	code/tile_loading_policy.cpp
-	code/fabdem_loader.cpp
-	code/isolation_finder_sl/cell_memory_manager.cpp
-	code/isolation_finder_sl/cell.cpp
-	code/isolation_finder_sl/concurrent_isolation_results.cpp
-	code/isolation_finder_sl/ilp_search_area_tree.cpp
-	code/isolation_finder_sl/isolation_finder_sl.cpp
-	code/isolation_finder_sl/isolation_sl_processor.cpp
-	code/isolation_finder_sl/sweepline_datastruct_naive.cpp
-	code/isolation_finder_sl/sweepline_datastruct_quadtree_dynamic.cpp
-	code/isolation_finder_sl/sweepline_datastruct.cpp
-	code/isolation_finder_sl/sweepline_primitives.cpp
-	code/isolation_finder_sl/tile_cell.cpp
-)
-
-target_link_libraries(
-	check_tile PRIVATE
-	pointlib 
-	loaderlib 
-	coordlib
-	tbb
-	pthread
-	ips4o
-)
+# add_executable(
+#    check_tile 
+# 	code/easylogging++.cc
+# 	code/file_format.cpp 
+# 	code/check_tile.cpp 
+# 	code/isolation_finder.cpp 
+# 	code/isolation_results.cpp 
+# 	code/isolation_task.cpp 
+# 	code/peak_finder.cpp 
+# 	code/point_map.cpp 
+# 	code/tile.cpp 
+# 	code/tile_cache.cpp 
+# 	code/tile_loading_policy.cpp
+# 	code/fabdem_loader.cpp
+# 	code/isolation_finder_sl/cell_memory_manager.cpp
+# 	code/isolation_finder_sl/cell.cpp
+# 	code/isolation_finder_sl/concurrent_isolation_results.cpp
+# 	code/isolation_finder_sl/ilp_search_area_tree.cpp
+# 	code/isolation_finder_sl/isolation_finder_sl.cpp
+# 	code/isolation_finder_sl/isolation_sl_processor.cpp
+# 	code/isolation_finder_sl/sweepline_datastruct_naive.cpp
+# 	code/isolation_finder_sl/sweepline_datastruct_quadtree_dynamic.cpp
+# 	code/isolation_finder_sl/sweepline_datastruct.cpp
+# 	code/isolation_finder_sl/sweepline_primitives.cpp
+# 	code/isolation_finder_sl/tile_cell.cpp
+# )
+# 
+# target_link_libraries(
+# 	check_tile PRIVATE
+# 	pointlib 
+# 	loaderlib 
+# 	coordlib
+# 	tbb
+# 	pthread
+# 	ips4o
+# )
 # add_executable(
 # 	prominence
 # 	code/divide_tree.cpp
