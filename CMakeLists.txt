@@ -12,7 +12,7 @@ SET (CMAKE_C_FLAGS_MINSIZEREL_INIT     "-Os -DNDEBUG")
 SET (CMAKE_C_FLAGS_RELEASE_INIT        "-O3 -g -DNDEBUG")
 SET (CMAKE_C_FLAGS_RELWITHDEBINFO_INIT "-O2 -g")
 
-SET (CMAKE_CXX_FLAGS_INIT                "-Werror -Wno-error=sign-compare -Wpedantic -std=c++17")
+SET (CMAKE_CXX_FLAGS_INIT                "-Werror -Wpedantic -std=c++17")
 SET (CMAKE_CXX_FLAGS_DEBUG_INIT          "-g")
 SET (CMAKE_CXX_FLAGS_MINSIZEREL_INIT     "-Os -DNDEBUG")
 SET (CMAKE_CXX_FLAGS_RELEASE_INIT        "-O3 -g -DNDEBUG")
@@ -30,11 +30,10 @@ find_package(TBB COMPONENTS tbbmalloc tbbmalloc_proxy tbb_preview)
 include_directories(external/glm)
 
 
-set( IPS2RA_DISABLE_PARALLEL "true")
-include_directories(ips2ra/extern/tlx)
-add_subdirectory(ips2ra)
-#set(IPS4O_DISABLE_PARALLEL "true")
-#add_subdirectory(ips4o)
+# set( IPS2RA_DISABLE_PARALLEL "true")
+# include_directories(ips2ra/extern/tlx)
+set(IPS4O_DISABLE_PARALLEL "true")
+add_subdirectory(ips4o)
 
 #string(REPLACE " -Werror" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 #set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17" )
@@ -154,7 +153,7 @@ target_link_libraries(
 	coordlib
 	tbb
 	pthread
-	ips2ra
+	ips4o
 )
 
 
@@ -192,45 +191,45 @@ target_link_libraries(
 	coordlib
 	tbb
 	pthread
-	ips2ra
+	ips4o
 )
 
-add_executable(
-   check_tile 
-	code/easylogging++.cc
-	code/file_format.cpp 
-	code/check_tile.cpp 
-	code/isolation_finder.cpp 
-	code/isolation_results.cpp 
-	code/isolation_task.cpp 
-	code/peak_finder.cpp 
-	code/point_map.cpp 
-	code/tile.cpp 
-	code/tile_cache.cpp 
-	code/tile_loading_policy.cpp
-	code/fabdem_loader.cpp
-	code/isolation_finder_sl/cell_memory_manager.cpp
-	code/isolation_finder_sl/cell.cpp
-	code/isolation_finder_sl/concurrent_isolation_results.cpp
-	code/isolation_finder_sl/ilp_search_area_tree.cpp
-	code/isolation_finder_sl/isolation_finder_sl.cpp
-	code/isolation_finder_sl/isolation_sl_processor.cpp
-	code/isolation_finder_sl/sweepline_datastruct_naive.cpp
-	code/isolation_finder_sl/sweepline_datastruct_quadtree_dynamic.cpp
-	code/isolation_finder_sl/sweepline_datastruct.cpp
-	code/isolation_finder_sl/sweepline_primitives.cpp
-	code/isolation_finder_sl/tile_cell.cpp
-)
-
-target_link_libraries(
-	check_tile PRIVATE
-	pointlib 
-	loaderlib 
-	coordlib
-	tbb
-	pthread
-	ips2ra
-)
+#add_executable(
+#   check_tile 
+#	code/easylogging++.cc
+#	code/file_format.cpp 
+#	code/check_tile.cpp 
+#	code/isolation_finder.cpp 
+#	code/isolation_results.cpp 
+#	code/isolation_task.cpp 
+#	code/peak_finder.cpp 
+#	code/point_map.cpp 
+#	code/tile.cpp 
+#	code/tile_cache.cpp 
+#	code/tile_loading_policy.cpp
+#	code/fabdem_loader.cpp
+#	code/isolation_finder_sl/cell_memory_manager.cpp
+#	code/isolation_finder_sl/cell.cpp
+#	code/isolation_finder_sl/concurrent_isolation_results.cpp
+#	code/isolation_finder_sl/ilp_search_area_tree.cpp
+#	code/isolation_finder_sl/isolation_finder_sl.cpp
+#	code/isolation_finder_sl/isolation_sl_processor.cpp
+#	code/isolation_finder_sl/sweepline_datastruct_naive.cpp
+#	code/isolation_finder_sl/sweepline_datastruct_quadtree_dynamic.cpp
+#	code/isolation_finder_sl/sweepline_datastruct.cpp
+#	code/isolation_finder_sl/sweepline_primitives.cpp
+#	code/isolation_finder_sl/tile_cell.cpp
+#)
+#
+#target_link_libraries(
+#	check_tile PRIVATE
+#	pointlib 
+#	loaderlib 
+#	coordlib
+#	tbb
+#	pthread
+#	ips4o
+#)
 # add_executable(
 # 	prominence
 # 	code/divide_tree.cpp
