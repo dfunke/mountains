@@ -31,13 +31,12 @@ using std::ceil;
 using std::floor;
 using std::string;
 
-// static const string baseFolder =
-// "/data02/funke/SRTM/viewfinderpanoramas.org/dem3"; static const string
-// baseFolderDem1 = "/data02/funke/SRTM/viewfinderpanoramas.org/dem1"; static
-// const string testFolder = "/home/huening/SRTM"; static const string
-// testResultFile = "/home/huening/multi-threading-all-new.txt";
+// static const string baseFolder = "/data02/funke/SRTM/viewfinderpanoramas.org/dem1"; 
+// static const string baseFolderDem1 = "/data02/funke/SRTM/viewfinderpanoramas.org/dem1"; 
+// static const string testFolder = "/home/huening/SRTM"; 
+// static const string testResultFile = "/home/huening/testresults.txt";
 
-static const string baseFolder = "/home/pc/Data2/SRTM-DEM3";
+static const string baseFolder = "/home/pc/Data1/SRTM-DEM1";
 static const string baseFolderDem1 = "/home/pc/Data2/SRTM-DEM1";
 static const string testFolder = "/home/pc/SRTM";
 static const string testResultFile = "/home/pc/tmp/testresults.txt";
@@ -208,11 +207,11 @@ int conductSpeedComparrisonTests() {
   using namespace std::chrono;
   int threads = 1;
   bool old = false;
-  FileFormat fileFormat(FileFormat::Value::HGT3);
+  FileFormat fileFormat(FileFormat::Value::HGT1);
   BasicTileLoadingPolicy policy(testFolder.c_str(), fileFormat);
   const int CACHE_SIZE = 50;
   auto setupCache = std::make_unique<TileCache>(&policy, CACHE_SIZE);
-  for (auto testCase : getTestCases()) {
+  for (auto testCase : getUsTestCase()) {
     double times = 0;
     double oldTimes = 0;
     float bounds[4] = {testCase.minLat, testCase.maxLat, testCase.minLng,
@@ -233,6 +232,7 @@ int conductSpeedComparrisonTests() {
         }
         high_resolution_clock::time_point t1 = high_resolution_clock::now();
         TileCache *cache = new TileCache(&policy, CACHE_SIZE);
+        cache->resetLoadingTime();
         if (old) {
           ThreadPool *threadPool = new ThreadPool(threads);
           vector<std::future<bool>> results;
@@ -261,17 +261,17 @@ int conductSpeedComparrisonTests() {
               new IsolationSlProcessor(cache, fileFormat);
           IsolationResults res = finder->findIsolations(threads, bounds, 1);
         }
-        delete cache;
         high_resolution_clock::time_point t2 = high_resolution_clock::now();
         duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
 
         if (old) {
-          oldTimes += time_span.count();
+          oldTimes += time_span.count() - cache->getLoadingTime();
           std::cout << "old" << time_span.count() << std::endl;
         } else {
-          times += time_span.count();
+          times += time_span.count() - cache->getLoadingTime();
           std::cout << "new" << time_span.count() << std::endl;
         }
+        delete cache;
       }
     }
     times = times / 1.0;

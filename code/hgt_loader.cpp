@@ -48,39 +48,6 @@ HgtLoader::HgtLoader(FileFormat format) {
 }
 
 
-Tile *incTileRes(Tile *base, FileFormat oldFormat, FileFormat newFormat) {
-  std::size_t num_samples =
-      newFormat.rawSamplesAcross() * newFormat.rawSamplesAcross();
-  float ratio =
-      newFormat.rawSamplesAcross() / (1.f * oldFormat.rawSamplesAcross());
-  assert(ratio > 1);
-  Elevation *samples = (Elevation *)malloc(sizeof(Elevation) * num_samples);
-  for (int j = 0; j < newFormat.rawSamplesAcross(); j++) {
-    for (int i = 0; i < newFormat.rawSamplesAcross(); i++) {
-      float x = i / ratio;
-      float y = j / ratio;
-      int x1 = floor(x);
-      int x2 = ceil(x);
-      x2 = std::min(x2, oldFormat.rawSamplesAcross()-1);
-      int y1 = floor(y);
-      int y2 = ceil(y);
-      y2 = std::min(y2, oldFormat.rawSamplesAcross()-1);
-      Elevation x1y1 = base->get(x1, y1);
-      Elevation x2y1 = base->get(x2, y1);
-      Elevation x1y2 = base->get(x1, y2);
-      Elevation x2y2 = base->get(x2, y2);
-      Elevation e1 = (x - x1) * x1y1 + (1 - x + x1) * x2y1;
-      Elevation e2 = (x - x1) * x1y2 + (1 - x + x1) * x2y2;
-      Elevation erg = (y - y1) * e1 + (1 - y + y1) * e2;
-      int idx = j * newFormat.rawSamplesAcross() + i;
-      samples[idx] = erg;
-    }
-  }
-  Tile *erg = new Tile(newFormat.rawSamplesAcross(),
-                       newFormat.rawSamplesAcross(), samples, newFormat);
-  return erg;
-}
-
 Tile *HgtLoader::loadTile(const std::string &directory, float minLat, float minLng) {
   char buf[100];
   snprintf(buf, sizeof(buf), "%c%02d%c%03d.hgt",
@@ -98,8 +65,7 @@ Tile *HgtLoader::loadTile(const std::string &directory, float minLat, float minL
     VLOG(3) << "Failed to open file " << filename;
     return nullptr;
   }
-  FileFormat hgt3 = FileFormat(FileFormat::Value::HGT3);
-  int num_samples = hgt3.rawSamplesAcross() * hgt3.rawSamplesAcross();
+  int num_samples = mFormat.rawSamplesAcross() * mFormat.rawSamplesAcross();
   
   int16 *inbuf = (int16 *) malloc(sizeof(int16) * num_samples);
   
@@ -121,17 +87,10 @@ Tile *HgtLoader::loadTile(const std::string &directory, float minLat, float minL
         samples[i] = static_cast<Elevation>(elevation);
       }
     }
-    retval = new Tile(hgt3.rawSamplesAcross(), hgt3.rawSamplesAcross(), samples, hgt3);
+    retval = new Tile(mFormat.rawSamplesAcross(), mFormat.rawSamplesAcross(), samples, mFormat);
   }
 
   free(inbuf);
   fclose(infile);
-  if (mFormat.rawSamplesAcross() != hgt3.rawSamplesAcross()) {
-    // Interpolate
-    Tile *interpolatedTile = incTileRes(retval, hgt3, mFormat);
-    delete retval;
-    return interpolatedTile;
-  }
-
   return retval;
 }
