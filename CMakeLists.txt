@@ -6,22 +6,15 @@ project(mountains,
     LANGUAGES CXX
 )
 
-SET (CMAKE_C_FLAGS_INIT                "-std=c17")
-SET (CMAKE_C_FLAGS_DEBUG_INIT          "-g")
-SET (CMAKE_C_FLAGS_MINSIZEREL_INIT     "-Os -DNDEBUG")
-SET (CMAKE_C_FLAGS_RELEASE_INIT        "-O3")
-SET (CMAKE_C_FLAGS_RELWITHDEBINFO_INIT "-O2 -g")
 
-SET (CMAKE_CXX_FLAGS_INIT                "-std=c++17")
-SET (CMAKE_CXX_FLAGS_DEBUG_INIT          "-g")
-SET (CMAKE_CXX_FLAGS_MINSIZEREL_INIT     "-Os -DNDEBUG")
-SET (CMAKE_CXX_FLAGS_RELEASE_INIT        "-O3")
-SET (CMAKE_CXX_FLAGS_RELWITHDEBINFO_INIT "-O2 -g")
-
+set( CMAKE_C_FLAGS_DEBUG "" CACHE STRING "" )       
+set( CMAKE_CXX_FLAGS_DEBUG "" CACHE STRING "" )
+set( CMAKE_C_FLAGS_RELEASE "" CACHE STRING "" )
+set( CMAKE_CXX_FLAGS_RELEASE "" CACHE STRING "" )
 
 #tbb
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/external/comake-modules)
-find_package(TBB COMPONENTS tbbmalloc tbbmalloc_proxy tbb_preview)
+# list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/external/comake-modules)
+# find_package(TBB COMPONENTS tbbmalloc tbbmalloc_proxy tbb_preview)
 
 
 # External dependencies for sweepline-isolation-finder
