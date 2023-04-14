@@ -46,6 +46,7 @@ public:
   // Insert the given point to the quadtree.
   // A copy is not made; the point must live as long as the quadtree.
   void insert(SlEvent *n) override;
+  void remove(const SlEvent *n) override;
 
   IsolationRecord calcPeak(const SlEvent *node) override;
 

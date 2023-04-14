@@ -94,13 +94,13 @@ void IsolationFinderSl::setup(const Tile *tile,
   if (prevResults != nullptr) {
     skipVal = 1;
     mEventQueue =
-        new SlEvent[((width - 2) / skipVal) * ((height - 2) / skipVal) +
+        new SlEvent[((width - 1) / skipVal) * ((height - 2) * 2 / skipVal) +
                     prevResults->size()];
   } else {
     // skipVal = tile->width() / (tile->metersPerSample() * 4);
     //  Reduce to
     skipVal = mFormat.inMemorySamplesAcross() / (mFormat.degreesAcross() * 500);
-    //skipVal = 3;
+    // skipVal = 3;
     PeakFinder pfinder(tile);
     peaks = pfinder.findPeaks();
     // Get distance-scale from tile
@@ -111,24 +111,23 @@ void IsolationFinderSl::setup(const Tile *tile,
         mLngDistanceScale[y] = cosf(degToRad(point.latitude()));
       }
     }
-    int queueSize = ((width - 2) / skipVal) * ((height - 2) / skipVal) + peaks.size();
+    int queueSize =
+        ((width - 1) / skipVal) * ((height - 1) / skipVal) * 2 + peaks.size();
     mEventQueue = new SlEvent[queueSize];
   }
-
-
 
   // Add peaks first, to guarantee > all inserted samples.
   if (prevResults != nullptr) {
     for (auto it = prevResults->mResults.cbegin();
          it < prevResults->mResults.cend(); ++it) {
-      mEventQueue[idx].initialize(it->peakElevation, true, it->peak,
-                                  Offsets(0, 0));
+      mEventQueue[idx].initialize(it->peakElevation, SlEventType::PEAK,
+                                  it->peak, Offsets(0, 0));
       ++idx;
     }
   } else {
     // Add peaks
     for (Offsets &peak : peaks) {
-      mEventQueue[idx].initialize(tile->get(peak), true,
+      mEventQueue[idx].initialize(tile->get(peak), SlEventType::PEAK,
                                   mCoordinateSystem->getLatLng(peak), peak);
       ++idx;
     }
@@ -141,8 +140,8 @@ void IsolationFinderSl::setup(const Tile *tile,
   }
 
   // On SRTM 1 pixel overlapp
-  for (int j = skipVal; j < height - skipVal; j += skipVal) {
-    for (int i = skipVal; i < width - skipVal; i += skipVal) {
+  for (int j = 0; j < height - skipVal; j += skipVal) {
+    for (int i = 0; i < width - skipVal; i += skipVal) {
       Offsets currentOffsets(i, j);
       // skip if smaller than minPeakElev
       /*
@@ -158,50 +157,36 @@ void IsolationFinderSl::setup(const Tile *tile,
 
       if (minSorrounding < tile->get(currentOffsets)) {
         mEventQueue[idx].initialize(
-            tile->get(currentOffsets), false,
+            tile->get(currentOffsets), SlEventType::ADD,
+            mCoordinateSystem->getLatLng(currentOffsets), currentOffsets);
+        ++idx;
+        mEventQueue[idx].initialize(
+            minSorrounding, SlEventType::REMOVE,
             mCoordinateSystem->getLatLng(currentOffsets), currentOffsets);
         ++idx;
       }
     }
   }
 
-  // Add top and left row if not fast
-  if (prevResults != nullptr) {
-    for (int i = 0; i < width; ++i) {
-      Offsets currOffsets(i, 0);
-      mEventQueue[idx].initialize(tile->get(currOffsets), false,
-                                  mCoordinateSystem->getLatLng(currOffsets),
-                                  currOffsets);
-      ++idx;
-    }
-    for (int i = 1; i < height; ++i) {
-      Offsets currOffsets(0, i);
-      mEventQueue[idx].initialize(tile->get(currOffsets), false,
-                                  mCoordinateSystem->getLatLng(currOffsets),
-                                  currOffsets);
-      ++idx;
-    }
-  }
-
   // sort peaks
   ips4o::sort(mEventQueue, mEventQueue + peakIdx - 1,
-                   [](SlEvent const &lhs, SlEvent const &rhs) {
-                     return lhs.getElev() > rhs.getElev();
-                   });
+              [](SlEvent const &lhs, SlEvent const &rhs) {
+                return lhs.getElev() > rhs.getElev();
+              });
   // sort events
   ips4o::sort(mEventQueue + peakIdx, mEventQueue + idx,
-                   [](SlEvent const &lhs, SlEvent const &rhs) {
-                     return lhs.getElev() > rhs.getElev();
-                   });
+              [](SlEvent const &lhs, SlEvent const &rhs) {
+                return lhs.getElev() > rhs.getElev();
+              });
   // Merge peaks and events
   std::inplace_merge(mEventQueue, mEventQueue + peakIdx, mEventQueue + idx,
-                   [](SlEvent const &lhs, SlEvent const &rhs) {
-                     return lhs.getElev() > rhs.getElev();
-                   });
+                     [](SlEvent const &lhs, SlEvent const &rhs) {
+                       return lhs.getElev() > rhs.getElev();
+                     });
 
   // Sort using height value
-  //std::stable_sort(mEventQueue, mEventQueue + idx,
-  //std::stable_sort(mEventQueue, mEventQueue + idx,
+  // std::stable_sort(mEventQueue, mEventQueue + idx,
+  // std::stable_sort(mEventQueue, mEventQueue + idx,
   //                 [](SlEvent const &lhs, SlEvent const &rhs) {
   //                   return lhs.getElev() > rhs.getElev();
   //                 });
@@ -227,30 +212,13 @@ IsolationResults IsolationFinderSl::runSweepline(float mMinIsolationKm,
     // LatLng(mMinLat, mMinLng));
     //  sld = new SweeplineDatastructQuadtreeDynamic(mMinLat, mMaxLat, mMinLng,
     //  mMaxLng);
-
-    switch (mFormat.value()) {
-    case FileFormat::Value::HGT3:
-      sld = new SweeplineDatastructQuadtreeStatic<DEM3_LEAF_SIZE>(
-          mMinLat, mMaxLat, mMinLng, mMaxLng,
-          (mWidth / skipVal) * (mHeight / skipVal),
-          [=](float lat, float lng) { return this->toOffsets(lat, lng); });
-      break;
-    case FileFormat::Value::HGT1:
-      sld = new SweeplineDatastructQuadtreeStatic<DEM1_LEAF_SIZE>(
-          mMinLat, mMaxLat, mMinLng, mMaxLng,
-          (mWidth / skipVal) * (mHeight / skipVal),
-          [=](float lat, float lng) { return this->toOffsets(lat, lng); });
-      break;
-    default:
-      sld = new SweeplineDatastructQuadtreeStatic<1024>(
-          mMinLat, mMaxLat, mMinLng, mMaxLng,
-          (mWidth / skipVal) * (mHeight / skipVal),
-          [=](float lat, float lng) { return this->toOffsets(lat, lng); });
-    }
+    sld = new SweeplineDatastructQuadtreeDynamic(
+        mMinLat, mMaxLat, mMinLng, mMaxLng, mLngDistanceScale, nullptr);
   }
   for (std::size_t i = 0; i < currSize; ++i) {
     SlEvent *node = &mEventQueue[i];
-    if (node->isPeak()) {
+    switch (node->getType()) {
+    case PEAK: {
       LatLng peakLoc = *node;
       IsolationRecord record = sld->calcPeak(node);
 
@@ -289,8 +257,13 @@ IsolationResults IsolationFinderSl::runSweepline(float mMinIsolationKm,
         // Add not found higher ground peaks just to buckets, not to final
         // result.
       }
-    } else {
+    } break;
+    case ADD:
       sld->insert(node);
+      break;
+    case REMOVE:
+      sld->remove(node);
+      break;
     }
     // if ((mFormat == FileFormat::HGT_DEM3 && counter % 3333 == 0) || (mFormat
     // == FileFormat::HGT_DEM1 && counter % 10000 == 0) )

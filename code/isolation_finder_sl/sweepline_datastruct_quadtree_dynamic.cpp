@@ -16,11 +16,14 @@ SweeplineDatastructQuadtreeDynamic::SweeplineDatastructQuadtreeDynamic(double mi
   mToOffsets = toOffsets;
   //this->mRoot = memoryManager.allocCell(LatLng(maxLat, maxLng), LatLng(minLat, minLng));
   int childSize = (1 << 4)-1;
-  this->mPresetCells = new Cell[childSize];
-  this->mRoot = &mPresetCells[0];
-  this->mRoot->topLeft = LatLng(maxLat, maxLng);
-  this->mRoot->bottomRight = LatLng(minLat, minLng);
-  this->mRoot->presetChilds(mPresetCells + 1, childSize-1, &memoryManager);
+  this->mRoot = memoryManager.allocCell();
+  this->mRoot->content = memoryManager.allocSlEvents();
+  this->mRoot->memoryManager = &memoryManager;
+  // make root slightly bigger to prevent <= issues ad the edges.
+  this->mRoot->topLeft = LatLng(maxLat + 0.00001, maxLng + 0.00001);
+  this->mRoot->bottomRight = LatLng(minLat - 0.00001, minLng - 0.00001);
+  this->mRoot->size = 0;
+  //this->mRoot->presetChilds(mPresetCells + 1, childSize-1, &memoryManager);
 }
 
 SweeplineDatastructQuadtreeDynamic::~SweeplineDatastructQuadtreeDynamic() {
@@ -32,18 +35,31 @@ void SweeplineDatastructQuadtreeDynamic::insert(SlEvent *n)
   mRoot->insert(n);
 }
 
+
+void SweeplineDatastructQuadtreeDynamic::remove(const SlEvent *n){
+  mRoot->remove(n);
+}
+
 IsolationRecord SweeplineDatastructQuadtreeDynamic::calcPeak(const SlEvent *node)
 {
   IsolationRecord ir;
   float *currShortestDistance = new float;
   *currShortestDistance = MAXFLOAT;
   LatLng *shortestPoint = new LatLng();
-  mRoot->fastShortestDistance(node, currShortestDistance, shortestPoint, mLngDistanceScale, mToOffsets);
+  if (mToOffsets == nullptr) {
+    mRoot->shortestDistance(node, currShortestDistance, shortestPoint);
+  } else {
+    mRoot->fastShortestDistance(node, currShortestDistance, shortestPoint, mLngDistanceScale, mToOffsets);
+  }
   
   if (*currShortestDistance < MAXFLOAT) {
     ir.foundHigherGround = true;
     ir.closestHigherGround = *shortestPoint;
-    ir.distance = ir.closestHigherGround.distance(*node);
+    if (mToOffsets == nullptr) {
+      ir.distance = ir.closestHigherGround.distanceEllipsoid(*node);
+    } else {
+      ir.distance = ir.closestHigherGround.distance(*node);
+    }
   }
   delete shortestPoint;
   delete currShortestDistance;

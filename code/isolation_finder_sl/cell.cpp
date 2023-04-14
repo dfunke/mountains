@@ -30,6 +30,8 @@ void Cell::configureChilds() {
   upperBound.set(splitAtLat, center);
   upperBound.set(!splitAtLat, this->topLeft.get(!splitAtLat));
   this->smaller = memoryManager->allocCell(upperBound, this->bottomRight);
+  this->bigger->parent = this;
+  this->smaller->parent = this;
   assert(bigger->bottomRight.latitude() != bigger->topLeft.latitude());
   assert(bigger->bottomRight.longitude() != bigger->topLeft.longitude());
 
@@ -65,7 +67,7 @@ void Cell::split() {
   if (bigger->size == MAX_VECTOR_SIZE) {
     bigger->split();
   }
-  //assert(this->smaller->size + this->bigger->size == this->size);
+  assert(this->smaller->size + this->bigger->size == this->size);
 }
 
 Cell *Cell::getSmaller()
@@ -115,7 +117,7 @@ void Cell::insert(SlEvent *point)
   Cell* toCheck = this;
   // find leaf where node needs to be removed
   while(!toCheck->isLeaf()) {
-    //++toCheck->size;
+    toCheck->size++;
     if (toCheck->isInBigger(point)) {
       toCheck = toCheck->getBigger();
     } else {
@@ -124,8 +126,14 @@ void Cell::insert(SlEvent *point)
   }
   if (toCheck->size < MAX_VECTOR_SIZE)
   {
-    toCheck->content[toCheck->size] = point;
-    ++toCheck->size;
+    for (int i = 0; i < MAX_VECTOR_SIZE; i++) {
+      if (toCheck->content[i] == nullptr) {
+        toCheck->content[i] = point;
+        toCheck->size++;
+        return;
+      }
+    }
+    assert(false); // If it is reached, there was no nullptr in that array
     return;
   }
   else
@@ -133,6 +141,73 @@ void Cell::insert(SlEvent *point)
     // Split up and insert aggain
     toCheck->split();
     toCheck->insert(point);
+  }
+}
+
+void Cell::remove(const SlEvent *point)
+{
+  // First step, find cell containing point and add one to size
+  Cell* toCheck = this;
+  // find leaf where node needs to be removed
+  while(!toCheck->isLeaf()) {
+    toCheck->size--;
+    if (toCheck->isInBigger(point)) {
+      toCheck = toCheck->getBigger();
+    } else {
+      toCheck = toCheck->getSmaller();
+    }
+  }
+  assert(toCheck->size > 0);
+  // Set point to nullptr in array
+  for (uint i = 0; i < MAX_VECTOR_SIZE; i++) {
+    if (toCheck->content[i] != nullptr && toCheck->content[i]->latitude() == point->latitude() && toCheck->content[i]->longitude() == point->longitude()) {
+      toCheck->content[i] = nullptr;
+      toCheck->size--;
+      break;
+    }
+  }
+  // Start collapsing if parent size to small
+  if (toCheck->parent != nullptr && toCheck->parent->size < MAX_VECTOR_SIZE / 2) {
+    // go back up untill parent-size > MAX_VECTOR_SIZE/2
+    while (toCheck->parent != nullptr && toCheck->parent->size < MAX_VECTOR_SIZE)
+    {
+      toCheck = toCheck->parent;
+    }
+    assert(toCheck->content == nullptr);
+    toCheck->content = memoryManager->allocSlEvents();
+    uint currSize = 0;
+    if (toCheck->bigger != nullptr) {
+      toCheck->bigger->collect(toCheck->content, &currSize);
+      memoryManager->freeCell(toCheck->bigger);
+      toCheck->bigger = nullptr;
+    }
+    if (toCheck->smaller != nullptr) {
+      toCheck->smaller->collect(toCheck->content, &currSize);
+      memoryManager->freeCell(toCheck->smaller);
+      toCheck->smaller = nullptr;
+    }
+    assert(currSize == toCheck->size);
+  }
+}
+
+void Cell::collect(SlEvent** dest, uint *currSize) {
+  if (this->isLeaf()) {
+    uint idx = 0;
+    for(uint i = 0; i < MAX_VECTOR_SIZE; i++) {
+      if (content[i] != nullptr) {
+        // fill new array from bottom
+        dest[idx + *currSize] = content[i];
+        idx++;
+      }
+    }
+    *currSize = *currSize + size;
+  } else {
+    if (smaller != nullptr) {
+      smaller->collect(dest, currSize);
+    }
+    if (bigger != nullptr) {
+      bigger->collect(dest, currSize);
+    }
   }
 }
 
@@ -212,8 +287,12 @@ float Cell::fastDistanceToCell(const SlEvent *point, float *lngDistanceScale, st
 }
 
 void Cell::shortestDistance(const SlEvent *point, float *currShortest, LatLng *shortestPoint) const {
+
   if (this->isLeaf()) {
-    for (std::size_t i = 0; i < size; ++i) {
+    for (uint i = 0; i < MAX_VECTOR_SIZE; i++) {
+      if (content[i] == nullptr) {
+        continue;
+      }
       float d = searchDistance(point, *this->content[i]);
       if (d < *currShortest && !content[i]->equal(*point)) {
         *currShortest = d;
@@ -257,7 +336,7 @@ void Cell::shortestDistance(const SlEvent *point, float *currShortest, LatLng *s
 
 void Cell::fastShortestDistance(const SlEvent *point, float* currShortest, LatLng *shortestPoint, float *lngDistanceScale, std::function<Offsets (float lat, float lng)> &toOffsets) const {
   if (this->isLeaf()) {
-    for (std::size_t i = 0; i < size; ++i) {
+    for (std::size_t i = 0; i < MAX_VECTOR_SIZE; ++i) {
       if (content[i] == nullptr) {
         continue;
       }
