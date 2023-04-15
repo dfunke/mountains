@@ -431,7 +431,7 @@ private:
       //  Create 4 Quads
       const int nBucket = bucketSize >> 2;
       const int nCunterSize = (counterSize - 1) >> 2;
-      Quad *quads = new Quad[4];
+      Quad quads[4];
 
       int quadsIdx = 0;
       const float midLatitude = (p.mMaxLat + p.mMinLat) / 2;
@@ -463,7 +463,6 @@ private:
              findNearest(n, quads[i], level + 1, nBucket, nCunterSize, ir);
          }
       }
-      delete [] quads;
    }
 
    float mMinLng;

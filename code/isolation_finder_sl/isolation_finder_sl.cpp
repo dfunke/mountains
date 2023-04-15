@@ -185,15 +185,22 @@ void IsolationFinderSl::setup(const Tile *tile,
   }
 
   // sort peaks
-  ips4o::sort(mEventQueue, mEventQueue + peakIdx - 1,
+  ips4o::sort(mEventQueue, mEventQueue + peakIdx,
                    [](SlEvent const &lhs, SlEvent const &rhs) {
                      return lhs.getElev() > rhs.getElev();
                    });
+  /*
+  for (int i = 1; i < peakIdx; i++) {
+    assert(mEventQueue[i-1].getElev() >= mEventQueue[i].getElev());
+  }*/
   // sort events
   ips4o::sort(mEventQueue + peakIdx, mEventQueue + idx,
                    [](SlEvent const &lhs, SlEvent const &rhs) {
                      return lhs.getElev() > rhs.getElev();
                    });
+  for (int i = 1; i < peakIdx; i++) {
+    assert(mEventQueue[i-1].getElev() >= mEventQueue[i].getElev());
+  }
   // Merge peaks and events
   std::inplace_merge(mEventQueue, mEventQueue + peakIdx, mEventQueue + idx,
                    [](SlEvent const &lhs, SlEvent const &rhs) {
