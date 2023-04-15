@@ -175,7 +175,7 @@ void IsolationFinderSl::setup(const Tile *tile,
   }
 
   // sort peaks
-  ips4o::sort(mEventQueue, mEventQueue + peakIdx - 1,
+  ips4o::sort(mEventQueue, mEventQueue + peakIdx,
               [](SlEvent const &lhs, SlEvent const &rhs) {
                 return lhs.getElev() > rhs.getElev();
               });
