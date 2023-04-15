@@ -198,9 +198,6 @@ void IsolationFinderSl::setup(const Tile *tile,
                    [](SlEvent const &lhs, SlEvent const &rhs) {
                      return lhs.getElev() > rhs.getElev();
                    });
-  for (int i = 1; i < peakIdx; i++) {
-    assert(mEventQueue[i-1].getElev() >= mEventQueue[i].getElev());
-  }
   // Merge peaks and events
   std::inplace_merge(mEventQueue, mEventQueue + peakIdx, mEventQueue + idx,
                    [](SlEvent const &lhs, SlEvent const &rhs) {
