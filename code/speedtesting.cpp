@@ -208,11 +208,11 @@ int conductSpeedComparrisonTests() {
   using namespace std::chrono;
   int threads = 1;
   bool old = false;
-  FileFormat fileFormat(FileFormat::Value::HGT1);
+  FileFormat fileFormat(FileFormat::Value::HGT04);
   BasicTileLoadingPolicy policy(testFolder.c_str(), fileFormat);
   const int CACHE_SIZE = 50;
   auto setupCache = std::make_unique<TileCache>(&policy, CACHE_SIZE);
-  for (auto testCase : getUsTestCase()) {
+  for (auto testCase : getTestCases()) {
     double times = 0;
     double oldTimes = 0;
     float bounds[4] = {testCase.minLat, testCase.maxLat, testCase.minLng,
@@ -224,10 +224,9 @@ int conductSpeedComparrisonTests() {
               << bounds[2] << " " << bounds[3] << " " << std::endl;
 
     for (int j = 0; j < 1; j++) {
-      for (int i = 0; i < 1; i++) {
+      for (int i = 0; i < 2; i++) {
         if (i == 0) {
-          old = false;
-          // old = rand() % 2;
+          old = rand() % 2;
         } else {
           old = !old;
         }
