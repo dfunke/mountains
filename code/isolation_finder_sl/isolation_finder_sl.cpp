@@ -218,8 +218,26 @@ IsolationResults IsolationFinderSl::runSweepline(float mMinIsolationKm,
     // LatLng(mMinLat, mMinLng));
     //  sld = new SweeplineDatastructQuadtreeDynamic(mMinLat, mMaxLat, mMinLng,
     //  mMaxLng);
-    sld = new SweeplineDatastructQuadtreeDynamic(
-        mMinLat, mMaxLat, mMinLng, mMaxLng, mLngDistanceScale, nullptr);
+
+    switch (mFormat.value()) {
+    case FileFormat::Value::HGT3:
+      sld = new SweeplineDatastructQuadtreeStatic<DEM3_LEAF_SIZE>(
+          mMinLat, mMaxLat, mMinLng, mMaxLng,
+          (mWidth / skipVal) * (mHeight / skipVal),
+          [=](float lat, float lng) { return this->toOffsets(lat, lng); });
+      break;
+    case FileFormat::Value::HGT1:
+      sld = new SweeplineDatastructQuadtreeStatic<DEM1_LEAF_SIZE>(
+          mMinLat, mMaxLat, mMinLng, mMaxLng,
+          (mWidth / skipVal) * (mHeight / skipVal),
+          [=](float lat, float lng) { return this->toOffsets(lat, lng); });
+      break;
+    default:
+      sld = new SweeplineDatastructQuadtreeStatic<1024>(
+          mMinLat, mMaxLat, mMinLng, mMaxLng,
+          (mWidth / skipVal) * (mHeight / skipVal),
+          [=](float lat, float lng) { return this->toOffsets(lat, lng); });
+    }
   }
   for (std::size_t i = 0; i < currSize; ++i) {
     SlEvent *node = &mEventQueue[i];
