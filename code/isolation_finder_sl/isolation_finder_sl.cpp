@@ -83,7 +83,7 @@ inline Elevation getMinSorrounding(const Tile *tile, const Offsets offset,
   return minSorrounding;
 }
 
-void IsolationFinderSl::setup(const Tile *tile,
+int IsolationFinderSl::setup(const Tile *tile,
                               const ConcurrentIsolationResults *prevResults) {
   // Tiles overlap one pixel on all sides
   int width = tile->width();
@@ -137,7 +137,7 @@ void IsolationFinderSl::setup(const Tile *tile,
 
   if (peakIdx == 0) {
     currSize = 0;
-    return;
+    return 0;
   }
 
   // On SRTM 1 pixel overlapp
@@ -212,6 +212,7 @@ void IsolationFinderSl::setup(const Tile *tile,
 
   // saveTileAsImage(tile);
   currSize = idx;
+  return peakIdx;
 }
 
 IsolationResults IsolationFinderSl::runSweepline(float mMinIsolationKm,
@@ -321,33 +322,34 @@ void IsolationFinderSl::addPeakToBucket(const LatLng &peakLocation,
   delete isolationPoint;
 }
 
-void IsolationFinderSl::fillPeakBuckets(float mMinIsolationKm) {
+int IsolationFinderSl::fillPeakBuckets(float mMinIsolationKm) {
   Tile *tile =
       mTileCache->loadWithoutCaching(mMinLat, mMinLng, *mCoordinateSystem);
   if (tile == nullptr) {
     nullPtrTile = true;
-    return;
+    return 0;
   }
   mIlpSearchTree->registerTile(mMinLat, mMinLng, tile->maxElevation());
   mMaxLat = mMinLat + mFormat.degreesAcross();
   mMaxLng = mMinLng + mFormat.degreesAcross();
   mWidth = tile->width();
   mHeight = tile->height();
-  setup(tile, nullptr);
+  int peakSize = setup(tile, nullptr);
   delete tile;
   runSweepline(mMinIsolationKm, true);
-  return;
+  return peakSize;
 }
 
-IsolationResults IsolationFinderSl::run(float mMinIsolationKm) {
+int IsolationFinderSl::run(float mMinIsolationKm) {
   Tile *tile =
       mTileCache->loadWithoutCaching(mMinLat, mMinLng, *mCoordinateSystem);
   ConcurrentIsolationResults *results =
       mIlpSearchTree->findBucket(mMinLat, mMinLng);
-  setup(tile, results);
-  delete results;
+  if (results == nullptr) {
+    return 0;
+  }
   delete tile;
-  return runSweepline(mMinIsolationKm, false);
+  return results->size();
 }
 
 Offsets IsolationFinderSl::toOffsets(float latitude, float longitude) const {

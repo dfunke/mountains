@@ -33,7 +33,7 @@ using namespace std::chrono;
 
 int mergeOldResults() {
   IsolationResults res;
-  string folder = "/home/pc/tmp/results";
+  string folder = "/home/pc/results/results";
   for (int lat = -90; lat < 90; ++lat) {
     for (int lng = -180; lng < 180; ++lng) {
       IsolationResults *ir = IsolationResults::loadFromFile(folder, lat, lng);
@@ -69,9 +69,9 @@ struct IsolationResultDiff {
 
 int compare() {
   IsolationResults *newRes =
-      IsolationResults::loadFromFile("/home/pc/tmp", 1, 2);
+      IsolationResults::loadFromFile("/home/pc/results", 1, 2);
   IsolationResults *oldRes =
-      IsolationResults::loadFromFile("/home/pc/tmp", 1, 1);
+      IsolationResults::loadFromFile("/home/pc/results", 1, 1);
   std::cout << "Start calculation" << std::endl;
 
   string terrain_directory("/home/pc/Data2/SRTM-DEM3/");
@@ -130,7 +130,7 @@ int main(int argc, char **argv) {
   START_EASYLOGGINGPP(argc, argv);
 
   return compare();
-  // return mergeOldResults();
+  //return mergeOldResults();
 
   int ch;
   string terrain_directory("/home/pc/Data2/SRTM-DEM3/");

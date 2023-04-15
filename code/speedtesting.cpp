@@ -36,7 +36,7 @@ using std::string;
 //static const string testFolder = "/home/huening/SRTM";
 //static const string testResultFile = "/home/huening/multi-threading-all-new.txt";
 
-static const string baseFolder = "/home/pc/Data2/SRTM-DEM3";
+static const string baseFolder = "/home/pc/Data1/SRTM-DEM3";
 static const string baseFolderDem1 = "/home/pc/SRTM-DEM1";
 static const string testFolder = "/home/pc/SRTM";
 static const string testResultFile = "/home/pc/tmp/testresults.txt";
@@ -227,7 +227,7 @@ void addDem1ToTestFolder(float *bounds, TileCache *cache)
 
 int conductSpeedComparrisonTests() {
     using namespace std::chrono;
-    int threads = 1;
+    int threads = 5;
     bool old = false;
     FileFormat fileFormat(FileFormat::Value::HGT3);
     BasicTileLoadingPolicy policy(testFolder.c_str(),fileFormat);
@@ -242,7 +242,7 @@ int conductSpeedComparrisonTests() {
         // float bounds[4] = {47, (47.f + t/d), 1,(1.f + t)};
 
         setupSrtmFolder(bounds);
-        std::cout << "Start Processing " << bounds[0] << " " << bounds[1] << " " << bounds[2] << " " << bounds[3] << " " << std::endl;
+        //std::cout << "Start Processing " << bounds[0] << " " << bounds[1] << " " << bounds[2] << " " << bounds[3] << " " << std::endl;
 
         for (int j = 0; j < 1; j++)
         {
@@ -295,17 +295,17 @@ int conductSpeedComparrisonTests() {
                 
                 if (old) {
                     oldTimes += time_span.count();
-                    std::cout << "old" << time_span.count() << std::endl;
+                    //std::cout << "old" << time_span.count() << std::endl;
                 } else {
                     times += time_span.count();
-                    std::cout << "new" << time_span.count() << std::endl;
+                    //std::cout << "new" << time_span.count() << std::endl;
                 }
             }
 
         }
         times = times / 1.0;
         oldTimes = oldTimes / 1.0;
-        std::cout << testCase.size << "," << oldTimes << "," << times << std::endl;
+        //std::cout << testCase.size << "," << oldTimes << "," << times << std::endl;
         writeToTestResults(testCase.size, oldTimes, times);
     }
     return 0;

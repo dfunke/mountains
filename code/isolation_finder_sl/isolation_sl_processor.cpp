@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <unordered_set>
 #include <vector>
+#include <iostream>
 
 using std::vector;
 
@@ -41,7 +42,7 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
   mSearchTree=
       new ILPSearchAreaTree(latMin, lngMin, latMax - latMin, lngMax - lngMin);
   ThreadPool *threadPool = new ThreadPool(numThreads);
-  vector<std::future<void>> voidFutures;
+  vector<std::future<int>> voidFutures;
   // Create Buckets and build TileTree
   vector<IsolationFinderSl *> finders;
   //std::cout << "Start building tile-tree" << std::endl;
@@ -61,14 +62,16 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
         [=] { return finder->fillPeakBuckets(mMinIsolationKm); }));
   }
 
+  int phaseOnePeaks = 0;
+
   for (auto &&waitFor : voidFutures) {
-    waitFor.get();
+    phaseOnePeaks += waitFor.get();
   }
 
   // Proccess all unbound peaks
   mSearchTree->proccessUnbound();
   int i = 0;
-  vector<std::future<IsolationResults>> futureResults;
+  vector<std::future<int>> futureResults;
   vector<IsolationResults> results;
   //std::cout << "Start exact calculations" << std::endl;
   maxheap<IsolationResult> q(&compare);
@@ -79,61 +82,13 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
         threadPool->enqueue([=] { return finder->run(mMinIsolationKm); }));
     }
   }
+  int phaseTwoPeaks = 0;
   for (auto &res : futureResults) {
-    IsolationResults newResults = res.get();
-    for (IsolationResult &oneResult : newResults.mResults) {
-      q.emplace(oneResult);
-    }
-    newResults.mResults.clear();
+    phaseTwoPeaks += res.get();
   }
+  std::cout << phaseOnePeaks << "," << phaseTwoPeaks << std::endl;
   //std::cout << "Start merging" << std::endl;
   //   Merge results
   IsolationResults finalResults;
-  TileCell newRoot(latMin, lngMin, latMax - latMin, lngMax - lngMin);
-  while (!q.empty()) {
-    if (q.top().isolationKm > mMinIsolationKm) {
-      finalResults.mResults.push_back(q.top());
-    }
-    IsolationResult minResPos = q.top();
-    q.pop();
-    while (!q.empty() && q.top().peak == minResPos.peak) {
-      q.pop();
-    }
-  }
-  delete mSearchTree;
-  delete threadPool;
-  //std::cout << "Sort final results by isolation" << std::endl;
-  std::sort(finalResults.mResults.begin(), finalResults.mResults.end(),
-            [](IsolationResult const &lhs, IsolationResult const &rhs) {
-              return lhs.isolationKm > rhs.isolationKm;
-            });
-  IsolationResults finalFinalResults;
-  // merge multiple detected peaks (with nearly same isolation)
-  if (finalResults.mResults.size() == 0) {
-    return finalResults;
-  }
-  // Filter out dublicates
-  // for (std::size_t i = 1; i < finalResults.mResults.size(); ++i)
-  //{
-  //    // Check if peaks are nearly identical
-  //    if (r.peak.distance(finalResults.mResults[i].peak) < 900)
-  //    {
-  //        // assume identical peak, use one with smaller isolation
-  //        if (finalResults.mResults[i].isolationKm < r.isolationKm)
-  //        {
-  //            r = finalResults.mResults[i];
-  //        }
-  //    }
-  //    else
-  //    {
-  //        finalFinalResults.mResults.push_back(r);
-  //        r = finalResults.mResults[i];
-  //    }
-  //    // Add last result
-  //    if (i == finalResults.mResults.size() - 1)
-  //    {
-  //        finalFinalResults.mResults.push_back(r);
-  //    }
-  //}
   return finalResults;
 }
