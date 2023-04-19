@@ -212,7 +212,7 @@ int IsolationFinderSl::setup(const Tile *tile,
 
   // saveTileAsImage(tile);
   currSize = idx;
-  return peakIdx;
+  return idx - peakIdx;
 }
 
 IsolationResults IsolationFinderSl::runSweepline(float mMinIsolationKm,
@@ -343,13 +343,18 @@ int IsolationFinderSl::fillPeakBuckets(float mMinIsolationKm) {
 int IsolationFinderSl::run(float mMinIsolationKm) {
   Tile *tile =
       mTileCache->loadWithoutCaching(mMinLat, mMinLng, *mCoordinateSystem);
+  if (tile == nullptr) {
+    return 0;
+  }
   ConcurrentIsolationResults *results =
       mIlpSearchTree->findBucket(mMinLat, mMinLng);
   if (results == nullptr) {
     return 0;
   }
+  int pixelCount = setup(tile, results);
   delete tile;
-  return results->size();
+  delete [] mEventQueue;
+  return pixelCount;
 }
 
 Offsets IsolationFinderSl::toOffsets(float latitude, float longitude) const {

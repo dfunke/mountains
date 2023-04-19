@@ -61,18 +61,18 @@ struct TestCase
 vector<TestCase> getTestCases()
 {
     vector<TestCase> testCases;
-    testCases.push_back(TestCase(75, 90, 151, 180, 4));
-    testCases.push_back(TestCase(74, 90, 149, 180, 9));
-    testCases.push_back(TestCase(72, 90, 145, 180, 21));
-    testCases.push_back(TestCase(71, 90, 145, 180, 35));
-    testCases.push_back(TestCase(70, 90, 144, 180, 62));
-    testCases.push_back(TestCase(68, 90, 142, 180, 151));
-    testCases.push_back(TestCase(66, 90, 140, 180, 249));
-    testCases.push_back(TestCase(61, 90, 132, 180, 550));
-    testCases.push_back(TestCase(53, 90, 118, 180, 1025));
-    testCases.push_back(TestCase(42, 90, 98, 180, 2027));
-    testCases.push_back(TestCase(26, 90, 67, 180, 4094));
-    testCases.push_back(TestCase(0, 90, 17, 180, 8245));
+    //testCases.push_back(TestCase(75, 90, 151, 180, 4));
+    //testCases.push_back(TestCase(74, 90, 149, 180, 9));
+    //testCases.push_back(TestCase(72, 90, 145, 180, 21));
+    //testCases.push_back(TestCase(71, 90, 145, 180, 35));
+    //testCases.push_back(TestCase(70, 90, 144, 180, 62));
+    //testCases.push_back(TestCase(68, 90, 142, 180, 151));
+    //testCases.push_back(TestCase(66, 90, 140, 180, 249));
+    //testCases.push_back(TestCase(61, 90, 132, 180, 550));
+    //testCases.push_back(TestCase(53, 90, 118, 180, 1025));
+    //testCases.push_back(TestCase(42, 90, 98, 180, 2027));
+    //testCases.push_back(TestCase(26, 90, 67, 180, 4094));
+    //testCases.push_back(TestCase(0, 90, 17, 180, 8245));
     testCases.push_back(TestCase(-55, 90, -91, 180, 16387));
     testCases.push_back(TestCase(-90, 90, -180, 180, 26095));
     return testCases;
@@ -309,86 +309,6 @@ int conductSpeedComparrisonTests() {
         writeToTestResults(testCase.size, oldTimes, times);
     }
     return 0;
-}
-
-
-int testCaseWithDem1Data() {
-    using namespace std::chrono;
-    int threads = 1;
-    bool old = false;
-    FileFormat fileFormat(FileFormat::Value::HGT1);
-    BasicTileLoadingPolicy policy(testFolder.c_str(),fileFormat);
-    const int CACHE_SIZE = 50;
-    PointMap *peakbagger_peaks = new PointMap();
-    TileCache *setupCache = new TileCache(&policy, CACHE_SIZE);
-    float bounds[4] = {-90, 90, -180, 180};
-    setupSrtmFolder(bounds);
-    addDem1ToTestFolder(bounds, setupCache);
-    double times = 0;
-    double oldTimes = 0;
-    for (int j = 0; j < 3; j++)
-    {
-        for (int i = 0; i < 2; i++)
-        {
-            if (i == 0)
-            {
-                old = rand() % 2;
-            }
-            else
-            {
-                old = !old;
-            }
-            high_resolution_clock::time_point t1 = high_resolution_clock::now();
-            TileCache *cache = new TileCache(&policy, CACHE_SIZE);
-            if (old)
-            {
-                ThreadPool *threadPool = new ThreadPool(threads);
-                vector<std::future<bool>> results;
-                for (int lat = (int)floor(bounds[0]); lat < (int)ceil(bounds[1]); ++lat)
-                {
-                    for (int lng = (int)floor(bounds[2]); lng < (int)ceil(bounds[3]); ++lng)
-                    {
-                        std::shared_ptr<CoordinateSystem> coordinateSystem(
-                            fileFormat.coordinateSystemForOrigin(lat + 0.f, lng + 0.f));
-                        IsolationTask *task = new IsolationTask(cache, "~/tmp", bounds, 1);
-                        results.push_back(threadPool->enqueue([=]
-                                                              { return task->run(lat, lng, *coordinateSystem, fileFormat); }));
-                    }
-                }
-                int num_tiles_processed = 0;
-                for (auto &&result : results)
-                {
-                    if (result.get())
-                    {
-                        num_tiles_processed += 1;
-                    }
-                }
-                delete threadPool;
-            }
-            else
-            {
-                IsolationSlProcessor *finder = new IsolationSlProcessor(cache, fileFormat);
-                IsolationResults res = finder->findIsolations(threads, bounds, 1);
-            }
-            delete cache;
-            high_resolution_clock::time_point t2 = high_resolution_clock::now();
-            duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-            
-            if (old) {
-                oldTimes += time_span.count();
-                std::cout << "old" << time_span.count() << std::endl;
-            } else {
-                times += time_span.count();
-                std::cout << "new" << time_span.count() << std::endl;
-            }
-        }
-
-    }
-    times = times / 5.0;
-    oldTimes = oldTimes / 5.0;
-    std::cout << 39058 << "," << oldTimes << "," << times << std::endl;
-    writeToTestResults(39058, oldTimes, times);
-    return 1;
 }
 
 

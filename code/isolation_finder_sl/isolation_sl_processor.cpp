@@ -62,10 +62,8 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
         [=] { return finder->fillPeakBuckets(mMinIsolationKm); }));
   }
 
-  int phaseOnePeaks = 0;
-
   for (auto &&waitFor : voidFutures) {
-    phaseOnePeaks += waitFor.get();
+    waitFor.get();
   }
 
   // Proccess all unbound peaks
@@ -82,11 +80,11 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
         threadPool->enqueue([=] { return finder->run(mMinIsolationKm); }));
     }
   }
-  int phaseTwoPeaks = 0;
+  int64 phaseTwoPeaks = 0;
   for (auto &res : futureResults) {
     phaseTwoPeaks += res.get();
   }
-  std::cout << phaseOnePeaks << "," << phaseTwoPeaks << std::endl;
+  std::cout << phaseTwoPeaks << std::endl;
   //std::cout << "Start merging" << std::endl;
   //   Merge results
   IsolationResults finalResults;
