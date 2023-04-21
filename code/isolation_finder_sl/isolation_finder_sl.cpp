@@ -101,7 +101,7 @@ void IsolationFinderSl::setup(const Tile *tile,
   if (prevResults != nullptr) {
     skipVal = 1;
     mEventQueue =
-        new SlEvent[((width - 1) / skipVal) * ((height - 2) * 2 / skipVal) +
+        new SlEvent[((width - 1) / skipVal) * ((height - 2) / skipVal) +
                     prevResults->size()];
   } else {
     // skipVal = tile->width() / (tile->metersPerSample() * 4);
@@ -168,10 +168,12 @@ void IsolationFinderSl::setup(const Tile *tile,
             tile->get(currentOffsets), SlEventType::ADD,
             mCoordinateSystem->getLatLng(currentOffsets), currentOffsets);
         ++idx;
+        if (prevResults == nullptr) {
         mEventQueue[idx].initialize(
             minSorrounding, SlEventType::REMOVE,
             mCoordinateSystem->getLatLng(currentOffsets), currentOffsets);
         ++idx;
+        }
       }
     }
   }

@@ -38,7 +38,7 @@ using std::string;
 // const string testFolder = "/home/huening/SRTM"; static const string
 // testResultFile = "/home/huening/testresults.txt";
 
-static const string baseFolder = "/home/pc/Data2/SRTM-DEM3";
+static const string baseFolder = "/home/pc/Data2/SRTM-DEM3-US";
 static const string baseFolderDem1 = "/home/pc/Data2/SRTM-DEM1";
 static const string testFolder = "/home/pc/SRTM";
 static const string testResultFile = "/home/pc/tmp/testresults.txt";
@@ -119,6 +119,7 @@ vector<TestCase> getSouthTestCase() {
 vector<TestCase> getUsTestCase() {
   vector<TestCase> testCases;
   testCases.push_back(TestCase(23, 47, -106, -68, 502));
+  //testCases.push_back(TestCase(23, 25, -106, -100, 502));
   return testCases;
 }
 
