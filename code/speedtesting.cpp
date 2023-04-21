@@ -1,5 +1,6 @@
 #include "coordinate_system.h"
 #include "easylogging++.h"
+#include "isolation_finder_sl/isolation_finder_sl.h"
 #include "isolation_finder_sl/isolation_sl_processor.h"
 #include "isolation_task.h"
 #include "point_map.h"
@@ -31,12 +32,13 @@ using std::ceil;
 using std::floor;
 using std::string;
 
-// static const string baseFolder = "/data02/funke/SRTM/viewfinderpanoramas.org/dem1"; 
-// static const string baseFolderDem1 = "/data02/funke/SRTM/viewfinderpanoramas.org/dem1"; 
-// static const string testFolder = "/home/huening/SRTM"; 
-// static const string testResultFile = "/home/huening/testresults.txt";
+// static const string baseFolder =
+// "/data02/funke/SRTM/viewfinderpanoramas.org/dem1"; static const string
+// baseFolderDem1 = "/data02/funke/SRTM/viewfinderpanoramas.org/dem1"; static
+// const string testFolder = "/home/huening/SRTM"; static const string
+// testResultFile = "/home/huening/testresults.txt";
 
-static const string baseFolder = "/home/pc/Data1/SRTM-DEM1";
+static const string baseFolder = "/home/pc/Data2/SRTM-DEM3";
 static const string baseFolderDem1 = "/home/pc/Data2/SRTM-DEM1";
 static const string testFolder = "/home/pc/SRTM";
 static const string testResultFile = "/home/pc/tmp/testresults.txt";
@@ -114,7 +116,7 @@ vector<TestCase> getSouthTestCase() {
   return testCases;
 }
 
-vector<TestCase> getUsTestCase() {
+vector<TestCase> getUsTestCases() {
   vector<TestCase> testCases;
   testCases.push_back(TestCase(45, 47, -70, -68, 4));
   testCases.push_back(TestCase(44, 47, -71, -68, 9));
@@ -123,6 +125,12 @@ vector<TestCase> getUsTestCase() {
   testCases.push_back(TestCase(39, 47, -77, -68, 59));
   testCases.push_back(TestCase(36, 47, -82, -68, 121));
   testCases.push_back(TestCase(32, 47, -89, -68, 247));
+  testCases.push_back(TestCase(23, 47, -106, -68, 502));
+  return testCases;
+}
+
+vector<TestCase> getUsTestCase() {
+  vector<TestCase> testCases;
   testCases.push_back(TestCase(23, 47, -106, -68, 502));
   return testCases;
 }
@@ -207,7 +215,7 @@ int conductSpeedComparrisonTests() {
   using namespace std::chrono;
   int threads = 1;
   bool old = false;
-  FileFormat fileFormat(FileFormat::Value::HGT1);
+  FileFormat fileFormat(FileFormat::Value::HGT3);
   BasicTileLoadingPolicy policy(testFolder.c_str(), fileFormat);
   const int CACHE_SIZE = 50;
   auto setupCache = std::make_unique<TileCache>(&policy, CACHE_SIZE);
@@ -221,63 +229,33 @@ int conductSpeedComparrisonTests() {
     setupSrtmFolder(bounds);
     std::cout << "Start Processing " << bounds[0] << " " << bounds[1] << " "
               << bounds[2] << " " << bounds[3] << " " << std::endl;
+    double finalPhaseOneSetup = 0;
+    double finalPhaseOneSl = 0;
+    double finalPhaseTwo = 0;
+    double finalPhaseThreeSetup = 0;
+    double finalPhaseThreeSl = 0;
 
-    for (int j = 0; j < 1; j++) {
-      for (int i = 0; i < 1; i++) {
-        if (i == 0) {
-          old = false;
-          // old = rand() % 2;
-        } else {
-          old = !old;
-        }
-        high_resolution_clock::time_point t1 = high_resolution_clock::now();
-        TileCache *cache = new TileCache(&policy, CACHE_SIZE);
-        cache->resetLoadingTime();
-        if (old) {
-          ThreadPool *threadPool = new ThreadPool(threads);
-          vector<std::future<bool>> results;
-          for (int lat = (int)floor(bounds[0]); lat < (int)ceil(bounds[1]);
-               ++lat) {
-            for (int lng = (int)floor(bounds[2]); lng < (int)ceil(bounds[3]);
-                 ++lng) {
-              std::shared_ptr<CoordinateSystem> coordinateSystem(
-                  fileFormat.coordinateSystemForOrigin(lat + 0.f, lng + 0.f));
-              IsolationTask *task =
-                  new IsolationTask(cache, "~/tmp", bounds, 1);
-              results.push_back(threadPool->enqueue([=] {
-                return task->run(lat, lng, *coordinateSystem, fileFormat);
-              }));
-            }
-          }
-          int num_tiles_processed = 0;
-          for (auto &&result : results) {
-            if (result.get()) {
-              num_tiles_processed += 1;
-            }
-          }
-          delete threadPool;
-        } else {
-          IsolationSlProcessor *finder =
-              new IsolationSlProcessor(cache, fileFormat);
-          IsolationResults res = finder->findIsolations(threads, bounds, 1);
-        }
-        high_resolution_clock::time_point t2 = high_resolution_clock::now();
-        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-
-        if (old) {
-          oldTimes += time_span.count() - cache->getLoadingTime();
-          std::cout << "old" << time_span.count() << std::endl;
-        } else {
-          times += time_span.count() - cache->getLoadingTime();
-          std::cout << "new" << time_span.count() << std::endl;
-        }
-        delete cache;
-      }
+    int testAmmount = 1;
+    for (int j = 0; j < testAmmount; j++) {
+      TileCache *cache = new TileCache(&policy, CACHE_SIZE);
+      cache->resetLoadingTime();
+      IsolationSlProcessor *finder =
+          new IsolationSlProcessor(cache, fileFormat);
+      IsolationResults res = finder->findIsolations(threads, bounds, 1);
+      delete cache;
+      finalPhaseOneSetup += phaseOneTimeSetup;
+      finalPhaseOneSl += phaseOneTimeSw;
+      finalPhaseTwo += phaseThreeTime;
+      finalPhaseThreeSetup += phaseTwoTimeSetup;
+      finalPhaseThreeSl += phaseTwoTimeSw;
     }
-    times = times / 1.0;
-    oldTimes = oldTimes / 1.0;
-    std::cout << testCase.size << "," << oldTimes << "," << times << std::endl;
-    writeToTestResults(testCase.size, oldTimes, times);
+    finalPhaseOneSetup /= testAmmount;
+    finalPhaseOneSl /= testAmmount;
+    finalPhaseTwo /= testAmmount;
+    finalPhaseThreeSetup /= testAmmount;
+    finalPhaseThreeSl /= testAmmount;
+    printf("%.5f,%.5f,%.5f,%.5f,%.5f", finalPhaseOneSetup, finalPhaseOneSl,
+           finalPhaseTwo, finalPhaseThreeSetup, finalPhaseThreeSl);
   }
   return 0;
 }

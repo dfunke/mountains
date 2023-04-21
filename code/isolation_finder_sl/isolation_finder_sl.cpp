@@ -28,7 +28,8 @@
 
 using std::pair;
 using std::vector;
-static const std::size_t DEM04_LEAF_SIZE= 4952; // will create 7 levels
+
+static const std::size_t DEM04_LEAF_SIZE = 4952; // will create 7 levels
 static const std::size_t DEM1_LEAF_SIZE =
     3166; // 12967201 points in DEM1, leafeSize 3166 will create 6 level.
 static const std::size_t DEM3_LEAF_SIZE = 370; //  353
@@ -101,7 +102,7 @@ void IsolationFinderSl::setup(const Tile *tile,
     // skipVal = tile->width() / (tile->metersPerSample() * 4);
     //  Reduce to
     skipVal = mFormat.inMemorySamplesAcross() / (mFormat.degreesAcross() * 500);
-    //skipVal = 3;
+    // skipVal = 3;
     PeakFinder pfinder(tile);
     peaks = pfinder.findPeaks();
     // Get distance-scale from tile
@@ -112,11 +113,10 @@ void IsolationFinderSl::setup(const Tile *tile,
         mLngDistanceScale[y] = cosf(degToRad(point.latitude()));
       }
     }
-    int queueSize = ((width - 2) / skipVal) * ((height - 2) / skipVal) + peaks.size();
+    int queueSize =
+        ((width - 2) / skipVal) * ((height - 2) / skipVal) + peaks.size();
     mEventQueue = new SlEvent[queueSize];
   }
-
-
 
   // Add peaks first, to guarantee > all inserted samples.
   if (prevResults != nullptr) {
@@ -186,23 +186,23 @@ void IsolationFinderSl::setup(const Tile *tile,
 
   // sort peaks
   ips4o::sort(mEventQueue, mEventQueue + peakIdx - 1,
-                   [](SlEvent const &lhs, SlEvent const &rhs) {
-                     return lhs.getElev() > rhs.getElev();
-                   });
+              [](SlEvent const &lhs, SlEvent const &rhs) {
+                return lhs.getElev() > rhs.getElev();
+              });
   // sort events
   ips4o::sort(mEventQueue + peakIdx, mEventQueue + idx,
-                   [](SlEvent const &lhs, SlEvent const &rhs) {
-                     return lhs.getElev() > rhs.getElev();
-                   });
+              [](SlEvent const &lhs, SlEvent const &rhs) {
+                return lhs.getElev() > rhs.getElev();
+              });
   // Merge peaks and events
   std::inplace_merge(mEventQueue, mEventQueue + peakIdx, mEventQueue + idx,
-                   [](SlEvent const &lhs, SlEvent const &rhs) {
-                     return lhs.getElev() > rhs.getElev();
-                   });
+                     [](SlEvent const &lhs, SlEvent const &rhs) {
+                       return lhs.getElev() > rhs.getElev();
+                     });
 
   // Sort using height value
-  //std::stable_sort(mEventQueue, mEventQueue + idx,
-  //std::stable_sort(mEventQueue, mEventQueue + idx,
+  // std::stable_sort(mEventQueue, mEventQueue + idx,
+  // std::stable_sort(mEventQueue, mEventQueue + idx,
   //                 [](SlEvent const &lhs, SlEvent const &rhs) {
   //                   return lhs.getElev() > rhs.getElev();
   //                 });
@@ -243,7 +243,7 @@ IsolationResults IsolationFinderSl::runSweepline(float mMinIsolationKm,
           [=](float lat, float lng) { return this->toOffsets(lat, lng); });
       break;
     case FileFormat::Value::HGT04:
-        sld = new SweeplineDatastructQuadtreeStatic<DEM04_LEAF_SIZE>(
+      sld = new SweeplineDatastructQuadtreeStatic<DEM04_LEAF_SIZE>(
           mMinLat, mMaxLat, mMinLng, mMaxLng,
           (mWidth / skipVal) * (mHeight / skipVal),
           [=](float lat, float lng) { return this->toOffsets(lat, lng); });
@@ -340,16 +340,27 @@ void IsolationFinderSl::fillPeakBuckets(float mMinIsolationKm) {
 }
 
 void IsolationFinderSl::fillPeakBuckets(float mMinIsolationKm, Tile *tile) {
+  std::chrono::high_resolution_clock::time_point t1 =
+      std::chrono::high_resolution_clock::now();
   mIlpSearchTree->registerTile(mMinLat, mMinLng, tile->maxElevation());
   mMaxLat = mMinLat + mFormat.degreesAcross();
   mMaxLng = mMinLng + mFormat.degreesAcross();
   mWidth = tile->width();
   mHeight = tile->height();
   setup(tile, nullptr);
+  std::chrono::high_resolution_clock::time_point t2 =
+      std::chrono::high_resolution_clock::now();
   runSweepline(mMinIsolationKm, true);
+  std::chrono::high_resolution_clock::time_point t3 =
+      std::chrono::high_resolution_clock::now();
+  phaseOneTimeSetup +=
+      std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1)
+          .count();
+  phaseOneTimeSw +=
+      std::chrono::duration_cast<std::chrono::duration<double>>(t3 - t2)
+          .count();
   return;
 }
-
 
 IsolationResults IsolationFinderSl::run(float mMinIsolationKm) {
   Tile *tile =
@@ -360,11 +371,24 @@ IsolationResults IsolationFinderSl::run(float mMinIsolationKm) {
 }
 
 IsolationResults IsolationFinderSl::run(float mMinIsolationKm, Tile *tile) {
+  std::chrono::high_resolution_clock::time_point t1 =
+      std::chrono::high_resolution_clock::now();
   ConcurrentIsolationResults *results =
       mIlpSearchTree->findBucket(mMinLat, mMinLng);
   setup(tile, results);
   delete results;
-  return runSweepline(mMinIsolationKm, false);
+  std::chrono::high_resolution_clock::time_point t2 =
+      std::chrono::high_resolution_clock::now();
+  IsolationResults res = runSweepline(mMinIsolationKm, false);
+  std::chrono::high_resolution_clock::time_point t3 =
+      std::chrono::high_resolution_clock::now();
+  phaseTwoTimeSetup +=
+      std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1)
+          .count();
+  phaseTwoTimeSw +=
+      std::chrono::duration_cast<std::chrono::duration<double>>(t3 - t2)
+          .count();
+  return res;
 }
 
 Offsets IsolationFinderSl::toOffsets(float latitude, float longitude) const {

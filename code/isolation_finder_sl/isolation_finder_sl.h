@@ -38,6 +38,12 @@
 
 #include <memory>
 
+inline double phaseOneTimeSetup;
+inline double phaseOneTimeSw;
+inline double phaseTwoTimeSetup;
+inline double phaseTwoTimeSw;
+inline double phaseThreeTime;
+
 class IsolationFinderSl {
 public:
   explicit IsolationFinderSl(TileCache *tileCache,

@@ -10,6 +10,7 @@
 #include "ilp_search_area_tree.h"
 
 #include <algorithm>
+#include <chrono>
 #include <unordered_set>
 #include <vector>
 
@@ -46,6 +47,11 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
   vector<IsolationFinderSl *> finders;
   //std::cout << "Start building tile-tree" << std::endl;
   vector<IsolationFinderSl *> *pFinders = &finders;
+  phaseOneTimeSw = 0;
+  phaseOneTimeSetup = 0;
+  phaseTwoTimeSw = 0;
+  phaseTwoTimeSetup = 0;
+
   // create finders
   for (int j = lngMin; j < lngMax; ++j) {
     for (int i = latMin; i < latMax; ++i) {
@@ -66,7 +72,11 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
   }
 
   // Proccess all unbound peaks
+  std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
   mSearchTree->proccessUnbound();
+  std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+  phaseThreeTime = std::chrono::duration_cast<std::chrono::duration<double>>( t2 - t1).count();
+
   int i = 0;
   vector<std::future<IsolationResults>> futureResults;
   vector<IsolationResults> results;
