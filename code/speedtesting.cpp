@@ -116,19 +116,6 @@ vector<TestCase> getSouthTestCase() {
   return testCases;
 }
 
-vector<TestCase> getUsTestCases() {
-  vector<TestCase> testCases;
-  testCases.push_back(TestCase(45, 47, -70, -68, 4));
-  testCases.push_back(TestCase(44, 47, -71, -68, 9));
-  testCases.push_back(TestCase(43, 47, -72, -68, 16));
-  testCases.push_back(TestCase(41, 47, -74, -68, 33));
-  testCases.push_back(TestCase(39, 47, -77, -68, 59));
-  testCases.push_back(TestCase(36, 47, -82, -68, 121));
-  testCases.push_back(TestCase(32, 47, -89, -68, 247));
-  testCases.push_back(TestCase(23, 47, -106, -68, 502));
-  return testCases;
-}
-
 vector<TestCase> getUsTestCase() {
   vector<TestCase> testCases;
   testCases.push_back(TestCase(23, 47, -106, -68, 502));
@@ -180,35 +167,6 @@ int setupSrtmFolder(float *bounds) {
     }
   }
   return counter;
-}
-
-void addDem1ToTestFolder(float *bounds, TileCache *cache) {
-  for (int lat = (int)floor(bounds[0]); lat < (int)ceil(bounds[1]); ++lat) {
-    for (int lng = (int)floor(bounds[2]); lng < (int)ceil(bounds[3]); ++lng) {
-      char buf[100];
-      sprintf(buf, "%c%02d%c%03d.hgt", (lat >= 0) ? 'N' : 'S', abs(lat),
-              (lng >= 0) ? 'E' : 'W', abs(lng));
-      string command(buf);
-      command = baseFolderDem1 + "/" + command;
-      if (fileExists(command.c_str())) {
-        string rmcommand(buf);
-        command = "ln -sf " + command + " " + testFolder;
-        // command = "cp /home/pc/Data2/SRTM-DEM1/" + command + "
-        // /home/pc/SRTM/";
-        int success = system(command.c_str());
-        if (success < 0) {
-          std::cout << "Error linking DEM-File" << std::endl;
-        }
-        // calculate max elevation
-        char buf[100];
-        sprintf(buf, "%c%02d%c%03d-maxelev.txt", (lat >= 0) ? 'N' : 'S',
-                abs(lat), (lng >= 0) ? 'E' : 'W', abs(lng));
-        string fileName(buf);
-        fileName =
-            "ln -sf " + baseFolderDem1 + "/" + fileName + " " + testFolder;
-      }
-    }
-  }
 }
 
 int conductSpeedComparrisonTests() {

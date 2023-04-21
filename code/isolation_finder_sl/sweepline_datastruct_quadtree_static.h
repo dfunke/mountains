@@ -64,6 +64,8 @@ public:
       delete[] mCells;
    }
 
+
+   void remove(const SlEvent *n) override {}
    // Insert the given point to the quadtree.
    // A copy is not made; the point must live as long as the quadtree.
    void insert(SlEvent *n) override

@@ -19,6 +19,7 @@ struct Cell {
   Cell *smaller = nullptr;
   // bigger lat / lng values
   Cell *bigger = nullptr;
+  Cell *parent = nullptr;
   LatLng topLeft;
   LatLng bottomRight;
   bool splitAtLat;
@@ -29,6 +30,9 @@ struct Cell {
   bool isLeaf() const { return this->content != nullptr; }
   // Insert SlEvent to tree
   void insert(SlEvent *point);
+  // remove event from tree + collaps
+  void remove(const SlEvent *point);
+  void collect(SlEvent **destination, uint *currSize);
   // Check if point is in cell
   bool isIn(const SlEvent *point) const;
   // Get the distance to the cell
