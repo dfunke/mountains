@@ -60,7 +60,7 @@ public:
 
 private:
   // Find cell that would contain point
-  Cell *mPresetCells = nullptr;
+  //Cell *mPresetCells = nullptr;
   bool fast = false;
   std::function<Offsets (float lat, float lng)> mToOffsets;
   float *mLngDistanceScale;

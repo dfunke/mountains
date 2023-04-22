@@ -88,4 +88,6 @@ void ILPSearchAreaTree::proccessUnbound() {
       break;
     }
   }
+  delete [] queue;
+  delete sld;
 }

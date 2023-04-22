@@ -27,7 +27,7 @@ SweeplineDatastructQuadtreeDynamic::SweeplineDatastructQuadtreeDynamic(double mi
 }
 
 SweeplineDatastructQuadtreeDynamic::~SweeplineDatastructQuadtreeDynamic() {
-  delete []mPresetCells;
+  //delete []mPresetCells;
 }
 
 void SweeplineDatastructQuadtreeDynamic::insert(SlEvent *n)
