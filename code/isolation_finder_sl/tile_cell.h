@@ -16,13 +16,9 @@ public:
   void registerTile(int minLat, int minLng, Elevation maxElev);
 
   void distributeToTiles(const LatLng &peakLocation, int elevation,
-                           float *isolationKm);
+                           float isolationKm);
 
   ConcurrentIsolationResults *findBucket(int mMinLat, int mMinLng);
-  
-  // Find upper bound and distribute
-  void findUpperBoundAndDistributeToTiles(const LatLng &peakLocation, int elevation,
-                           float *isolationKm);
   
 private:
   float maxDistanceToCell(const LatLng &point) const;
