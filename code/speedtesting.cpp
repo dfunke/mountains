@@ -37,7 +37,7 @@ using std::string;
 // const string testFolder = "/home/huening/SRTM"; static const string
 // testResultFile = "/home/huening/multi-threading-all-new.txt";
 
-static const string baseFolder = "/home/pc/Data1/SRTM-DEM1";
+static const string baseFolder = "/home/pc/Data2/SRTM-DEM3-US";
 static const string baseFolderDem1 = "/home/pc/SRTM-DEM1";
 static const string testFolder = "/home/pc/SRTM";
 static const string testResultFile = "/home/pc/tmp/testresults.txt";
@@ -179,7 +179,7 @@ int conductSpeedComparrisonTests() {
   using namespace std::chrono;
   int threads = 1;
   bool old = false;
-  FileFormat fileFormat(FileFormat::Value::HGT1);
+  FileFormat fileFormat(FileFormat::Value::HGT3);
   BasicTileLoadingPolicy policy(testFolder.c_str(), fileFormat);
   const int CACHE_SIZE = 50;
   auto setupCache = std::make_unique<TileCache>(&policy, CACHE_SIZE);
@@ -196,10 +196,9 @@ int conductSpeedComparrisonTests() {
               << bounds[2] << " " << bounds[3] << " " << std::endl;
 
     for (int j = 0; j < 1; j++) {
-      for (int i = 0; i < 1; i++) {
+      for (int i = 0; i < 2; i++) {
         if (i == 0) {
-          old = false;
-          // old = rand() % 2;
+          old = rand() % 2;
         } else {
           old = !old;
         }
