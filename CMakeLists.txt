@@ -29,7 +29,7 @@ find_package(TBB COMPONENTS tbbmalloc tbbmalloc_proxy tbb_preview)
 # glm
 include_directories(external/glm)
 
-
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 # set( IPS2RA_DISABLE_PARALLEL "true")
 # include_directories(ips2ra/extern/tlx)
 set(IPS4O_DISABLE_PARALLEL "true")
