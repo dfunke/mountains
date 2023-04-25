@@ -7,8 +7,10 @@
 #include "tile_loading_policy.h"
 
 #include "ThreadPool.h"
+#include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <cstddef>
 #include <ctime>
 #include <iostream>
 #include <ratio>
@@ -41,6 +43,11 @@ static const string baseFolder = "/home/pc/Data1/SRTM-DEM1";
 static const string baseFolderDem1 = "/home/pc/SRTM-DEM1";
 static const string testFolder = "/home/pc/SRTM";
 static const string testResultFile = "/home/pc/tmp/testresults.txt";
+
+struct DynamicTestCase {
+  Offsets centerTile;
+  int tileNumber;
+};
 
 struct TestCase {
   TestCase(float minLat, float maxLat, float minLng, float maxLng, int size) {
@@ -146,116 +153,221 @@ void writeToTestResults(std::size_t tileCount, double oldTime, double newTime) {
   outfile.close();
 }
 
-int setupSrtmFolder(float *bounds) {
+int copyTile(int lat, int lng) {
+  char buf[100];
+  sprintf(buf, "%c%02d%c%03d.hgt", (lat >= 0) ? 'N' : 'S', abs(lat),
+          (lng >= 0) ? 'E' : 'W', abs(lng));
+  string command(buf);
+  command = baseFolder + "/" + command;
+  if (fileExists(command.c_str())) {
+    command = "cp " + command + " " + testFolder;
+    // command = "cp /home/pc/Data2/SRTM-DEM1/" + command + "
+    // /home/pc/SRTM/";
+    int success = system(command.c_str());
+    if (success < 0) {
+      std::cout << "copiing DEM-File" << std::endl;
+    }
+    return 1;
+  }
+  return 0;
+}
+
+float *setupSrtmFolder(DynamicTestCase testCase) {
+  int r = 0;
+  int i = 0;
+  int j = 0;
   int counter = 0;
+  int addToJ = 1;
+  float *bounds = new float[4];
+  bounds[0] = 180.f;
+  bounds[1] = -180.f;
+  bounds[2] = 180.f;
+  bounds[3] = -180.f;
+  for (int r = 0; counter != testCase.tileNumber; r++) {
+    for (i = -r; i <= r; ++i) {
+      if (i == abs(-r)) {
+        addToJ = 1;
+      } else {
+        addToJ = 2 * r + 1;
+      }
+      for (j = -r; j <= r; j += addToJ) {
+        int lat = i + testCase.centerTile.x();
+        if (lat >= 90) {
+          lat = 89;
+        }
+        if (lat < -90) {
+          lat = -90;
+        }
+        int lng = j + testCase.centerTile.y();
+        if (lng >= 180) {
+          lng = 179;
+        }
+        if (lng < -180) {
+          lng = -180;
+        }
+        bounds[0]= std::min(lat+0.f, bounds[0]);
+        bounds[1]= std::max(lat+0.f, bounds[1]);
+        bounds[2]= std::min(lng+0.f, bounds[2]);
+        bounds[3]= std::max(lng+0.f, bounds[3]);
+
+        counter += copyTile(lat, lng);
+        if (counter == testCase.tileNumber) {
+          return bounds;
+        }
+      }
+      if (i > 180) {
+      }
+    }
+    if (r > 360) {
+      // not enoth tiles
+      return nullptr;
+    }
+  }
+  return bounds;
+}
+
+void cleanSrtmFolder() {
   string cleanCommand = "rm " + testFolder + "/*";
   int success = system(cleanCommand.c_str());
   if (success < 0) {
     std::cout << "Error removing" << std::endl;
   }
+}
+
+int setupSrtmFolder(float *bounds) {
+  int counter = 0;
+  cleanSrtmFolder();
   for (int lat = (int)floor(bounds[0]); lat < (int)ceil(bounds[1]); ++lat) {
     for (int lng = (int)floor(bounds[2]); lng < (int)ceil(bounds[3]); ++lng) {
-      char buf[100];
-      sprintf(buf, "%c%02d%c%03d.hgt", (lat >= 0) ? 'N' : 'S', abs(lat),
-              (lng >= 0) ? 'E' : 'W', abs(lng));
-      string command(buf);
-      command = baseFolder + "/" + command;
-      if (fileExists(command.c_str())) {
-        command = "cp " + command + " " + testFolder;
-        // command = "cp /home/pc/Data2/SRTM-DEM1/" + command + "
-        // /home/pc/SRTM/";
-        success = system(command.c_str());
-        if (success < 0) {
-          std::cout << "copiing DEM-File" << std::endl;
-        }
-        counter++;
-      }
+      counter += copyTile(lat, lng);
     }
   }
   return counter;
 }
 
-int conductSpeedComparrisonTests() {
-  using namespace std::chrono;
+double runTest(FileFormat fileFormat, float bounds[], bool old) {
   int threads = 1;
-  bool old = false;
-  FileFormat fileFormat(FileFormat::Value::HGT1);
+  using namespace std::chrono;
   BasicTileLoadingPolicy policy(testFolder.c_str(), fileFormat);
   const int CACHE_SIZE = 50;
-  auto setupCache = std::make_unique<TileCache>(&policy, CACHE_SIZE);
+  double times = 0;
+  double oldTimes = 0;
+  high_resolution_clock::time_point t1 = high_resolution_clock::now();
+  TileCache *cache = new TileCache(&policy, CACHE_SIZE);
+  if (old) {
+    ThreadPool *threadPool = new ThreadPool(threads);
+    vector<std::future<bool>> results;
+    for (int lat = (int)floor(bounds[0]); lat < (int)ceil(bounds[1]); ++lat) {
+      for (int lng = (int)floor(bounds[2]); lng < (int)ceil(bounds[3]); ++lng) {
+        std::shared_ptr<CoordinateSystem> coordinateSystem(
+            fileFormat.coordinateSystemForOrigin(lat + 0.f, lng + 0.f));
+        IsolationTask *task = new IsolationTask(cache, "~/tmp", bounds, 1);
+        results.push_back(threadPool->enqueue([=] {
+          return task->run(lat, lng, *coordinateSystem, fileFormat);
+        }));
+      }
+    }
+    int num_tiles_processed = 0;
+    for (auto &&result : results) {
+      if (result.get()) {
+        num_tiles_processed += 1;
+      }
+    }
+    delete threadPool;
+  } else {
+    IsolationSlProcessor *finder = new IsolationSlProcessor(cache, fileFormat);
+    IsolationResults res = finder->findIsolations(threads, bounds, 1);
+  }
+  delete cache;
+  high_resolution_clock::time_point t2 = high_resolution_clock::now();
+  duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+  return time_span.count();
+}
+
+int conductSpeedComparrisonTests() {
+  using namespace std::chrono;
+  FileFormat fileFormat(FileFormat::Value::HGT3);
+  BasicTileLoadingPolicy policy(testFolder.c_str(), fileFormat);
   for (auto testCase : getUsTestCase()) {
-    double times = 0;
-    double oldTimes = 0;
     float bounds[4] = {testCase.minLat, testCase.maxLat, testCase.minLng,
                        testCase.maxLng};
     // float bounds[4] = {34, (34.f + t/d), -118,(-118.f + t)};
     // float bounds[4] = {47, (47.f + t/d), 1,(1.f + t)};
 
-    setupSrtmFolder(bounds);
+    int tileNumber = setupSrtmFolder(bounds);
     std::cout << "Start Processing " << bounds[0] << " " << bounds[1] << " "
               << bounds[2] << " " << bounds[3] << " " << std::endl;
+    double oldTime = 0;
+    double newTime = 0;
+    bool old = false;
+    for (int i = 0; i < 2; i++) {
+      if (i == 0) {
+        old = rand() % 2;
+      } else {
+        old = !old;
+      }
+      double time = runTest(fileFormat, bounds, old);
+      if (old) {
+        oldTime += time;
+      } else {
+        newTime += time;
+      }
+    }
+    writeToTestResults(tileNumber, oldTime, newTime);
+  }
+  return 0;
+}
 
-    for (int j = 0; j < 1; j++) {
+int conductRandomSampleComparrisonTests() {
+  int MAX_TILE_COUNT = 26095;
+  FileFormat fileFormat(FileFormat::Value::HGT3);
+  int maxTiles = 0;
+  int testCases = 5;
+  bool old = false;
+  for (int n = 2; std::pow(2, n) < MAX_TILE_COUNT; n++) {
+    if (n > 9) {
+      testCases = 9-n/2;
+    } else {
+      testCases = (12-n) * (12-n) / 2;
+    }
+    double oldTime = 0;
+    double newTime = 0;
+    for (int j = 1; j <= testCases; j++) {
+      int lat = rand() % 180 - 90;
+      int lng = rand() % 360 - 180;
+      auto testCase = DynamicTestCase();
+      testCase.centerTile = Offsets(lat, lng);
+      testCase.tileNumber = std::pow(2, n);
+      std::cout << "Testcase:" << lat << "," << lng << "," << testCase.tileNumber;
+      cleanSrtmFolder();
+      float* bounds = setupSrtmFolder(testCase);
       for (int i = 0; i < 2; i++) {
         if (i == 0) {
           old = rand() % 2;
         } else {
           old = !old;
         }
-        high_resolution_clock::time_point t1 = high_resolution_clock::now();
-        TileCache *cache = new TileCache(&policy, CACHE_SIZE);
+        double time = runTest(fileFormat, bounds, old);
         if (old) {
-          ThreadPool *threadPool = new ThreadPool(threads);
-          vector<std::future<bool>> results;
-          for (int lat = (int)floor(bounds[0]); lat < (int)ceil(bounds[1]);
-               ++lat) {
-            for (int lng = (int)floor(bounds[2]); lng < (int)ceil(bounds[3]);
-                 ++lng) {
-              std::shared_ptr<CoordinateSystem> coordinateSystem(
-                  fileFormat.coordinateSystemForOrigin(lat + 0.f, lng + 0.f));
-              IsolationTask *task =
-                  new IsolationTask(cache, "~/tmp", bounds, 1);
-              results.push_back(threadPool->enqueue([=] {
-                return task->run(lat, lng, *coordinateSystem, fileFormat);
-              }));
-            }
-          }
-          int num_tiles_processed = 0;
-          for (auto &&result : results) {
-            if (result.get()) {
-              num_tiles_processed += 1;
-            }
-          }
-          delete threadPool;
+          oldTime += time;
         } else {
-          IsolationSlProcessor *finder =
-              new IsolationSlProcessor(cache, fileFormat);
-          IsolationResults res = finder->findIsolations(threads, bounds, 1);
-        }
-        delete cache;
-        high_resolution_clock::time_point t2 = high_resolution_clock::now();
-        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-
-        if (old) {
-          oldTimes += time_span.count();
-          std::cout << "old" << time_span.count() << std::endl;
-        } else {
-          times += time_span.count();
-          std::cout << "new" << time_span.count() << std::endl;
+          newTime += time;
         }
       }
+      std::cout << "," << oldTime / j << "," << newTime / j << std::endl;
     }
-    times = times / 1.0;
-    oldTimes = oldTimes / 1.0;
-    std::cout << testCase.size << "," << oldTimes << "," << times << std::endl;
-    writeToTestResults(testCase.size, oldTimes, times);
+    oldTime /= testCases;
+    newTime /= testCases;
+    std::cout << oldTime << "," << newTime << std::endl;
+    writeToTestResults(std::pow(2,n), oldTime, newTime);
   }
   return 0;
 }
 
 int main(int argc, char **argv) {
   START_EASYLOGGINGPP(argc, argv);
-  return conductSpeedComparrisonTests();
+  return conductRandomSampleComparrisonTests();
+  // return conductSpeedComparrisonTests();
   // return testCaseWithDem1Data();
   TestCase testCase = getNorthAmerika();
   float bounds[4] = {testCase.minLat, testCase.maxLat, testCase.minLng,
