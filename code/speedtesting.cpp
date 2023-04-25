@@ -39,7 +39,7 @@ using std::string;
 // const string testFolder = "/home/huening/SRTM"; static const string
 // testResultFile = "/home/huening/multi-threading-all-new.txt";
 
-static const string baseFolder = "/home/pc/Data1/SRTM-DEM1";
+static const string baseFolder = "/home/pc/Data1/SRTM-DEM3";
 static const string baseFolderDem1 = "/home/pc/SRTM-DEM1";
 static const string testFolder = "/home/pc/SRTM";
 static const string testResultFile = "/home/pc/tmp/testresults.txt";
@@ -366,12 +366,19 @@ int conductRandomSampleComparrisonTests() {
 
 int main(int argc, char **argv) {
   START_EASYLOGGINGPP(argc, argv);
-  return conductRandomSampleComparrisonTests();
+  // return conductRandomSampleComparrisonTests();
   // return conductSpeedComparrisonTests();
   // return testCaseWithDem1Data();
-  TestCase testCase = getNorthAmerika();
-  float bounds[4] = {testCase.minLat, testCase.maxLat, testCase.minLng,
-                     testCase.maxLng};
-  setupSrtmFolder(bounds);
+  FileFormat fileFormat(FileFormat::Value::HGT3);
+  BasicTileLoadingPolicy policy(baseFolder.c_str(), fileFormat);
+  TileCache *cache = new TileCache(&policy, 50);
+
+  for (auto testCase : getUsTestCase()) {
+    std::shared_ptr<CoordinateSystem> coordinateSystem(
+        fileFormat.coordinateSystemForOrigin(testCase.minLat, testCase.minLng));
+    Tile* t = cache->loadWithoutCaching(testCase.minLat, testCase.minLng, *coordinateSystem);
+    delete t;
+  }
   // return testSpecificArea();
+  return 0;
 }

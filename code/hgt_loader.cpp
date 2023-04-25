@@ -28,8 +28,10 @@
 #include "easylogging++.h"
 #include "file_format.h"
 
+#include <bits/chrono.h>
 #include <stdio.h>
 #include <string>
+#include <chrono>
 
 using std::string;
 
@@ -44,6 +46,7 @@ HgtLoader::HgtLoader(FileFormat format) {
 }
 
 Tile *HgtLoader::loadTile(const std::string &directory, float minLat, float minLng) {
+  std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
   char buf[100];
   snprintf(buf, sizeof(buf), "%c%02d%c%03d.hgt",
            (minLat >= 0) ? 'N' : 'S',
@@ -68,6 +71,9 @@ Tile *HgtLoader::loadTile(const std::string &directory, float minLat, float minL
   Tile *retval = nullptr;
   
   int samples_read = static_cast<int>(fread(inbuf, sizeof(int16), num_samples, infile));
+  std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+  double ioTime = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+  t1 = std::chrono::high_resolution_clock::now();
   if (samples_read != num_samples) {
     fprintf(stderr, "Couldn't read tile file: %s, got %d samples expecting %d\n",
             filename.c_str(), samples_read, num_samples);
@@ -88,6 +94,9 @@ Tile *HgtLoader::loadTile(const std::string &directory, float minLat, float minL
 
   free(inbuf);
   fclose(infile);
+  t2 = std::chrono::high_resolution_clock::now();
+  double compTime = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+  std::cout << ioTime << "," << compTime << std::endl;
 
   return retval;
 }
