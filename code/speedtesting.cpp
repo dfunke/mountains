@@ -36,7 +36,7 @@ using std::string;
 static const string baseFolder = "/data02/funke/SRTM/viewfinderpanoramas.org/dem3"; 
 static const string baseFolderDem1 = "/data02/funke/SRTM/viewfinderpanoramas.org/dem1"; 
 static const string testFolder = "/data02/funke/SRTM/SRTM"; 
-static const string testResultFile = "/home/huening/testresults-us-dem3-randomsample.txt";
+static const string testResultFile = "/home/huening/testresults-world-dem3-randomsample.txt";
 
 // static const string baseFolder = "/home/pc/Data2/SRTM-DEM3-US";
 // static const string baseFolderDem1 = "/home/pc/SRTM-DEM1";
@@ -335,6 +335,10 @@ int conductRandomSampleComparrisonTests() {
     }
     double oldTime = 0;
     double newTime = 0;
+    double maxOld = 0;
+    double minOld = 100000000000000.f;
+    double maxNew = 0;
+    double minNew = 100000000000000.f;
     for (int j = 1; j <= testCases; j++) {
       int lat = rand() % 180 - 90;
       int lng = rand() % 360 - 180;
@@ -358,15 +362,20 @@ int conductRandomSampleComparrisonTests() {
         if (old) {
           oldTime += time;
 	  oldTimeRun = time;
+          minOld = std::min(time, minOld);
+          maxOld = std::max(time, maxOld);
         } else {
           newTime += time;
 	  newTimeRun = time;
+          minNew = std::min(time, minNew);
+          maxNew = std::max(time, maxNew);
         }
       }
       std::cout << "," << oldTimeRun << "," << newTimeRun << std::endl;
     }
     oldTime /= testCases;
     newTime /= testCases;
+    std::cout << "maxMin:" << maxOld << "," << minOld << "," << maxNew << "," << minNew << std::endl;
     std::cout << oldTime << "," << newTime << std::endl;
     writeToTestResults(std::pow(2,n), oldTime, newTime);
   }
