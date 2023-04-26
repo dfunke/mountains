@@ -33,15 +33,15 @@ using std::ceil;
 using std::floor;
 using std::string;
 
-static const string baseFolder = "/data02/funke/SRTM/viewfinderpanoramas.org/dem3-us"; 
-static const string baseFolderDem1 = "/data02/funke/SRTM/viewfinderpanoramas.org/dem1"; 
-static const string testFolder = "/data02/funke/SRTM/SRTM"; 
-static const string testResultFile = "/home/huening/testresults-us-dem3-randomsample.txt";
+//static const string baseFolder = "/data02/funke/SRTM/viewfinderpanoramas.org/dem3-us"; 
+//static const string baseFolderDem1 = "/data02/funke/SRTM/viewfinderpanoramas.org/dem1"; 
+//static const string testFolder = "/data02/funke/SRTM/SRTM"; 
+//static const string testResultFile = "/home/huening/testresults-us-dem3-randomsample.txt";
 
-//static const string baseFolder = "/home/pc/Data1/SRTM-DEM1";
-//static const string baseFolderDem1 = "/home/pc/SRTM-DEM1";
-//static const string testFolder = "/home/pc/SRTM";
-//static const string testResultFile = "/home/pc/tmp/testresults.txt";
+static const string baseFolder = "/home/pc/Data2/SRTM-DEM3-US";
+static const string baseFolderDem1 = "/home/pc/SRTM-DEM1";
+static const string testFolder = "/home/pc/SRTM";
+static const string testResultFile = "/home/pc/tmp/testresults.txt";
 
 struct DynamicTestCase {
   Offsets centerTile;
@@ -211,6 +211,8 @@ float *setupSrtmFolder(DynamicTestCase testCase) {
 
         counter += copyTile(lat, lng);
         if (counter == testCase.tileNumber) {
+          bounds[1] = bounds[1]+1;
+          bounds[3] = bounds[3] +1;
           return bounds;
         }
       }
@@ -334,8 +336,10 @@ int conductRandomSampleComparrisonTests() {
     double oldTime = 0;
     double newTime = 0;
     for (int j = 1; j <= testCases; j++) {
-      int lat = rand() % 24 + 23;
-      int lng = rand() % 38 - 106;
+      // int lat = rand() % 24 + 23;
+      // int lng = rand() % 38 - 106;
+      int lat = 27;
+      int lng = -90;
       auto testCase = DynamicTestCase();
       testCase.centerTile = Offsets(lat, lng);
       testCase.tileNumber = std::pow(2, n);
