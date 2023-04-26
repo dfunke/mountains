@@ -33,16 +33,15 @@ using std::ceil;
 using std::floor;
 using std::string;
 
-// static const string baseFolder =
-// "/data02/funke/SRTM/viewfinderpanoramas.org/dem3"; static const string
-// baseFolderDem1 = "/data02/funke/SRTM/viewfinderpanoramas.org/dem1"; static
-// const string testFolder = "/home/huening/SRTM"; static const string
-// testResultFile = "/home/huening/multi-threading-all-new.txt";
+static const string baseFolder = "/data02/funke/SRTM/viewfinderpanoramas.org/dem3-us"; 
+static const string baseFolderDem1 = "/data02/funke/SRTM/viewfinderpanoramas.org/dem1"; 
+static const string testFolder = "/data02/funke/SRTM/SRTM"; 
+static const string testResultFile = "/home/huening/testresults-us-dem3-randomsample.txt";
 
-static const string baseFolder = "/home/pc/Data1/SRTM-DEM1";
-static const string baseFolderDem1 = "/home/pc/SRTM-DEM1";
-static const string testFolder = "/home/pc/SRTM";
-static const string testResultFile = "/home/pc/tmp/testresults.txt";
+//static const string baseFolder = "/home/pc/Data1/SRTM-DEM1";
+//static const string baseFolderDem1 = "/home/pc/SRTM-DEM1";
+//static const string testFolder = "/home/pc/SRTM";
+//static const string testResultFile = "/home/pc/tmp/testresults.txt";
 
 struct DynamicTestCase {
   Offsets centerTile;
@@ -318,8 +317,10 @@ int conductSpeedComparrisonTests() {
   return 0;
 }
 
+ //testCases.push_back(TestCase(23, 47, -106, -68, 502));
 int conductRandomSampleComparrisonTests() {
-  int MAX_TILE_COUNT = 26095;
+  //int MAX_TILE_COUNT = 26095;
+  int MAX_TILE_COUNT = 502;
   FileFormat fileFormat(FileFormat::Value::HGT3);
   int maxTiles = 0;
   int testCases = 5;
@@ -333,14 +334,16 @@ int conductRandomSampleComparrisonTests() {
     double oldTime = 0;
     double newTime = 0;
     for (int j = 1; j <= testCases; j++) {
-      int lat = rand() % 180 - 90;
-      int lng = rand() % 360 - 180;
+      int lat = rand() % 24 + 23;
+      int lng = rand() % 38 - 106;
       auto testCase = DynamicTestCase();
       testCase.centerTile = Offsets(lat, lng);
       testCase.tileNumber = std::pow(2, n);
       std::cout << "Testcase:" << lat << "," << lng << "," << testCase.tileNumber;
       cleanSrtmFolder();
       float* bounds = setupSrtmFolder(testCase);
+      double oldTimeRun = 0;
+      double newTimeRun = 0;
       for (int i = 0; i < 2; i++) {
         if (i == 0) {
           old = rand() % 2;
@@ -350,11 +353,13 @@ int conductRandomSampleComparrisonTests() {
         double time = runTest(fileFormat, bounds, old);
         if (old) {
           oldTime += time;
+	  oldTimeRun = time;
         } else {
           newTime += time;
+	  newTimeRun = time;
         }
       }
-      std::cout << "," << oldTime / j << "," << newTime / j << std::endl;
+      std::cout << "," << oldTimeRun << "," << newTimeRun << std::endl;
     }
     oldTime /= testCases;
     newTime /= testCases;
