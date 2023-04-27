@@ -38,7 +38,7 @@ static const string baseFolderDem1 = "/data02/funke/SRTM/viewfinderpanoramas.org
 static const string testFolder = "/data02/funke/SRTM/SRTM"; 
 static const string testResultFile = "/home/huening/testresults-world-dem3-randomsample.txt";
 
-// static const string baseFolder = "/home/pc/Data2/SRTM-DEM3-US";
+// static const string baseFolder = "/home/pc/Data1/SRTM-DEM3";
 // static const string baseFolderDem1 = "/home/pc/SRTM-DEM1";
 // static const string testFolder = "/home/pc/SRTM";
 // static const string testResultFile = "/home/pc/tmp/testresults.txt";
@@ -157,6 +157,11 @@ int copyTile(int lat, int lng) {
   sprintf(buf, "%c%02d%c%03d.hgt", (lat >= 0) ? 'N' : 'S', abs(lat),
           (lng >= 0) ? 'E' : 'W', abs(lng));
   string command(buf);
+  string testFile = testFolder + "/" + command;
+  if (fileExists(testFile.c_str())) {
+    // to not copy if file already exists.
+    return 0;
+  }
   command = baseFolder + "/" + command;
   if (fileExists(command.c_str())) {
     command = "cp " + command + " " + testFolder;
@@ -211,6 +216,7 @@ float *setupSrtmFolder(DynamicTestCase testCase) {
 
         counter += copyTile(lat, lng);
         if (counter == testCase.tileNumber) {
+
           bounds[1] = bounds[1]+1;
           bounds[3] = bounds[3] +1;
           return bounds;
@@ -327,7 +333,7 @@ int conductRandomSampleComparrisonTests() {
   int maxTiles = 0;
   int testCases = 5;
   bool old = false;
-  for (int n = 2; std::pow(2, n) < MAX_TILE_COUNT; n++) {
+  for (int n = 12; std::pow(2, n) < MAX_TILE_COUNT; n++) {
     if (n > 9) {
       testCases = 9-n/2;
     } else {
@@ -344,6 +350,8 @@ int conductRandomSampleComparrisonTests() {
       int lng = rand() % 360 - 180;
       // int lat = rand() % 24 + 23;
       // int lng = rand() % 38 - 106;
+      // int lat = -90;
+      // int lng = -161;
       auto testCase = DynamicTestCase();
       testCase.centerTile = Offsets(lat, lng);
       testCase.tileNumber = std::pow(2, n);
