@@ -38,10 +38,10 @@ static const string baseFolderDem1 = "/data02/funke/SRTM/viewfinderpanoramas.org
 static const string testFolder = "/data02/funke/SRTM/SRTM"; 
 static const string testResultFile = "/home/huening/testresults-world-dem3-randomsample.txt";
 
-// static const string baseFolder = "/home/pc/Data1/SRTM-DEM3";
-// static const string baseFolderDem1 = "/home/pc/SRTM-DEM1";
-// static const string testFolder = "/home/pc/SRTM";
-// static const string testResultFile = "/home/pc/tmp/testresults.txt";
+//static const string baseFolder = "/home/pc/Data1/SRTM-DEM1";
+//static const string baseFolderDem1 = "/home/pc/SRTM-DEM1";
+//static const string testFolder = "/home/pc/SRTM";
+//static const string testResultFile = "/home/pc/tmp/testresults.txt";
 
 struct DynamicTestCase {
   Offsets centerTile;
@@ -123,14 +123,15 @@ vector<TestCase> getSouthTestCase() {
 
 vector<TestCase> getUsTestCase() {
   vector<TestCase> testCases;
-  testCases.push_back(TestCase(45, 47, -70, -68, 4));
-  testCases.push_back(TestCase(44, 47, -71, -68, 9));
-  testCases.push_back(TestCase(43, 47, -72, -68, 16));
-  testCases.push_back(TestCase(41, 47, -74, -68, 33));
-  testCases.push_back(TestCase(39, 47, -77, -68, 59));
-  testCases.push_back(TestCase(36, 47, -82, -68, 121));
-  testCases.push_back(TestCase(32, 47, -89, -68, 247));
-  testCases.push_back(TestCase(23, 47, -106, -68, 502));
+  //testCases.push_back(TestCase(45, 47, -70, -68, 4));
+  //testCases.push_back(TestCase(44, 47, -71, -68, 9));
+  //testCases.push_back(TestCase(43, 47, -72, -68, 16));
+  //testCases.push_back(TestCase(41, 47, -74, -68, 33));
+  //testCases.push_back(TestCase(39, 47, -77, -68, 59));
+  //testCases.push_back(TestCase(36, 47, -82, -68, 121));
+  //testCases.push_back(TestCase(32, 47, -89, -68, 247));
+  //testCases.push_back(TestCase(23, 47, -106, -68, 502));
+  testCases.push_back(TestCase(12, 90, -168, -51, 502));
   return testCases;
 }
 
@@ -252,8 +253,7 @@ int setupSrtmFolder(float *bounds) {
   return counter;
 }
 
-double runTest(FileFormat fileFormat, float bounds[], bool old) {
-  int threads = 1;
+double runTest(FileFormat fileFormat, float bounds[], bool old, int threads) {
   using namespace std::chrono;
   BasicTileLoadingPolicy policy(testFolder.c_str(), fileFormat);
   const int CACHE_SIZE = 50;
@@ -293,34 +293,37 @@ double runTest(FileFormat fileFormat, float bounds[], bool old) {
 
 int conductSpeedComparrisonTests() {
   using namespace std::chrono;
-  FileFormat fileFormat(FileFormat::Value::HGT3);
+  FileFormat fileFormat(FileFormat::Value::HGT1);
   BasicTileLoadingPolicy policy(testFolder.c_str(), fileFormat);
-  for (auto testCase : getUsTestCase()) {
-    float bounds[4] = {testCase.minLat, testCase.maxLat, testCase.minLng,
-                       testCase.maxLng};
-    // float bounds[4] = {34, (34.f + t/d), -118,(-118.f + t)};
-    // float bounds[4] = {47, (47.f + t/d), 1,(1.f + t)};
+  for (int t = 1; t <= 128; t *= 2) {
+    for (auto testCase : getUsTestCase()) {
+      float bounds[4] = {testCase.minLat, testCase.maxLat, testCase.minLng,
+                         testCase.maxLng};
+      // float bounds[4] = {34, (34.f + t/d), -118,(-118.f + t)};
+      // float bounds[4] = {47, (47.f + t/d), 1,(1.f + t)};
 
-    int tileNumber = setupSrtmFolder(bounds);
-    std::cout << "Start Processing " << bounds[0] << " " << bounds[1] << " "
-              << bounds[2] << " " << bounds[3] << " " << std::endl;
-    double oldTime = 0;
-    double newTime = 0;
-    bool old = false;
-    for (int i = 0; i < 2; i++) {
-      if (i == 0) {
-        old = rand() % 2;
-      } else {
-        old = !old;
+      int tileNumber = setupSrtmFolder(bounds);
+      std::cout << "Start Processing " << bounds[0] << " " << bounds[1] << " "
+                << bounds[2] << " " << bounds[3] << " " << "threads:" << t << std::endl;
+      double oldTime = 0;
+      double newTime = 0;
+      bool old = false;
+      for (int i = 0; i < 1; i++) {
+        if (i == 0) {
+          old = false;
+          //old = rand() % 2;
+        } else {
+          old = !old;
+        }
+        double time = runTest(fileFormat, bounds, old, t);
+        if (old) {
+          oldTime += time;
+        } else {
+          newTime += time;
+        }
       }
-      double time = runTest(fileFormat, bounds, old);
-      if (old) {
-        oldTime += time;
-      } else {
-        newTime += time;
-      }
+      writeToTestResults(t, oldTime, newTime);
     }
-    writeToTestResults(tileNumber, oldTime, newTime);
   }
   return 0;
 }
@@ -366,7 +369,7 @@ int conductRandomSampleComparrisonTests() {
         } else {
           old = !old;
         }
-        double time = runTest(fileFormat, bounds, old);
+        double time = runTest(fileFormat, bounds, old, 1);
         if (old) {
           oldTime += time;
 	  oldTimeRun = time;
@@ -392,8 +395,8 @@ int conductRandomSampleComparrisonTests() {
 
 int main(int argc, char **argv) {
   START_EASYLOGGINGPP(argc, argv);
-  return conductRandomSampleComparrisonTests();
-  // return conductSpeedComparrisonTests();
+  //return conductRandomSampleComparrisonTests();
+  return conductSpeedComparrisonTests();
   // return testCaseWithDem1Data();
   TestCase testCase = getNorthAmerika();
   float bounds[4] = {testCase.minLat, testCase.maxLat, testCase.minLng,
