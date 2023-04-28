@@ -10,6 +10,7 @@ using std::vector;
 struct PeakNumbers {
   std::size_t totalPeakCount;
   std::size_t finalPeakCount;
+  std::size_t pixelCount;
 };
 
 class IsolationSlProcessor {

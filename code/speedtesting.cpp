@@ -290,7 +290,7 @@ double runTest(FileFormat fileFormat, float bounds[], bool old) {
   high_resolution_clock::time_point t2 = high_resolution_clock::now();
   duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
   if (!old) {
-    std::cout << pNumbers.finalPeakCount << "," << pNumbers.totalPeakCount;
+    std::cout << pNumbers.pixelCount << "," << pNumbers.finalPeakCount << "," << pNumbers.totalPeakCount;
   }
   return time_span.count();
 }

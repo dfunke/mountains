@@ -36,15 +36,20 @@
 #include "../coordinate_system.h"
 #include "ilp_search_area_tree.h"
 
+#include <cstddef>
 #include <memory>
 
+struct CounterIsolationResults {
+  IsolationResults res;
+  std::size_t demPixel;
+};
 
 class IsolationFinderSl {
 public:
     explicit IsolationFinderSl(TileCache *tileCache, ILPSearchAreaTree *ilpSearchTree, int minLat, int minLng, FileFormat format);
     ~IsolationFinderSl();
     uint fillPeakBuckets(float minIsolationKm);
-    IsolationResults run(float minIsolationKm);
+    CounterIsolationResults run(float minIsolationKm);
     
     bool nullPtrTile = false;
 private:

@@ -69,7 +69,7 @@ PeakNumbers IsolationSlProcessor::findIsolations(int numThreads,
   // Proccess all unbound peaks
   mSearchTree->proccessUnbound();
   int i = 0;
-  vector<std::future<IsolationResults>> futureResults;
+  vector<std::future<CounterIsolationResults>> futureResults;
   vector<IsolationResults> results;
   //std::cout << "Start exact calculations" << std::endl;
   maxheap<IsolationResult> q(&compare);
@@ -80,12 +80,14 @@ PeakNumbers IsolationSlProcessor::findIsolations(int numThreads,
         threadPool->enqueue([=] { return finder->run(mMinIsolationKm); }));
     }
   }
+  std::size_t demPixels = 0;
   for (auto &res : futureResults) {
-    IsolationResults newResults = res.get();
-    for (IsolationResult &oneResult : newResults.mResults) {
+    CounterIsolationResults newResults = res.get();
+    for (IsolationResult &oneResult : newResults.res.mResults) {
       q.emplace(oneResult);
     }
-    newResults.mResults.clear();
+    newResults.res.mResults.clear();
+    demPixels += newResults.demPixel;
   }
   //std::cout << "Start merging" << std::endl;
   //   Merge results
@@ -111,7 +113,7 @@ PeakNumbers IsolationSlProcessor::findIsolations(int numThreads,
   IsolationResults finalFinalResults;
   // merge multiple detected peaks (with nearly same isolation)
   if (finalResults.mResults.size() == 0) {
-    return PeakNumbers {toltalPeakCount, 0};
+    return PeakNumbers {toltalPeakCount, 0, demPixels};
   }
   // Filter out dublicates
   // for (std::size_t i = 1; i < finalResults.mResults.size(); ++i)
@@ -137,5 +139,5 @@ PeakNumbers IsolationSlProcessor::findIsolations(int numThreads,
   //    }
   //}
 
-  return PeakNumbers {toltalPeakCount, finalResults.mResults.size()};
+  return PeakNumbers {toltalPeakCount, finalResults.mResults.size(), demPixels};
 }
