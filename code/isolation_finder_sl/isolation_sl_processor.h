@@ -7,10 +7,15 @@
 
 using std::vector;
 
+struct PeakNumbers {
+  std::size_t totalPeakCount;
+  std::size_t finalPeakCount;
+};
+
 class IsolationSlProcessor {
 public:
   explicit IsolationSlProcessor(TileCache *cache, FileFormat format);
-  IsolationResults findIsolations(int numThreads, float bounds[],
+  PeakNumbers findIsolations(int numThreads, float bounds[],
                                   float mMinIsolationKm);
 
 private:

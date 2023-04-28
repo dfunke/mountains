@@ -15,6 +15,7 @@
 
 using std::vector;
 
+
 IsolationSlProcessor::IsolationSlProcessor(TileCache *cache, FileFormat format) { 
   mCache = cache; 
   mFormat = format;
@@ -31,7 +32,7 @@ bool compare(IsolationResult const &el, IsolationResult const &er) {
 template <typename T>
 using maxheap = std::priority_queue<T, vector<T>, decltype(&compare)>;
 
-IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
+PeakNumbers IsolationSlProcessor::findIsolations(int numThreads,
                                                       float bounds[],
                                                       float mMinIsolationKm) {
   int latMax = (int)ceil(bounds[1]);
@@ -41,7 +42,7 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
   mSearchTree=
       new ILPSearchAreaTree(latMin, lngMin, latMax - latMin, lngMax - lngMin);
   ThreadPool *threadPool = new ThreadPool(numThreads);
-  vector<std::future<void>> voidFutures;
+  vector<std::future<uint>> voidFutures;
   // Create Buckets and build TileTree
   vector<IsolationFinderSl *> finders;
   //std::cout << "Start building tile-tree" << std::endl;
@@ -60,9 +61,9 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
     voidFutures.push_back(threadPool->enqueue(
         [=] { return finder->fillPeakBuckets(mMinIsolationKm); }));
   }
-
+  std::size_t toltalPeakCount = 0;
   for (auto &&waitFor : voidFutures) {
-    waitFor.get();
+    toltalPeakCount += waitFor.get();
   }
 
   // Proccess all unbound peaks
@@ -110,7 +111,7 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
   IsolationResults finalFinalResults;
   // merge multiple detected peaks (with nearly same isolation)
   if (finalResults.mResults.size() == 0) {
-    return finalResults;
+    return PeakNumbers {toltalPeakCount, 0};
   }
   // Filter out dublicates
   // for (std::size_t i = 1; i < finalResults.mResults.size(); ++i)
@@ -135,5 +136,6 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
   //        finalFinalResults.mResults.push_back(r);
   //    }
   //}
-  return finalResults;
+
+  return PeakNumbers {toltalPeakCount, finalResults.mResults.size()};
 }

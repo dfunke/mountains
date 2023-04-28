@@ -87,7 +87,7 @@ inline Elevation getMinSorrounding(const Tile *tile, const Offsets offset,
   return minSorrounding;
 }
 
-void IsolationFinderSl::setup(const Tile *tile,
+uint IsolationFinderSl::setup(const Tile *tile,
                               const ConcurrentIsolationResults *prevResults) {
   // Tiles overlap one pixel on all sides
   int width = tile->width();
@@ -142,7 +142,7 @@ void IsolationFinderSl::setup(const Tile *tile,
 
   if (peakIdx == 0) {
     currSize = 0;
-    return;
+    return 0;
   }
 
   // On SRTM 1 pixel overlapp
@@ -199,6 +199,7 @@ void IsolationFinderSl::setup(const Tile *tile,
 
   // saveTileAsImage(tile);
   currSize = idx;
+  return static_cast<uint>(peakIdx);
 }
 
 IsolationResults IsolationFinderSl::runSweepline(float mMinIsolationKm,
@@ -296,22 +297,22 @@ void IsolationFinderSl::addPeakToBucket(const LatLng &peakLocation,
   delete isolationPoint;
 }
 
-void IsolationFinderSl::fillPeakBuckets(float mMinIsolationKm) {
+uint IsolationFinderSl::fillPeakBuckets(float mMinIsolationKm) {
   Tile *tile =
       mTileCache->loadWithoutCaching(mMinLat, mMinLng, *mCoordinateSystem);
   if (tile == nullptr) {
     nullPtrTile = true;
-    return;
+    return 0;
   }
   mIlpSearchTree->registerTile(mMinLat, mMinLng, tile->maxElevation());
   mMaxLat = mMinLat + mFormat.degreesAcross();
   mMaxLng = mMinLng + mFormat.degreesAcross();
   mWidth = tile->width();
   mHeight = tile->height();
-  setup(tile, nullptr);
+  uint peakCount = setup(tile, nullptr);
   delete tile;
   runSweepline(mMinIsolationKm, true);
-  return;
+  return peakCount;
 }
 
 IsolationResults IsolationFinderSl::run(float mMinIsolationKm) {

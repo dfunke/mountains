@@ -33,15 +33,15 @@ using std::ceil;
 using std::floor;
 using std::string;
 
-static const string baseFolder = "/data02/funke/SRTM/viewfinderpanoramas.org/dem3"; 
-static const string baseFolderDem1 = "/data02/funke/SRTM/viewfinderpanoramas.org/dem1"; 
-static const string testFolder = "/data02/funke/SRTM/SRTM"; 
-static const string testResultFile = "/home/huening/testresults-world-dem3-randomsample.txt";
+//static const string baseFolder = "/data02/funke/SRTM/viewfinderpanoramas.org/dem3"; 
+//static const string baseFolderDem1 = "/data02/funke/SRTM/viewfinderpanoramas.org/dem1"; 
+//static const string testFolder = "/data02/funke/SRTM/SRTM"; 
+//static const string testResultFile = "/home/huening/testresults-world-dem3-randomsample.txt";
 
-// static const string baseFolder = "/home/pc/Data1/SRTM-DEM3";
-// static const string baseFolderDem1 = "/home/pc/SRTM-DEM1";
-// static const string testFolder = "/home/pc/SRTM";
-// static const string testResultFile = "/home/pc/tmp/testresults.txt";
+static const string baseFolder = "/home/pc/Data2/SRTM-US-DEM3";
+static const string baseFolderDem1 = "/home/pc/SRTM-DEM1";
+static const string testFolder = "/home/pc/SRTM";
+static const string testResultFile = "/home/pc/tmp/testresults.txt";
 
 struct DynamicTestCase {
   Offsets centerTile;
@@ -261,6 +261,7 @@ double runTest(FileFormat fileFormat, float bounds[], bool old) {
   double oldTimes = 0;
   high_resolution_clock::time_point t1 = high_resolution_clock::now();
   TileCache *cache = new TileCache(&policy, CACHE_SIZE);
+  PeakNumbers pNumbers;
   if (old) {
     ThreadPool *threadPool = new ThreadPool(threads);
     vector<std::future<bool>> results;
@@ -283,11 +284,14 @@ double runTest(FileFormat fileFormat, float bounds[], bool old) {
     delete threadPool;
   } else {
     IsolationSlProcessor *finder = new IsolationSlProcessor(cache, fileFormat);
-    IsolationResults res = finder->findIsolations(threads, bounds, 1);
+    pNumbers = finder->findIsolations(threads, bounds, 1);
   }
   delete cache;
   high_resolution_clock::time_point t2 = high_resolution_clock::now();
   duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+  if (!old) {
+    std::cout << pNumbers.finalPeakCount << "," << pNumbers.totalPeakCount;
+  }
   return time_span.count();
 }
 
@@ -327,13 +331,13 @@ int conductSpeedComparrisonTests() {
 
  //testCases.push_back(TestCase(23, 47, -106, -68, 502));
 int conductRandomSampleComparrisonTests() {
-  int MAX_TILE_COUNT = 26095;
-  //int MAX_TILE_COUNT = 502;
+  //int MAX_TILE_COUNT = 26095;
+  int MAX_TILE_COUNT = 502;
   FileFormat fileFormat(FileFormat::Value::HGT3);
   int maxTiles = 0;
   int testCases = 5;
   bool old = false;
-  for (int n = 12; std::pow(2, n) < MAX_TILE_COUNT; n++) {
+  for (int n = 2; std::pow(2, n) < MAX_TILE_COUNT; n++) {
     if (n > 9) {
       testCases = 9-n/2;
     } else {
@@ -346,16 +350,16 @@ int conductRandomSampleComparrisonTests() {
     double maxNew = 0;
     double minNew = 100000000000000.f;
     for (int j = 1; j <= testCases; j++) {
-      int lat = rand() % 180 - 90;
-      int lng = rand() % 360 - 180;
-      // int lat = rand() % 24 + 23;
-      // int lng = rand() % 38 - 106;
+      // int lat = rand() % 180 - 90;
+      // int lng = rand() % 360 - 180;
+      int lat = rand() % 24 + 23;
+      int lng = rand() % 38 - 106;
       // int lat = -90;
       // int lng = -161;
       auto testCase = DynamicTestCase();
       testCase.centerTile = Offsets(lat, lng);
       testCase.tileNumber = std::pow(2, n);
-      std::cout << "Testcase:" << lat << "," << lng << "," << testCase.tileNumber;
+      std::cout << testCase.tileNumber << "," << lat << "," << lng << ",";
       cleanSrtmFolder();
       float* bounds = setupSrtmFolder(testCase);
       double oldTimeRun = 0;
@@ -380,11 +384,12 @@ int conductRandomSampleComparrisonTests() {
         }
       }
       std::cout << "," << oldTimeRun << "," << newTimeRun << std::endl;
+      delete [] bounds;
     }
     oldTime /= testCases;
     newTime /= testCases;
-    std::cout << "maxMin:" << maxOld << "," << minOld << "," << maxNew << "," << minNew << std::endl;
-    std::cout << oldTime << "," << newTime << std::endl;
+    //std::cout << "maxMin:" << maxOld << "," << minOld << "," << maxNew << "," << minNew << std::endl;
+    //std::cout << oldTime << "," << newTime << std::endl;
     writeToTestResults(std::pow(2,n), oldTime, newTime);
   }
   return 0;

@@ -43,7 +43,7 @@ class IsolationFinderSl {
 public:
     explicit IsolationFinderSl(TileCache *tileCache, ILPSearchAreaTree *ilpSearchTree, int minLat, int minLng, FileFormat format);
     ~IsolationFinderSl();
-    void fillPeakBuckets(float minIsolationKm);
+    uint fillPeakBuckets(float minIsolationKm);
     IsolationResults run(float minIsolationKm);
     
     bool nullPtrTile = false;
@@ -67,7 +67,7 @@ private:
   float *mLngDistanceScale;
   CoordinateSystem *mCoordinateSystem;
 
-  void setup(const Tile* tile, const ConcurrentIsolationResults* prevResults);
+  uint setup(const Tile* tile, const ConcurrentIsolationResults* prevResults);
 
   void addPeakToBucket(const LatLng &peakLocation, int elevation, float isolationKm);
 

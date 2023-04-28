@@ -138,8 +138,8 @@ int main(int argc, char **argv) {
 
   if (sweepline) {
     IsolationSlProcessor *processor = new IsolationSlProcessor(cache.get(), fileFormat);
-    IsolationResults res = processor->findIsolations(numThreads, bounds, minIsolation);
-    res.saveSl(output_directory, bounds[0], bounds[1], bounds[2], bounds[3]);
+   processor->findIsolations(numThreads, bounds, minIsolation);
+    //res.saveSl(output_directory, bounds[0], bounds[1], bounds[2], bounds[3]);
   } else {
     auto threadPool = std::make_unique<ThreadPool>(numThreads);
     int num_tiles_processed = 0;
