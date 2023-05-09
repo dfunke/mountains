@@ -33,7 +33,7 @@ set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 # set( IPS2RA_DISABLE_PARALLEL "true")
 # include_directories(ips2ra/extern/tlx)
 set(IPS4O_DISABLE_PARALLEL "true")
-add_subdirectory(ips4o)
+add_subdirectory(external/ips4o)
 
 #string(REPLACE " -Werror" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 #set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17" )
