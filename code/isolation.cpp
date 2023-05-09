@@ -57,6 +57,7 @@ static void usage() {
   printf("  -m min_isolation Minimum isolation threshold for output, default = 1km\n");
   printf("  -o directory     Directory for output data\n");
   printf("  -t num_threads   Number of threads, default = 1\n");
+  printf("  -s               Run sweepline option\n");
   printf("  -f format        Tile format. Possible formats: SRTM3, SRTM1, SRTM04\n");
   exit(1);
 }

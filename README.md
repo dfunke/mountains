@@ -8,37 +8,16 @@ elevation data.
 C++14 support is required to build the code.  Binaries are placed in
 the "debug" or "release" subdirectories.
 
-### OSX and gcc
-
-Debug version:
-
+### Build using cmake
 ```
-make  
-```
-
-Release version:
-
-```
-RELEASE=1 make
+git submodule update --recursive --init
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make
 ```
 
-This has been tested under Mac OS 12.2.1 with clang-1300.0.29.30, and Unbuntu 20.04 with gcc 9.
-
-### Windows
-
-Debug version:
-
-```
-nmake -f makefile.win
-```
-
-Release version:
-
-```
-nmake RELEASE=1 -f makefile.win
-```
-
-This has been tested under Windows 10 with Microsoft Visual Studio 2022.
+Currently only linux is supported.
 
 ## Running the code
 
@@ -159,7 +138,9 @@ These X and Y coordinates also correspond to the naming of the tiles.
 
 | Name | Resolution | Coverage | Projection | Download |
 -------|------------|----------|------------|----------|
-| SRTM   | 90m        | global   | lat/lng |[Link](viewfinderpanoramas.com) |
+| SRTM3  | 90m        | global   | lat/lng |[Link](viewfinderpanoramas.com) |
+| SRTM1  | 30m        | US, Canada, West-Europe | lat/lng |[Link](viewfinderpanoramas.com) |
+| SRTM04 | 12m        | US | lat/lng |[Link](viewfinderpanoramas.com) |
 | NED1   | 30m        | US, Canada, Mexico | lat/lng | [Link](https://prd-tnm.s3.amazonaws.com/index.html?prefix=StagedProducts/Elevation/1/) |
 | GLO-30 | 30m        | global minus Azerbaijan and Armenia | lat/lng | [Link](https://registry.opendata.aws/copernicus-dem/) |
 | FABDEM | 30m        | GLO-30 minus < -60°S and > 80°N | lat/lng | [Link](https://data.bris.ac.uk/data/dataset/25wfy0f9ukoge2gs7a5mqpq2j7) |
@@ -177,6 +158,8 @@ Options:
   -m min_isolation Minimum isolation threshold for output, default = 1km
   -o directory     Directory for output data
   -t num_threads   Number of threads, default = 1
+  -s               Run sweepline option
+  -f format        Tile format. Possible formats: SRTM3, SRTM1, SRTM04
 
 ```
 
