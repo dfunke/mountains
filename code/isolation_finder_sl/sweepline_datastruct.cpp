@@ -6,13 +6,12 @@
 void SweeplineDatastruct::insert(SlEvent* node) {
     // pass
 }
+void SweeplineDatastruct::remove(const SlEvent* node) {
+    // pass
+}
 
 IsolationRecord SweeplineDatastruct::calcPeak(const SlEvent *node) {
     return IsolationRecord();
 }
 
 SweeplineDatastruct::~SweeplineDatastruct(){}
-
-void SweeplineDatastruct::saveHeatMap(int level){}
-
-void SweeplineDatastruct::saveAsImage(int w, int h, int level, Offsets peak, Offsets highestElev) {}

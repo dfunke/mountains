@@ -19,9 +19,9 @@ public:
 
     void insert(SlEvent *node) override;
 
-    void remove(const SlEvent *node);
+    void remove(const SlEvent *node) override;
 
-    virtual void saveHeatMap(int level) override;
+    virtual void saveHeatMap(int level);
 
     IsolationRecord calcPeak(const SlEvent *node) override;
 

@@ -3,6 +3,10 @@
 
 #include "concurrent_isolation_results.h"
 #include "tile_cell.h"
+#include "sweepline_primitives.h"
+
+#include <atomic>
+#include <tbb/concurrent_vector.h>
 
 class ILPSearchAreaTree {
 public:
@@ -27,6 +31,8 @@ private:
   // Results which have currently no upper bound.
   // This will be added in the last step.
   ConcurrentIsolationResults mUnboundResults;
+  tbb::concurrent_vector<SlEvent> mTileEvents;
+  int mMinLat, mMinLng, mMaxLat, mMaxLng;
 };
 
 #endif // _ILP_SEARCH_AREA_TREE_H_

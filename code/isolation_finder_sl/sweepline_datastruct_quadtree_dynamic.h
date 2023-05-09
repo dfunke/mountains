@@ -46,20 +46,19 @@ public:
   // Insert the given point to the quadtree.
   // A copy is not made; the point must live as long as the quadtree.
   void insert(SlEvent *n) override;
+  void remove(const SlEvent *n) override;
 
   IsolationRecord calcPeak(const SlEvent *node) override;
 
   void saveAsImage(int w, int h, int level, SlEvent **allNodes, int nodeSize);
 
-  void saveAsImage(int w, int h, int level, Offsets peak, Offsets highestElev) override {}
-
   void createSnapshot(int staps);
 
-  void saveHeatMap(int level) override;
+  void saveHeatMap(int level);
 
 private:
   // Find cell that would contain point
-  Cell *mPresetCells = nullptr;
+  //Cell *mPresetCells = nullptr;
   bool fast = false;
   std::function<Offsets (float lat, float lng)> mToOffsets;
   float *mLngDistanceScale;

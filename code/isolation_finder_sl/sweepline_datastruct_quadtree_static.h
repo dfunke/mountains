@@ -64,6 +64,8 @@ public:
       delete[] mCells;
    }
 
+
+   void remove(const SlEvent *n) override {}
    // Insert the given point to the quadtree.
    // A copy is not made; the point must live as long as the quadtree.
    void insert(SlEvent *n) override
@@ -119,7 +121,7 @@ public:
    IsolationRecord calcPeak(const SlEvent *node) override
    {
       IsolationRecord ir;
-      if (! mNodeOccupied[0])
+      if (! mNodeOccupied[0] && mMaxLevel > 0)
       {
          return ir;
       }
@@ -130,7 +132,7 @@ public:
       return ir;
    }
 
-   void saveAsImage(int w, int h, int level, Offsets peak, Offsets highestElev) override {
+   void saveAsImage(int w, int h, int level, Offsets peak, Offsets highestElev) {
       FILE *imageFile;
       int height = h - 1, width = w - 1;
       std::ostringstream stream;
@@ -225,7 +227,7 @@ public:
       fclose(imageFile);
    }
 
-   void saveHeatMap(int level) override
+   void saveHeatMap(int level)
    {
       FILE *imageFile;
       int cellWIdth = sqrt(mCellsSize);
