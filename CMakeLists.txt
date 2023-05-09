@@ -28,20 +28,6 @@ set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 set(IPS4O_DISABLE_PARALLEL "true")
 add_subdirectory(external/ips4o)
 
-#string(REPLACE " -Werror" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-#set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17" )
-
-#set( CMAKE_C_FLAGS_DEBUG "" CACHE STRING "" )       
-#set( CMAKE_CXX_FLAGS_DEBUG "" CACHE STRING "" )
-#set( CMAKE_C_FLAGS_RELEASE "" CACHE STRING "" )
-#set( CMAKE_CXX_FLAGS_RELEASE "" CACHE STRING "" )
-#add_definitions(-std=c++17 -Wno-erro)
-#list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/ips4o/extern/cmake-modules)
-#find_package(TBB REQUIRED)
-
-# list(APPEND CMAKE_MODULE_PATH "/opt/intel/oneapi/tbb/latest/lib/cmake/tbb/")
-# find_package(TBB REQUIRED)
-
 set(
 	BUILD_TARGETS
 	isolation
@@ -222,78 +208,78 @@ target_link_libraries(
 	pthread
 	ips4o
 )
-# add_executable(
-# 	prominence
-# 	code/divide_tree.cpp
-# 	code/domain_map.cpp 
-# 	code/easylogging++.cc 
-# 	code/filter.cpp 
-# 	code/file_format.cpp 
-# 	code/fabdem_loader.cpp
-# 	code/island_tree.cpp 
-# 	code/kml_writer.cpp 
-# 	code/line_tree.cpp 
-# 	code/point_map.cpp 
-# 	code/prominence.cpp 
-# 	code/prominence_task.cpp 
-# 	code/tile.cpp 
-# 	code/tile_cache.cpp 
-# 	code/tile_loading_policy.cpp 
-# 	code/tree_builder.cpp 
-# )
-# 
-# target_link_libraries(
-# 	prominence
-# 	pointlib 
-# 	loaderlib 
-# 	coordlib
-# 	pthread
-# )
-# 
-# add_executable(
-# 	merge_divide_trees
-# 	code/divide_tree.cpp
-# 	code/easylogging++.cc
-# 	code/island_tree.cpp
-# 	code/kml_writer.cpp
-# 	code/line_tree.cpp
-# 	code/merge_divide_trees.cpp
-# 	code/tile.cpp
-# )
-# 
-# target_link_libraries(
-# 	merge_divide_trees
-# 	pointlib  
-# 	coordlib
-# )
-# 
-# add_executable(
-# 	filter_points
-# 	code/easylogging++.cc
-# 	code/filter.cpp
-# 	code/filter_points.cpp
-# )
-# 
-# target_link_libraries(
-# 	filter_points
-# 	pointlib  
-# )
-# 
-# add_executable(
-# 	compute_parents
-# 	code/divide_tree.cpp
-# 	code/easylogging++.cc
-# 	code/island_tree.cpp
-# 	code/kml_writer.cpp
-# 	code/line_tree.cpp
-# 	code/compute_parents.cpp
-# )
-# 
-# target_link_libraries(
-# 	compute_parents
-# 	pointlib
-# 	coordlib
-# )
+ add_executable(
+ 	prominence
+ 	code/divide_tree.cpp
+ 	code/domain_map.cpp 
+ 	code/easylogging++.cc 
+ 	code/filter.cpp 
+ 	code/file_format.cpp 
+ 	code/fabdem_loader.cpp
+ 	code/island_tree.cpp 
+ 	code/kml_writer.cpp 
+ 	code/line_tree.cpp 
+ 	code/point_map.cpp 
+ 	code/prominence.cpp 
+ 	code/prominence_task.cpp 
+ 	code/tile.cpp 
+ 	code/tile_cache.cpp 
+ 	code/tile_loading_policy.cpp 
+ 	code/tree_builder.cpp 
+ )
+ 
+ target_link_libraries(
+ 	prominence
+ 	pointlib 
+ 	loaderlib 
+ 	coordlib
+ 	pthread
+ )
+ 
+ add_executable(
+ 	merge_divide_trees
+ 	code/divide_tree.cpp
+ 	code/easylogging++.cc
+ 	code/island_tree.cpp
+ 	code/kml_writer.cpp
+ 	code/line_tree.cpp
+ 	code/merge_divide_trees.cpp
+ 	code/tile.cpp
+ )
+ 
+ target_link_libraries(
+ 	merge_divide_trees
+ 	pointlib  
+ 	coordlib
+ )
+ 
+ add_executable(
+ 	filter_points
+ 	code/easylogging++.cc
+ 	code/filter.cpp
+ 	code/filter_points.cpp
+ )
+ 
+ target_link_libraries(
+ 	filter_points
+ 	pointlib  
+ )
+ 
+ add_executable(
+ 	compute_parents
+ 	code/divide_tree.cpp
+ 	code/easylogging++.cc
+ 	code/island_tree.cpp
+ 	code/kml_writer.cpp
+ 	code/line_tree.cpp
+ 	code/compute_parents.cpp
+ )
+ 
+ target_link_libraries(
+ 	compute_parents
+ 	pointlib
+ 	coordlib
+ )
 
 # Build libraries
 foreach(X IN LISTS BUILD_LIBS)
