@@ -5,8 +5,7 @@ elevation data.
 
 ## Building the code
 
-C++14 support is required to build the code.  Binaries are placed in
-the "debug" or "release" subdirectories.
+C++14 support is required to build the code.
 
 ### Build using cmake
 ```
