@@ -15,7 +15,3 @@ IsolationRecord SweeplineDatastruct::calcPeak(const SlEvent *node) {
 }
 
 SweeplineDatastruct::~SweeplineDatastruct(){}
-
-void SweeplineDatastruct::saveHeatMap(int level){}
-
-void SweeplineDatastruct::saveAsImage(int w, int h, int level, Offsets peak, Offsets highestElev) {}

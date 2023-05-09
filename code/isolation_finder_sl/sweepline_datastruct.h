@@ -12,9 +12,6 @@ public:
     virtual ~SweeplineDatastruct();
     virtual void insert(SlEvent *node);
     virtual void remove(const SlEvent *node);
-    virtual void saveHeatMap(int level);
-    virtual void saveAsImage(int w, int h, int level, Offsets peak, Offsets highestElev);
-
     virtual IsolationRecord calcPeak(const SlEvent *node);
 };
 
