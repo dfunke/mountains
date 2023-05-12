@@ -52,11 +52,9 @@ public:
 
   void saveAsImage(int w, int h, int level, SlEvent **allNodes, int nodeSize);
 
-  void saveAsImage(int w, int h, int level, Offsets peak, Offsets highestElev) override {}
-
   void createSnapshot(int staps);
 
-  void saveHeatMap(int level) override;
+  void saveHeatMap(int level);
 
 private:
   // Find cell that would contain point
