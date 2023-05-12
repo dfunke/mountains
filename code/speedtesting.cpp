@@ -33,15 +33,18 @@ using std::ceil;
 using std::floor;
 using std::string;
 
-static const string baseFolder = "/data02/funke/SRTM/viewfinderpanoramas.org/dem3"; 
-static const string baseFolderDem1 = "/data02/funke/SRTM/viewfinderpanoramas.org/dem1"; 
-static const string testFolder = "/data02/funke/SRTM/SRTM"; 
-static const string testResultFile = "/home/huening/testresults-world-dem3-randomsample.txt";
+//static const string baseFolder =
+//    "/data02/funke/SRTM/viewfinderpanoramas.org/dem3";
+//static const string baseFolderDem1 =
+//    "/data02/funke/SRTM/viewfinderpanoramas.org/dem1";
+//static const string testFolder = "/data02/funke/SRTM/SRTM";
+//static const string testResultFile =
+//    "/home/huening/testresults-world-dem3-randomsample.txt";
 
-// static const string baseFolder = "/home/pc/Data2/SRTM-US-DEM3";
-// static const string baseFolderDem1 = "/home/pc/SRTM-DEM1";
-// static const string testFolder = "/home/pc/SRTM";
-// static const string testResultFile = "/home/pc/tmp/testresults.txt";
+static const string baseFolder = "/home/pc/Data2/SRTM-US-DEM3";
+static const string baseFolderDem1 = "/home/pc/SRTM-DEM1";
+static const string testFolder = "/home/pc/SRTM";
+static const string testResultFile = "/home/pc/tmp/testresults.txt";
 
 struct DynamicTestCase {
   Offsets centerTile;
@@ -56,12 +59,216 @@ struct TestCase {
     this->maxLng = maxLng;
     this->size = size;
   }
-  float minLat;
-  float minLng;
-  float maxLat;
-  float maxLng;
+  int minLat;
+  int minLng;
+  int maxLat;
+  int maxLng;
   int size;
 };
+
+vector<TestCase> getRandomSampleDem3UsCase() {
+  vector<TestCase> testCases;
+  testCases.push_back(TestCase(42, -97, 0, 0, 4));
+  testCases.push_back(TestCase(66, -170, 0, 0, 4));
+  testCases.push_back(TestCase(69, -155, 0, 0, 4));
+  testCases.push_back(TestCase(51, -169, 0, 0, 4));
+  testCases.push_back(TestCase(52, -76, 0, 0, 4));
+  testCases.push_back(TestCase(54, 7, 0, 0, 4));
+  testCases.push_back(TestCase(72, -43, 0, 0, 4));
+  testCases.push_back(TestCase(40, -12, 0, 0, 4));
+  testCases.push_back(TestCase(46, -75, 0, 0, 4));
+  testCases.push_back(TestCase(36, -44, 0, 0, 4));
+  testCases.push_back(TestCase(49, -3, 0, 0, 4));
+  testCases.push_back(TestCase(32, -140, 0, 0, 4));
+  testCases.push_back(TestCase(69, -101, 0, 0, 4));
+  testCases.push_back(TestCase(63, -170, 0, 0, 4));
+  testCases.push_back(TestCase(68, -66, 0, 0, 4));
+  testCases.push_back(TestCase(72, 3, 0, 0, 4));
+  testCases.push_back(TestCase(76, -65, 0, 0, 4));
+  testCases.push_back(TestCase(60, -80, 0, 0, 4));
+  testCases.push_back(TestCase(49, -64, 0, 0, 4));
+  testCases.push_back(TestCase(82, -9, 0, 0, 4));
+  testCases.push_back(TestCase(59, -130, 0, 0, 4));
+  testCases.push_back(TestCase(35, -105, 0, 0, 4));
+  testCases.push_back(TestCase(42, -160, 0, 0, 4));
+  testCases.push_back(TestCase(46, -159, 0, 0, 4));
+  testCases.push_back(TestCase(80, 0, 0, 0, 4));
+  testCases.push_back(TestCase(32, -97, 0, 0, 4));
+  testCases.push_back(TestCase(53, -157, 0, 0, 4));
+  testCases.push_back(TestCase(80, -159, 0, 0, 4));
+  testCases.push_back(TestCase(67, 1, 0, 0, 4));
+  testCases.push_back(TestCase(34, -149, 0, 0, 4));
+  testCases.push_back(TestCase(56, -125, 0, 0, 4));
+  testCases.push_back(TestCase(68, -164, 0, 0, 4));
+  testCases.push_back(TestCase(78, -81, 0, 0, 4));
+  testCases.push_back(TestCase(46, -118, 0, 0, 4));
+  testCases.push_back(TestCase(43, -143, 0, 0, 4));
+  testCases.push_back(TestCase(38, -136, 0, 0, 4));
+  testCases.push_back(TestCase(77, -101, 0, 0, 4));
+  testCases.push_back(TestCase(49, -90, 0, 0, 4));
+  testCases.push_back(TestCase(64, -74, 0, 0, 4));
+  testCases.push_back(TestCase(34, -137, 0, 0, 4));
+  testCases.push_back(TestCase(39, -98, 0, 0, 4));
+  testCases.push_back(TestCase(72, -154, 0, 0, 4));
+  testCases.push_back(TestCase(80, -110, 0, 0, 4));
+  testCases.push_back(TestCase(51, -132, 0, 0, 4));
+  testCases.push_back(TestCase(67, -166, 0, 0, 4));
+  testCases.push_back(TestCase(37, -51, 0, 0, 4));
+  testCases.push_back(TestCase(76, -159, 0, 0, 4));
+  testCases.push_back(TestCase(77, -41, 0, 0, 4));
+  testCases.push_back(TestCase(41, -76, 0, 0, 4));
+  testCases.push_back(TestCase(38, -105, 0, 0, 4));
+  testCases.push_back(TestCase(66, -92, 0, 0, 8));
+  testCases.push_back(TestCase(49, -125, 0, 0, 8));
+  testCases.push_back(TestCase(43, -138, 0, 0, 8));
+  testCases.push_back(TestCase(58, -118, 0, 0, 8));
+  testCases.push_back(TestCase(82, -129, 0, 0, 8));
+  testCases.push_back(TestCase(61, -52, 0, 0, 8));
+  testCases.push_back(TestCase(73, -15, 0, 0, 8));
+  testCases.push_back(TestCase(60, -112, 0, 0, 8));
+  testCases.push_back(TestCase(47, -94, 0, 0, 8));
+  testCases.push_back(TestCase(42, -154, 0, 0, 8));
+  testCases.push_back(TestCase(48, -160, 0, 0, 8));
+  testCases.push_back(TestCase(63, -120, 0, 0, 8));
+  testCases.push_back(TestCase(47, -156, 0, 0, 8));
+  testCases.push_back(TestCase(45, -122, 0, 0, 8));
+  testCases.push_back(TestCase(71, -148, 0, 0, 8));
+  testCases.push_back(TestCase(34, -152, 0, 0, 8));
+  testCases.push_back(TestCase(68, -44, 0, 0, 8));
+  testCases.push_back(TestCase(39, -118, 0, 0, 8));
+  testCases.push_back(TestCase(67, -57, 0, 0, 8));
+  testCases.push_back(TestCase(81, 1, 0, 0, 8));
+  testCases.push_back(TestCase(59, -167, 0, 0, 8));
+  testCases.push_back(TestCase(59, -48, 0, 0, 8));
+  testCases.push_back(TestCase(70, -10, 0, 0, 8));
+  testCases.push_back(TestCase(64, -45, 0, 0, 8));
+  testCases.push_back(TestCase(33, -114, 0, 0, 8));
+  testCases.push_back(TestCase(65, -104, 0, 0, 8));
+  testCases.push_back(TestCase(37, -129, 0, 0, 8));
+  testCases.push_back(TestCase(43, -125, 0, 0, 8));
+  testCases.push_back(TestCase(51, -142, 0, 0, 8));
+  testCases.push_back(TestCase(72, -139, 0, 0, 8));
+  testCases.push_back(TestCase(34, -71, 0, 0, 8));
+  testCases.push_back(TestCase(47, -93, 0, 0, 8));
+  testCases.push_back(TestCase(54, -53, 0, 0, 8));
+  testCases.push_back(TestCase(39, -24, 0, 0, 8));
+  testCases.push_back(TestCase(54, -155, 0, 0, 8));
+  testCases.push_back(TestCase(73, -149, 0, 0, 8));
+  testCases.push_back(TestCase(48, -87, 0, 0, 8));
+  testCases.push_back(TestCase(46, -103, 0, 0, 8));
+  testCases.push_back(TestCase(44, -29, 0, 0, 8));
+  testCases.push_back(TestCase(56, -79, 0, 0, 8));
+  testCases.push_back(TestCase(41, -73, 0, 0, 16));
+  testCases.push_back(TestCase(67, -54, 0, 0, 16));
+  testCases.push_back(TestCase(64, -44, 0, 0, 16));
+  testCases.push_back(TestCase(70, -82, 0, 0, 16));
+  testCases.push_back(TestCase(75, -139, 0, 0, 16));
+  testCases.push_back(TestCase(38, -118, 0, 0, 16));
+  testCases.push_back(TestCase(40, -19, 0, 0, 16));
+  testCases.push_back(TestCase(65, -80, 0, 0, 16));
+  testCases.push_back(TestCase(70, -64, 0, 0, 16));
+  testCases.push_back(TestCase(37, -113, 0, 0, 16));
+  testCases.push_back(TestCase(42, -55, 0, 0, 16));
+  testCases.push_back(TestCase(35, -13, 0, 0, 16));
+  testCases.push_back(TestCase(44, -47, 0, 0, 16));
+  testCases.push_back(TestCase(56, 4, 0, 0, 16));
+  testCases.push_back(TestCase(51, -43, 0, 0, 16));
+  testCases.push_back(TestCase(32, -131, 0, 0, 16));
+  testCases.push_back(TestCase(56, -86, 0, 0, 16));
+  testCases.push_back(TestCase(77, -46, 0, 0, 16));
+  testCases.push_back(TestCase(81, -148, 0, 0, 16));
+  testCases.push_back(TestCase(36, 2, 0, 0, 16));
+  testCases.push_back(TestCase(33, -56, 0, 0, 16));
+  testCases.push_back(TestCase(73, -168, 0, 0, 16));
+  testCases.push_back(TestCase(70, -73, 0, 0, 16));
+  testCases.push_back(TestCase(45, -145, 0, 0, 16));
+  testCases.push_back(TestCase(81, -108, 0, 0, 16));
+  testCases.push_back(TestCase(48, -21, 0, 0, 16));
+  testCases.push_back(TestCase(63, -97, 0, 0, 16));
+  testCases.push_back(TestCase(64, -144, 0, 0, 16));
+  testCases.push_back(TestCase(67, -92, 0, 0, 16));
+  testCases.push_back(TestCase(58, -37, 0, 0, 16));
+  testCases.push_back(TestCase(34, -141, 0, 0, 16));
+  testCases.push_back(TestCase(55, -126, 0, 0, 16));
+  testCases.push_back(TestCase(56, -55, 0, 0, 32));
+  testCases.push_back(TestCase(66, -111, 0, 0, 32));
+  testCases.push_back(TestCase(49, -96, 0, 0, 32));
+  testCases.push_back(TestCase(73, -87, 0, 0, 32));
+  testCases.push_back(TestCase(66, -103, 0, 0, 32));
+  testCases.push_back(TestCase(63, -120, 0, 0, 32));
+  testCases.push_back(TestCase(46, 6, 0, 0, 32));
+  testCases.push_back(TestCase(78, -162, 0, 0, 32));
+  testCases.push_back(TestCase(62, -20, 0, 0, 32));
+  testCases.push_back(TestCase(33, -17, 0, 0, 32));
+  testCases.push_back(TestCase(46, -104, 0, 0, 32));
+  testCases.push_back(TestCase(35, 5, 0, 0, 32));
+  testCases.push_back(TestCase(75, -167, 0, 0, 32));
+  testCases.push_back(TestCase(59, -21, 0, 0, 32));
+  testCases.push_back(TestCase(36, -63, 0, 0, 32));
+  testCases.push_back(TestCase(57, -24, 0, 0, 32));
+  testCases.push_back(TestCase(38, -91, 0, 0, 32));
+  testCases.push_back(TestCase(80, -57, 0, 0, 32));
+  testCases.push_back(TestCase(34, -61, 0, 0, 32));
+  testCases.push_back(TestCase(55, -40, 0, 0, 32));
+  testCases.push_back(TestCase(81, -120, 0, 0, 32));
+  testCases.push_back(TestCase(73, -94, 0, 0, 32));
+  testCases.push_back(TestCase(71, -44, 0, 0, 32));
+  testCases.push_back(TestCase(72, -108, 0, 0, 32));
+  testCases.push_back(TestCase(68, -62, 0, 0, 64));
+  testCases.push_back(TestCase(38, -35, 0, 0, 64));
+  testCases.push_back(TestCase(65, -53, 0, 0, 64));
+  testCases.push_back(TestCase(57, -165, 0, 0, 64));
+  testCases.push_back(TestCase(66, -1, 0, 0, 64));
+  testCases.push_back(TestCase(68, -130, 0, 0, 64));
+  testCases.push_back(TestCase(34, -89, 0, 0, 64));
+  testCases.push_back(TestCase(41, -71, 0, 0, 64));
+  testCases.push_back(TestCase(70, -145, 0, 0, 64));
+  testCases.push_back(TestCase(37, -106, 0, 0, 64));
+  testCases.push_back(TestCase(60, 1, 0, 0, 64));
+  testCases.push_back(TestCase(44, -65, 0, 0, 64));
+  testCases.push_back(TestCase(48, -71, 0, 0, 64));
+  testCases.push_back(TestCase(33, -96, 0, 0, 64));
+  testCases.push_back(TestCase(47, -55, 0, 0, 64));
+  testCases.push_back(TestCase(43, 0, 0, 0, 64));
+  testCases.push_back(TestCase(49, -67, 0, 0, 64));
+  testCases.push_back(TestCase(52, -80, 0, 0, 64));
+  testCases.push_back(TestCase(56, -99, 0, 0, 128));
+  testCases.push_back(TestCase(52, -12, 0, 0, 128));
+  testCases.push_back(TestCase(67, -33, 0, 0, 128));
+  testCases.push_back(TestCase(56, -107, 0, 0, 128));
+  testCases.push_back(TestCase(41, -162, 0, 0, 128));
+  testCases.push_back(TestCase(56, -117, 0, 0, 128));
+  testCases.push_back(TestCase(70, -168, 0, 0, 128));
+  testCases.push_back(TestCase(62, -151, 0, 0, 128));
+  testCases.push_back(TestCase(54, -170, 0, 0, 128));
+  testCases.push_back(TestCase(43, -66, 0, 0, 128));
+  testCases.push_back(TestCase(46, -127, 0, 0, 128));
+  testCases.push_back(TestCase(50, -43, 0, 0, 128));
+  testCases.push_back(TestCase(72, -61, 0, 0, 256));
+  testCases.push_back(TestCase(69, -17, 0, 0, 256));
+  testCases.push_back(TestCase(49, -11, 0, 0, 256));
+  testCases.push_back(TestCase(68, 0, 0, 0, 256));
+  testCases.push_back(TestCase(51, -32, 0, 0, 256));
+  testCases.push_back(TestCase(57, -63, 0, 0, 256));
+  testCases.push_back(TestCase(46, -53, 0, 0, 256));
+  testCases.push_back(TestCase(71, -47, 0, 0, 256));
+  testCases.push_back(TestCase(38, -127, 0, 0, 512));
+  testCases.push_back(TestCase(61, -85, 0, 0, 512));
+  testCases.push_back(TestCase(44, -111, 0, 0, 512));
+  testCases.push_back(TestCase(66, -33, 0, 0, 512));
+  testCases.push_back(TestCase(61, -164, 0, 0, 1024));
+  testCases.push_back(TestCase(72, -60, 0, 0, 1024));
+  testCases.push_back(TestCase(47, -62, 0, 0, 1024));
+  testCases.push_back(TestCase(80, -56, 0, 0, 1024));
+  testCases.push_back(TestCase(78, -51, 0, 0, 2048));
+  testCases.push_back(TestCase(58, -18, 0, 0, 2048));
+  testCases.push_back(TestCase(42, -155, 0, 0, 2048));
+  testCases.push_back(TestCase(51, -46, 0, 0, 2048));
+  testCases.push_back(TestCase(56, -130, 0, 0, 4096));
+  testCases.push_back(TestCase(66, -34, 0, 0, 4096));
+  testCases.push_back(TestCase(53, -132, 0, 0, 4096));
+  return testCases;
+}
 
 vector<TestCase> getTestCases() {
   vector<TestCase> testCases;
@@ -209,16 +416,16 @@ float *setupSrtmFolder(DynamicTestCase testCase) {
         if (lng < -180) {
           lng = -180;
         }
-        bounds[0]= std::min(lat+0.f, bounds[0]);
-        bounds[1]= std::max(lat+0.f, bounds[1]);
-        bounds[2]= std::min(lng+0.f, bounds[2]);
-        bounds[3]= std::max(lng+0.f, bounds[3]);
+        bounds[0] = std::min(lat + 0.f, bounds[0]);
+        bounds[1] = std::max(lat + 0.f, bounds[1]);
+        bounds[2] = std::min(lng + 0.f, bounds[2]);
+        bounds[3] = std::max(lng + 0.f, bounds[3]);
 
         counter += copyTile(lat, lng);
         if (counter == testCase.tileNumber) {
 
-          bounds[1] = bounds[1]+1;
-          bounds[3] = bounds[3] +1;
+          bounds[1] = bounds[1] + 1;
+          bounds[3] = bounds[3] + 1;
           return bounds;
         }
       }
@@ -290,7 +497,8 @@ double runTest(FileFormat fileFormat, float bounds[], bool old) {
   high_resolution_clock::time_point t2 = high_resolution_clock::now();
   duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
   if (!old) {
-    std::cout << pNumbers.pixelCount << "," << pNumbers.finalPeakCount << "," << pNumbers.totalPeakCount;
+    std::cout << pNumbers.pixelCount << "," << pNumbers.finalPeakCount << ","
+              << pNumbers.totalPeakCount;
   }
   return time_span.count();
 }
@@ -300,8 +508,8 @@ int conductSpeedComparrisonTests() {
   FileFormat fileFormat(FileFormat::Value::HGT3);
   BasicTileLoadingPolicy policy(testFolder.c_str(), fileFormat);
   for (auto testCase : getUsTestCase()) {
-    float bounds[4] = {testCase.minLat, testCase.maxLat, testCase.minLng,
-                       testCase.maxLng};
+    float bounds[4] = {testCase.minLat + 0.f, testCase.maxLat + 0.f, testCase.minLng + 0.f,
+                       testCase.maxLng + 0.f};
     // float bounds[4] = {34, (34.f + t/d), -118,(-118.f + t)};
     // float bounds[4] = {47, (47.f + t/d), 1,(1.f + t)};
 
@@ -329,19 +537,53 @@ int conductSpeedComparrisonTests() {
   return 0;
 }
 
- //testCases.push_back(TestCase(23, 47, -106, -68, 502));
+int reconductRandomSampleComparrisonTests() {
+  FileFormat fileFormat(FileFormat::Value::HGT3);
+  int maxTiles = 0;
+  bool old = false;
+
+  for (auto testSample : getRandomSampleDem3UsCase()) {
+    int n = std::log2(testSample.size);
+    auto testCase = DynamicTestCase();
+    testCase.centerTile = Offsets(testSample.minLat , testSample.minLng);
+    testCase.tileNumber = std::pow(2, n);
+    std::cout << testCase.tileNumber << "," << testSample.minLat << "," << testSample.minLng << ","<< std::flush;
+    cleanSrtmFolder();
+    float *bounds = setupSrtmFolder(testCase);
+    double oldTimeRun = 0;
+    double newTimeRun = 0;
+    for (int i = 0; i < 2; i++) {
+      if (i == 0) {
+        old = rand() % 2;
+      } else {
+        old = !old;
+      }
+      double time = runTest(fileFormat, bounds, old);
+      if (old) {
+        oldTimeRun = time;
+      } else {
+        newTimeRun = time;
+      }
+    }
+    std::cout << "," << oldTimeRun << "," << newTimeRun << std::endl;
+    delete[] bounds;
+  }
+  return 0;
+}
+
+// testCases.push_back(TestCase(23, 47, -106, -68, 502));
 int conductRandomSampleComparrisonTests() {
   int MAX_TILE_COUNT = 26095;
-  //int MAX_TILE_COUNT = 502;
+  // int MAX_TILE_COUNT = 502;
   FileFormat fileFormat(FileFormat::Value::HGT3);
   int maxTiles = 0;
   int testCases = 5;
   bool old = false;
   for (int n = 12; std::pow(2, n) < MAX_TILE_COUNT; n++) {
     if (n > 9) {
-      testCases = 9-n/2;
+      testCases = 9 - n / 2;
     } else {
-      testCases = (12-n) * (12-n) / 2;
+      testCases = (12 - n) * (12 - n) / 2;
     }
     double oldTime = 0;
     double newTime = 0;
@@ -359,48 +601,50 @@ int conductRandomSampleComparrisonTests() {
       testCase.tileNumber = std::pow(2, n);
       std::cout << testCase.tileNumber << "," << lat << "," << lng << ",";
       cleanSrtmFolder();
-      float* bounds = setupSrtmFolder(testCase);
+      float *bounds = setupSrtmFolder(testCase);
       double oldTimeRun = 0;
       double newTimeRun = 0;
-      for (int i = 0; i < 2; i++) {
+      for (int i = 0; i < 1; i++) {
         if (i == 0) {
-          old = rand() % 2;
+          old = true;
+          //old = rand() % 2;
         } else {
           old = !old;
         }
         double time = runTest(fileFormat, bounds, old);
         if (old) {
           oldTime += time;
-	  oldTimeRun = time;
+          oldTimeRun = time;
           minOld = std::min(time, minOld);
           maxOld = std::max(time, maxOld);
         } else {
           newTime += time;
-	  newTimeRun = time;
+          newTimeRun = time;
           minNew = std::min(time, minNew);
           maxNew = std::max(time, maxNew);
         }
       }
       std::cout << "," << oldTimeRun << "," << newTimeRun << std::endl;
-      delete [] bounds;
+      delete[] bounds;
     }
     oldTime /= testCases;
     newTime /= testCases;
-    //std::cout << "maxMin:" << maxOld << "," << minOld << "," << maxNew << "," << minNew << std::endl;
-    //std::cout << oldTime << "," << newTime << std::endl;
-    writeToTestResults(std::pow(2,n), oldTime, newTime);
+    // std::cout << "maxMin:" << maxOld << "," << minOld << "," << maxNew << ","
+    // << minNew << std::endl; std::cout << oldTime << "," << newTime <<
+    // std::endl;
+    writeToTestResults(std::pow(2, n), oldTime, newTime);
   }
   return 0;
 }
 
 int main(int argc, char **argv) {
   START_EASYLOGGINGPP(argc, argv);
-  return conductRandomSampleComparrisonTests();
+  return reconductRandomSampleComparrisonTests();
   // return conductSpeedComparrisonTests();
   // return testCaseWithDem1Data();
   TestCase testCase = getNorthAmerika();
-  float bounds[4] = {testCase.minLat, testCase.maxLat, testCase.minLng,
-                     testCase.maxLng};
+  float bounds[4] = {testCase.minLat + 0.f, testCase.maxLat + 0.f, testCase.minLng + 0.f,
+                     testCase.maxLng + 0.f};
   setupSrtmFolder(bounds);
   // return testSpecificArea();
 }

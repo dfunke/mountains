@@ -119,10 +119,10 @@ IsolationRecord IsolationFinder::findIsolation(Offsets peak) const {
         }
 
         // We only want to do the slow, exact check if we're not in the peak's tile
-        LatLng *locationToUse = nullptr;
-        if (lat != peakLat || lng != peakLng) {
-          locationToUse = &peakLocation;
-        }
+        LatLng *locationToUse = &peakLocation;
+        //if (lat != peakLat || lng != peakLng) {
+        //  locationToUse = &peakLocation;
+        //}
         IsolationRecord neighborRecord = checkNeighboringTile(
           static_cast<float>(lat), static_cast<float>(neighborLng), locationToUse,
           Offsets(seedx, seedy), elev);
