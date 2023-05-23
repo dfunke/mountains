@@ -1,4 +1,4 @@
-#include "sweepline_datastruct_quadtree_dynamic.h"
+#include "sweepline_datastruct_kd.h"
 #include "../isolation_finder.h"
 //#include "math.h"
 
@@ -8,9 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-using std::vector;
-
-SweeplineDatastructQuadtreeDynamic::SweeplineDatastructQuadtreeDynamic(double minLat, double maxLat, double minLng, double maxLng, float *lngDistanceScale, std::function<Offsets (float lat, float lng)> toOffsets)
+SweeplineDatastructKD::SweeplineDatastructKD(double minLat, double maxLat, double minLng, double maxLng, float *lngDistanceScale, std::function<Offsets (float lat, float lng)> toOffsets)
 {
   mLngDistanceScale = lngDistanceScale;
   mToOffsets = toOffsets;
@@ -26,21 +24,21 @@ SweeplineDatastructQuadtreeDynamic::SweeplineDatastructQuadtreeDynamic(double mi
   //this->mRoot->presetChilds(mPresetCells + 1, childSize-1, &memoryManager);
 }
 
-SweeplineDatastructQuadtreeDynamic::~SweeplineDatastructQuadtreeDynamic() {
+SweeplineDatastructKD::~SweeplineDatastructKD() {
   //delete []mPresetCells;
 }
 
-void SweeplineDatastructQuadtreeDynamic::insert(SlEvent *n)
+void SweeplineDatastructKD::insert(SlEvent *n)
 {
   mRoot->insert(n);
 }
 
 
-void SweeplineDatastructQuadtreeDynamic::remove(const SlEvent *n){
+void SweeplineDatastructKD::remove(const SlEvent *n){
   mRoot->remove(n);
 }
 
-IsolationRecord SweeplineDatastructQuadtreeDynamic::calcPeak(const SlEvent *node)
+IsolationRecord SweeplineDatastructKD::calcPeak(const SlEvent *node)
 {
   IsolationRecord ir;
   float *currShortestDistance = new float;
@@ -66,7 +64,7 @@ IsolationRecord SweeplineDatastructQuadtreeDynamic::calcPeak(const SlEvent *node
   return ir;
 }
 
-void SweeplineDatastructQuadtreeDynamic::saveAsImage(int w, int h, int level, SlEvent **allNodes, int nodeSize)
+void SweeplineDatastructKD::saveAsImage(int w, int h, int level, SlEvent **allNodes, int nodeSize)
 {
   /*
     FILE *imageFile;
@@ -119,13 +117,13 @@ void SweeplineDatastructQuadtreeDynamic::saveAsImage(int w, int h, int level, Sl
     */
 }
 
-void SweeplineDatastructQuadtreeDynamic::createSnapshot(int step) {
+void SweeplineDatastructKD::createSnapshot(int step) {
   int elements = this->mRoot->countNodes();
   int maxDepth = this->mRoot->getMaxDepth();
   int leafs = this->mRoot->countLeafs();
   printf("%d,%ld,%d,%d,%d", step, mRoot->size, maxDepth, elements, leafs);
 }
 
-void SweeplineDatastructQuadtreeDynamic::saveHeatMap(int level) {
+void SweeplineDatastructKD::saveHeatMap(int level) {
 
 }

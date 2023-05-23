@@ -118,7 +118,7 @@ add_executable(
 	code/isolation_finder_sl/isolation_finder_sl.cpp
 	code/isolation_finder_sl/isolation_sl_processor.cpp
 	code/isolation_finder_sl/sweepline_datastruct_naive.cpp
-	code/isolation_finder_sl/sweepline_datastruct_quadtree_dynamic.cpp
+	code/isolation_finder_sl/sweepline_datastruct_kd.cpp
 	code/isolation_finder_sl/sweepline_datastruct.cpp
 	code/isolation_finder_sl/sweepline_primitives.cpp
 	code/isolation_finder_sl/tile_cell.cpp
@@ -156,7 +156,7 @@ add_executable(
 	code/isolation_finder_sl/isolation_finder_sl.cpp
 	code/isolation_finder_sl/isolation_sl_processor.cpp
 	code/isolation_finder_sl/sweepline_datastruct_naive.cpp
-	code/isolation_finder_sl/sweepline_datastruct_quadtree_dynamic.cpp
+	code/isolation_finder_sl/sweepline_datastruct_kd.cpp
 	code/isolation_finder_sl/sweepline_datastruct.cpp
 	code/isolation_finder_sl/sweepline_primitives.cpp
 	code/isolation_finder_sl/tile_cell.cpp
@@ -193,7 +193,7 @@ add_executable(
 	code/isolation_finder_sl/isolation_finder_sl.cpp
 	code/isolation_finder_sl/isolation_sl_processor.cpp
 	code/isolation_finder_sl/sweepline_datastruct_naive.cpp
-	code/isolation_finder_sl/sweepline_datastruct_quadtree_dynamic.cpp
+	code/isolation_finder_sl/sweepline_datastruct_kd.cpp
 	code/isolation_finder_sl/sweepline_datastruct.cpp
 	code/isolation_finder_sl/sweepline_primitives.cpp
 	code/isolation_finder_sl/tile_cell.cpp

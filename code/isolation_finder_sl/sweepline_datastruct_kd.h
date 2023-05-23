@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Andrew Kirmse
+ * Copyright (c) 2023 Nicolai Huening
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,11 +37,11 @@
 #include <functional>
 #include <vector>
 
-class SweeplineDatastructQuadtreeDynamic : public SweeplineDatastruct
+class SweeplineDatastructKD : public SweeplineDatastruct
 {
 public:
-  SweeplineDatastructQuadtreeDynamic(double minLat, double maxLat, double minLng, double maxLng, float *latDistanceScale, std::function<Offsets (float lat, float lng)> toOffsets);
-  ~SweeplineDatastructQuadtreeDynamic();
+  SweeplineDatastructKD(double minLat, double maxLat, double minLng, double maxLng, float *latDistanceScale, std::function<Offsets (float lat, float lng)> toOffsets);
+  ~SweeplineDatastructKD();
 
   // Insert the given point to the quadtree.
   // A copy is not made; the point must live as long as the quadtree.

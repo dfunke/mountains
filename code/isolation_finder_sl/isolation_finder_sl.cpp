@@ -12,7 +12,7 @@
 #include "ilp_search_area_tree.h"
 #include "sweepline_datastruct.h"
 #include "sweepline_datastruct_naive.h"
-#include "sweepline_datastruct_quadtree_dynamic.h"
+#include "sweepline_datastruct_kd.h"
 #include "sweepline_datastruct_quadtree_static.h"
 
 #include "ips4o.hpp"
@@ -210,15 +210,15 @@ IsolationResults IsolationFinderSl::runSweepline(float mMinIsolationKm,
   // LatLng(maxLat, maxLng), LatLng(minLat, minLng));
   SweeplineDatastruct *sld;
   if (fast) {
-    sld = new SweeplineDatastructQuadtreeDynamic(
+    sld = new SweeplineDatastructKD(
         mMinLat, mMaxLat, mMinLng, mMaxLng, mLngDistanceScale,
         [=](float lat, float lng) { return this->toOffsets(lat, lng); });
   } else {
     // sld = new SweeplineDatastructNaive(1200, 1200, LatLng(mMaxLat, mMaxLng),
     // LatLng(mMinLat, mMinLng));
-    //  sld = new SweeplineDatastructQuadtreeDynamic(mMinLat, mMaxLat, mMinLng,
+    //  sld = new SweeplineDatastructKD(mMinLat, mMaxLat, mMinLng,
     //  mMaxLng);
-    sld = new SweeplineDatastructQuadtreeDynamic(
+    sld = new SweeplineDatastructKD(
         mMinLat, mMaxLat, mMinLng, mMaxLng, mLngDistanceScale, nullptr);
   }
   for (std::size_t i = 0; i < currSize; ++i) {
