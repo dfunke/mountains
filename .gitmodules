@@ -7,3 +7,9 @@
 [submodule "external/ips4o"]
 	path = external/ips4o
 	url = https://github.com/ips4o/ips4o.git
+[submodule "external/--force"]
+	path = external/--force
+	url = https://github.com/OSGeo/libgeotiff.git
+[submodule "external/libgeotiff"]
+	path = external/libgeotiff
+	url = https://github.com/OSGeo/libgeotiff.git
