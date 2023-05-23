@@ -4,8 +4,8 @@ C++ programs for calculating the isolation and prominence from digital elevation
 
 This is a fork of [https://github.com/akirmse/mountains](https://github.com/akirmse/mountains),
 with an additional sweep-plane implementation to find the isolations of every mountain.
-To run the sweep-plane implementation build the code as described below and execute the isolation
-binary with the `-s` flag.
+
+**To run the sweep-plane implementation build the code as described below and execute the isolation binary with the `-s` flag**.
 
 ## Building the code
 
