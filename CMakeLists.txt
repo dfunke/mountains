@@ -31,6 +31,7 @@ add_subdirectory(external/ips4o)
 set(
 	BUILD_TARGETS
 	isolation
+	converter
 )
 
 set(
@@ -62,6 +63,7 @@ set(
 	code/flt_loader.cpp 
 	code/glo_loader.cpp 
 	code/hgt_loader.cpp 
+	code/tiff_loader.cpp 
 )
 set(COORDLIB_OBJS
 	code/coordinate_system.cpp 
@@ -87,6 +89,12 @@ add_library(
 	code/flt_loader.cpp
 	code/glo_loader.cpp
 	code/hgt_loader.cpp
+	code/tiff_loader.cpp 
+)
+
+target_link_libraries(
+       loaderlib PRIVATE
+       tiff
 )
 
 add_library(
@@ -132,6 +140,25 @@ target_link_libraries(
 	tbb
 	pthread
 	ips4o
+)
+
+add_executable(
+    converter
+	code/easylogging++.cc
+	code/file_format.cpp 
+	code/tile.cpp 
+	code/tile_cache.cpp 
+	code/tile_loading_policy.cpp
+	code/fabdem_loader.cpp
+	code/converter.cpp
+	code/hgt_writer.cpp
+)
+
+target_link_libraries(
+    converter PRIVATE
+	pointlib 
+	loaderlib 
+	coordlib
 )
 
 

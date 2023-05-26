@@ -41,6 +41,7 @@ int FileFormat::rawSamplesAcross() const {
   case Value::HGT1:       return 3601;
   case Value::HGT04:       return 9001;
   case Value::THREEDEP_1M:  return 10012;
+  case Value::HGT_MARS:   return 7622;
   default:
     // In particular, fail on GLO, because this number is variable with latitude.
     LOG(ERROR) << "Couldn't compute tile size of unknown file format";
@@ -57,6 +58,7 @@ int FileFormat::inMemorySamplesAcross() const {
   case Value::HGT1:       return 3601;
   case Value::HGT04:       return 9001;
   case Value::THREEDEP_1M:  return 10001;
+  case Value::HGT_MARS:   return 7622;
   case Value::GLO30: // Fall through
   case Value::FABDEM:
     return 3601;
@@ -74,6 +76,7 @@ float FileFormat::degreesAcross() const {
   case Value::HGT3:        return 1.0f;
   case Value::HGT1:       return 1.0f;
   case Value::HGT04:      return 1.0f;
+  case Value::HGT_MARS:   return 296.3735f;
   case Value::GLO30:  // Fall through
   case Value::FABDEM:
     return 1.0f;
@@ -100,6 +103,7 @@ CoordinateSystem *FileFormat::coordinateSystemForOrigin(float lat, float lng, in
   case Value::HGT1:
   case Value::HGT04:
   case Value::GLO30:
+  case Value::HGT_MARS:
   case Value::FABDEM: {
     // The -1 removes overlap with neighbors
     int samplesPerDegreeLat = static_cast<int>((inMemorySamplesAcross() - 1) / degreesAcross());
@@ -136,6 +140,7 @@ FileFormat *FileFormat::fromName(const string &name) {
     { "NED19",     Value::NED19, },
     { "GLO30",     Value::GLO30, },
     { "FABDEM",    Value::FABDEM, },
+    { "HGT_MARS",    Value::HGT_MARS, },
     { "3DEP-1M",   Value::THREEDEP_1M, },
   };
 
