@@ -159,6 +159,7 @@ target_link_libraries(
 	pointlib 
 	loaderlib 
 	coordlib
+	tiff
 )
 
 

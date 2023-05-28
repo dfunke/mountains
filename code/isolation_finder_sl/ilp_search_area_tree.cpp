@@ -5,8 +5,8 @@
 #include "tile_cell.h"
 
 ILPSearchAreaTree::ILPSearchAreaTree(int minLat, int minLng, int offsetLat,
-                                     int offsetLng) {
-  mRoot = new TileCell(minLat, minLng, offsetLat, offsetLng);
+                                     int offsetLng, float degreeAcross) {
+  mRoot = new TileCell(minLat, minLng, offsetLat, offsetLng, degreeAcross);
   mMinLat = minLat;
   mMinLng = minLng;
   mMaxLat = minLat + offsetLat;

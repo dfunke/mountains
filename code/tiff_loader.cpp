@@ -36,13 +36,12 @@ Tile *GeotiffLoader::loadTile(const std::string &directory, float minLat, float 
   uint32_t height;
   TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &height);
   uint32_t width = TIFFScanlineSize(tif) / 2;
-  int num_samples = height * width;
   
   int16_t *inbuf = (int16_t *) malloc(sizeof(int16_t) * width);
   
   Tile *retval = nullptr;
   uint32_t row;
-  Elevation *samples = (Elevation *) malloc(sizeof(Elevation) * num_samples);
+  Elevation *samples = (Elevation *) malloc(sizeof(Elevation) * width * height);
   for (row = 0; row < height; ++row) {
     TIFFReadScanline(tif, inbuf, row);
   // SRTM data is in big-endian order; convert to Elevation
@@ -54,7 +53,7 @@ Tile *GeotiffLoader::loadTile(const std::string &directory, float minLat, float 
       } else {
         samples[row * width + i] = static_cast<Elevation>(elevation);
       }
-    } 
+    }
   }
   TIFFClose(tif);
   

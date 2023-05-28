@@ -10,9 +10,12 @@
 #include <cmath>
 
 using std::floor;
+float EPSILON = 0.0000001;
 
-TileCell::TileCell(int minLat, int minLng, int offsetLat, int offsetLng) {
+TileCell::TileCell(int minLat, int minLng, int offsetLat, int offsetLng,
+                   float arcsecondsAcross) {
   // build tree
+  mArcsecondsAcross = arcsecondsAcross;
   mBottomRight = LatLng(minLat, minLng);
   mTopLeft = LatLng(minLat + offsetLat, minLng + offsetLng);
   mSmaller = nullptr;
@@ -81,22 +84,18 @@ void TileCell::distributeToTiles(const LatLng &peakLocation, int elevation,
   if (shortestDistanceToSmaller < shortestDistanceToBigger) {
     // go first in smaller
     if (isolationKm > shortestDistanceToSmaller) {
-      mSmaller->distributeToTiles(peakLocation, elevation,
-                                  isolationKm);
+      mSmaller->distributeToTiles(peakLocation, elevation, isolationKm);
     }
     if (isolationKm > shortestDistanceToBigger) {
-      mBigger->distributeToTiles(peakLocation, elevation,
-                                 isolationKm);
+      mBigger->distributeToTiles(peakLocation, elevation, isolationKm);
     }
   } else {
     // go first in bigger
     if (isolationKm > shortestDistanceToBigger) {
-      mBigger->distributeToTiles(peakLocation, elevation,
-                                 isolationKm);
+      mBigger->distributeToTiles(peakLocation, elevation, isolationKm);
     }
     if (isolationKm > shortestDistanceToSmaller) {
-      mSmaller->distributeToTiles(peakLocation, elevation,
-                                  isolationKm);
+      mSmaller->distributeToTiles(peakLocation, elevation, isolationKm);
     }
   }
 }
@@ -125,12 +124,10 @@ ConcurrentIsolationResults *TileCell::findBucket(int minLat, int minLng) {
 }
 
 bool TileCell::isLeaf() {
-  return static_cast<int>(mTopLeft.latitude()) -
-                 static_cast<int>(mBottomRight.latitude()) ==
-             1 &&
-         static_cast<int>(mTopLeft.longitude()) -
-                 static_cast<int>(mBottomRight.longitude()) ==
-             1;
+  return mTopLeft.latitude() - mBottomRight.latitude() <
+             mArcsecondsAcross + EPSILON &&
+         mTopLeft.longitude() - mBottomRight.longitude() <
+             mArcsecondsAcross + EPSILON;
 }
 
 void TileCell::checkAndSplit() {
@@ -142,20 +139,21 @@ void TileCell::checkAndSplit() {
       return;
     }
     if (offsetLat > offsetLng) {
-      mSmaller = new TileCell((int)mBottomRight.latitude(),
-                              (int)mBottomRight.longitude(),
-                              offsetLat / 2 + (offsetLat % 2), offsetLng);
-      mBigger = new TileCell(
-          (int)mBottomRight.latitude() + offsetLat / 2 + (offsetLat % 2),
-          (int)mBottomRight.longitude(), offsetLat / 2, offsetLng);
+      mSmaller = new TileCell(
+          (int)mBottomRight.latitude(), (int)mBottomRight.longitude(),
+          offsetLat / 2 + (offsetLat % 2), offsetLng, mArcsecondsAcross);
+      mBigger = new TileCell((int)mBottomRight.latitude() + offsetLat / 2 +
+                                 (offsetLat % 2),
+                             (int)mBottomRight.longitude(), offsetLat / 2,
+                             offsetLng, mArcsecondsAcross);
     } else {
-      mSmaller = new TileCell((int)mBottomRight.latitude(),
-                              (int)mBottomRight.longitude(), offsetLat,
-                              offsetLng / 2 + (offsetLng % 2));
+      mSmaller = new TileCell(
+          (int)mBottomRight.latitude(), (int)mBottomRight.longitude(),
+          offsetLat, offsetLng / 2 + (offsetLng % 2), mArcsecondsAcross);
       mBigger = new TileCell((int)mBottomRight.latitude(),
                              (int)mBottomRight.longitude() + offsetLng / 2 +
                                  (offsetLng % 2),
-                             offsetLat, offsetLng / 2);
+                             offsetLat, offsetLng / 2, mArcsecondsAcross);
     }
     // Split
   }

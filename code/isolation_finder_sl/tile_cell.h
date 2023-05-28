@@ -10,7 +10,7 @@
 
 class TileCell {
 public:
-  TileCell(int minLat, int minLng, int offsetLat, int offsetLng);
+  TileCell(int minLat, int minLng, int offsetLat, int offsetLng, float arcsecondsAcross);
   ~TileCell();
 
   void registerTile(int minLat, int minLng, Elevation maxElev);
@@ -23,6 +23,7 @@ public:
 private:
   float maxDistanceToCell(const LatLng &point) const;
   Lock mLock;
+  int mArcsecondsAcross;
   ConcurrentIsolationResults *mBucket;
   LatLng mTopLeft;
   LatLng mBottomRight;

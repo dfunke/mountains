@@ -72,6 +72,7 @@ Tile *BasicTileLoadingPolicy::loadTile(float minLat, float minLng) const {
   if (mNeighborEdgeLoadingEnabled) {
     switch (mFileFormat.value()) {
     case FileFormat::Value::HGT3:  // Fall through
+    case FileFormat::Value::HGT_MARS:  // Fall through
     case FileFormat::Value::HGT1:
     case FileFormat::Value::NED19:
     case FileFormat::Value::NED13_ZIP:
@@ -105,6 +106,7 @@ Tile *BasicTileLoadingPolicy::loadInternal(float minLat, float minLng) const {
   switch (mFileFormat.value()) {
   case FileFormat::Value::HGT3:
   case FileFormat::Value::HGT1:
+  case FileFormat::Value::HGT_MARS:
     loader = new HgtLoader(mFileFormat);
     break;
 

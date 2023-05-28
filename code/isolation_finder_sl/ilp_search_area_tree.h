@@ -10,7 +10,7 @@
 
 class ILPSearchAreaTree {
 public:
-  ILPSearchAreaTree(int minLat, int minLng, int offsetLat, int offsetLng);
+  ILPSearchAreaTree(int minLat, int minLng, int offsetLat, int offsetLng, float degreeAcross);
   ~ILPSearchAreaTree();
 
   // Register a tile to the ilp search area tree.

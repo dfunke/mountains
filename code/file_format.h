@@ -67,6 +67,8 @@ public:
   // Does this format use UTM coordinates rather than lat/lng?
   bool isUtm() const;
 
+  double getRadius() const;
+
   // Return a new CoordinateSystem describing the section of the Earth that
   // the given tile with the given origin (lower-left corner) covers.
   CoordinateSystem *coordinateSystemForOrigin(float lat, float lng, int utmZone = 0) const;

@@ -105,6 +105,9 @@ void IsolationFinderSl::setup(const Tile *tile,
     // skipVal = tile->width() / (tile->metersPerSample() * 4);
     //  Reduce to
     skipVal = mFormat.inMemorySamplesAcross() / (mFormat.degreesAcross() * 500);
+    if (skipVal < 1) {
+      skipVal = 1;
+    }
     loopStartIdx = skipVal;
     // skipVal = 3;
     PeakFinder pfinder(tile);
@@ -303,6 +306,7 @@ void IsolationFinderSl::fillPeakBuckets(float mMinIsolationKm) {
     nullPtrTile = true;
     return;
   }
+  tile->saveAsImage("/home/pc/tmp", mMinLat, mMinLng);
   mIlpSearchTree->registerTile(mMinLat, mMinLng, tile->maxElevation());
   mMaxLat = mMinLat + mFormat.degreesAcross();
   mMaxLng = mMinLng + mFormat.degreesAcross();
@@ -327,8 +331,8 @@ IsolationResults IsolationFinderSl::run(float mMinIsolationKm) {
 
 Offsets IsolationFinderSl::toOffsets(float latitude, float longitude) const {
   // Samples are edge-centered; OK to go half a pixel outside a corner
-  int x = (int)((longitude - mMinLng) * (mWidth - 1) + 0.5);
-  int y = (int)((mMaxLat - latitude) * (mHeight - 1) + 0.5);
+  int x = (int)(((longitude - mMinLng) / mFormat.degreesAcross()) * (mWidth - 1) + 0.5);
+  int y = (int)(((mMaxLat - latitude) /  mFormat.degreesAcross()) * (mHeight - 1) + 0.5);
 
   return Offsets(x, y);
 }

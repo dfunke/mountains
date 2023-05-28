@@ -39,7 +39,7 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
   int latMin = (int)floor(bounds[0]);
   int lngMin = (int)floor(bounds[2]);
   mSearchTree=
-      new ILPSearchAreaTree(latMin, lngMin, latMax - latMin, lngMax - lngMin);
+      new ILPSearchAreaTree(latMin, lngMin, latMax - latMin, lngMax - lngMin, mFormat.degreesAcross());
   ThreadPool *threadPool = new ThreadPool(numThreads);
   vector<std::future<void>> voidFutures;
   // Create Buckets and build TileTree
@@ -47,8 +47,8 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
   //std::cout << "Start building tile-tree" << std::endl;
   vector<IsolationFinderSl *> *pFinders = &finders;
   // create finders
-  for (int j = lngMin; j < lngMax; ++j) {
-    for (int i = latMin; i < latMax; ++i) {
+  for (int j = lngMin; j < lngMax; j+= mFormat.degreesAcross()) {
+    for (int i = latMin; i < latMax; i+= mFormat.degreesAcross()) {
       IsolationFinderSl *finder =
           new IsolationFinderSl(mCache, mSearchTree, i, j, mFormat);
       pFinders->push_back(finder);
@@ -89,7 +89,7 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
   //std::cout << "Start merging" << std::endl;
   //   Merge results
   IsolationResults finalResults;
-  TileCell newRoot(latMin, lngMin, latMax - latMin, lngMax - lngMin);
+  TileCell newRoot(latMin, lngMin, latMax - latMin, lngMax - lngMin, mFormat.degreesAcross());
   while (!q.empty()) {
     if (q.top().isolationKm > mMinIsolationKm) {
       finalResults.mResults.push_back(q.top());
