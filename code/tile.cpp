@@ -119,9 +119,10 @@ void Tile::saveAsImage(std::string dir, float lat, float lng)
       int b = std::max(0, (int)(255 * (1 - ratio)));
       int r = std::max(0, (int)(255 * (ratio - 1)));
       int g = 255 - b - r;
-      pix[(i * width + j) * 3] = r;
-      pix[(i * width + j) * 3 + 1] = g;
-      pix[(i * width + j) * 3 + 2] = b;
+      int idx = (j * width + i) * 3;
+      pix[idx] = r;
+      pix[idx + 1] = g;
+      pix[idx + 2] = b;
     }
   }
   fwrite(pix, 1, 3 * width * height, imageFile);
