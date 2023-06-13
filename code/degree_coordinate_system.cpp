@@ -33,7 +33,7 @@ using std::string;
 using std::vector;
 
 DegreeCoordinateSystem::DegreeCoordinateSystem(float minLat, float minLng, float maxLat, float maxLng,
-                                               int pixelsPerDegreeLat, int pixelsPerDegreeLng) {
+                                               float pixelsPerDegreeLat, float pixelsPerDegreeLng) {
   mMinLatitude = minLat;
   mMinLongitude = minLng;
   mMaxLatitude = maxLat;

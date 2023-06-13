@@ -100,7 +100,7 @@ float FileFormat::degreesAcross() const {
   case Value::HGT04:
     return 1.0f;
   case Value::HGT_MARS:
-    return 296.3735f;
+    return 25.71428571f;
   case Value::GLO30: // Fall through
   case Value::FABDEM:
     return 1.0f;
@@ -146,10 +146,11 @@ CoordinateSystem *FileFormat::coordinateSystemForOrigin(float lat, float lng,
   case Value::HGT_MARS:
   case Value::FABDEM: {
     // The -1 removes overlap with neighbors
-    int samplesPerDegreeLat =
-        static_cast<int>((inMemorySamplesAcross() - 1) / degreesAcross());
-    int samplesPerDegreeLng =
-        static_cast<int>((inMemorySamplesAcross() - 1) / degreesAcross());
+
+    float samplesPerDegreeLat =
+        (inMemorySamplesAcross() - 1) / degreesAcross();
+    float samplesPerDegreeLng =
+        (inMemorySamplesAcross() - 1) / degreesAcross();
     return new DegreeCoordinateSystem(lat, lng, lat + degreesAcross(),
                                       lng + degreesAcross(),
                                       samplesPerDegreeLat, samplesPerDegreeLng);

@@ -306,7 +306,6 @@ void IsolationFinderSl::fillPeakBuckets(float mMinIsolationKm) {
     nullPtrTile = true;
     return;
   }
-  tile->saveAsImage("/home/pc/tmp", mMinLat, mMinLng);
   mIlpSearchTree->registerTile(mMinLat, mMinLng, tile->maxElevation());
   mMaxLat = mMinLat + mFormat.degreesAcross();
   mMaxLng = mMinLng + mFormat.degreesAcross();

@@ -34,7 +34,7 @@ class DegreeCoordinateSystem : public CoordinateSystem {
 public:
 
   DegreeCoordinateSystem(float minLat, float minLng, float maxLat, float maxLng,
-                         int pixelsPerDegreeLat, int pixelsPerDegreeLng);
+                         float pixelsPerDegreeLat, float pixelsPerDegreeLng);
   virtual ~DegreeCoordinateSystem();
 
   virtual CoordinateSystem *clone() const;
@@ -59,8 +59,8 @@ private:
   float mMinLongitude;
   float mMaxLatitude;
   float mMaxLongitude;
-  int mSamplesPerDegreeLatitude;
-  int mSamplesPerDegreeLongitude;
+  float mSamplesPerDegreeLatitude;
+  float mSamplesPerDegreeLongitude;
 };
   
 #endif  // _DEGREE_COORDINATE_SYSTEM_H_

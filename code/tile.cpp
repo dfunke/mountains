@@ -103,8 +103,9 @@ void Tile::saveAsImage(std::string dir, float lat, float lng)
   fprintf(imageFile, "255\n");                  // Max pixel
 
   //unsigned char pix[width * height * 3];
-  unsigned char *pix = (unsigned char*)malloc(width * height * 3 * sizeof(char));
-  std::fill(pix, pix + width * height * 3, 0);
+  uint64_t size = width * height * 3.0;
+  unsigned char *pix = (unsigned char*)malloc(size * sizeof(char));
+  std::fill(pix, pix + size, 0);
 
   for (int i = 0; i < width; ++i)
   {
@@ -119,11 +120,12 @@ void Tile::saveAsImage(std::string dir, float lat, float lng)
       int b = std::max(0, (int)(255 * (1 - ratio)));
       int r = std::max(0, (int)(255 * (ratio - 1)));
       int g = 255 - b - r;
-      pix[(i * width + j) * 3] = r;
-      pix[(i * width + j) * 3 + 1] = g;
-      pix[(i * width + j) * 3 + 2] = b;
+      uint64_t idx = (i * width + j) * 3;
+      pix[idx] = r;
+      pix[idx + 1] = g;
+      pix[idx + 2] = b;
     }
   }
-  fwrite(pix, 1, 3 * width * height, imageFile);
+  fwrite(pix, 1, size, imageFile);
   fclose(imageFile);
 }

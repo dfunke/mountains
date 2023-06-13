@@ -1,7 +1,8 @@
 #include "ilp_search_area_tree.h"
 #include "sweepline_datastruct.h"
-#include "sweepline_datastruct_quadtree_static.h"
+#include "sweepline_datastruct_kd.h"
 #include "sweepline_primitives.h"
+#include "spherical_math_util.h"
 #include "tile_cell.h"
 
 ILPSearchAreaTree::ILPSearchAreaTree(int minLat, int minLng, int offsetLat,
@@ -55,10 +56,13 @@ void ILPSearchAreaTree::proccessUnbound() {
                    [](SlEvent const &lhs, SlEvent const &rhs) {
                      return lhs.getElev() > rhs.getElev();
                    });
-  SweeplineDatastruct *sld = new SweeplineDatastructQuadtreeStatic<16>(
-      mMinLat, mMaxLat, mMinLng, mMaxLng,
-      (mMaxLat - mMinLat) * (mMaxLng - mMinLng),
-      [=](float lat, float lng) { return Offsets(); });
+  SweeplineDatastruct *sld = new SweeplineDatastructKD(
+    mMinLat, mMaxLat, mMinLng, mMaxLng, nullptr, nullptr
+  );
+  //SweeplineDatastruct *sld = new SweeplineDatastructQuadtreeStatic<16>(
+  //    mMinLat, mMaxLat, mMinLng, mMaxLng,
+  //    (mMaxLat - mMinLat) * (mMaxLng - mMinLng),
+  //    [=](float lat, float lng) { return Offsets(); });
   // run sweepline
   for (int i = 0; i < idx; i++) {
     switch (queue[i].getType()) {
