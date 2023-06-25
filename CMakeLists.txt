@@ -31,7 +31,7 @@ add_subdirectory(external/ips4o)
 set(
 	BUILD_TARGETS
 	isolation
-	converter
+	#converter
 )
 
 set(
@@ -63,7 +63,7 @@ set(
 	code/flt_loader.cpp 
 	code/glo_loader.cpp 
 	code/hgt_loader.cpp 
-	code/tiff_loader.cpp 
+	#code/tiff_loader.cpp 
 	code/sldem_loader.cpp
 )
 set(COORDLIB_OBJS
@@ -90,13 +90,13 @@ add_library(
 	code/flt_loader.cpp
 	code/glo_loader.cpp
 	code/hgt_loader.cpp
-	code/tiff_loader.cpp 
+	#code/tiff_loader.cpp 
 	code/sldem_loader.cpp
 )
 
 target_link_libraries(
        loaderlib PRIVATE
-       tiff
+       #tiff
 )
 
 add_library(
@@ -144,26 +144,26 @@ target_link_libraries(
 	ips4o
 )
 
-add_executable(
-    converter
-	code/easylogging++.cc
-	code/file_format.cpp 
-	code/tile.cpp 
-	code/tile_cache.cpp 
-	code/tile_loading_policy.cpp
-	code/fabdem_loader.cpp
-	code/converter.cpp
-	code/hgt_writer.cpp
-	code/sldem_writer.cpp
-)
-
-target_link_libraries(
-    converter PRIVATE
-	pointlib 
-	loaderlib 
-	coordlib
-	tiff
-)
+#add_executable(
+#    converter
+#	code/easylogging++.cc
+#	code/file_format.cpp 
+#	code/tile.cpp 
+#	code/tile_cache.cpp 
+#	code/tile_loading_policy.cpp
+#	code/fabdem_loader.cpp
+#	code/converter.cpp
+#	code/hgt_writer.cpp
+#	code/sldem_writer.cpp
+#)
+#
+#target_link_libraries(
+#    converter PRIVATE
+#	pointlib 
+#	loaderlib 
+#	coordlib
+#	tiff
+#)
 
 
 add_executable(
@@ -240,78 +240,78 @@ target_link_libraries(
 	pthread
 	ips4o
 )
- add_executable(
- 	prominence
- 	code/divide_tree.cpp
- 	code/domain_map.cpp 
- 	code/easylogging++.cc 
- 	code/filter.cpp 
- 	code/file_format.cpp 
- 	code/fabdem_loader.cpp
- 	code/island_tree.cpp 
- 	code/kml_writer.cpp 
- 	code/line_tree.cpp 
- 	code/point_map.cpp 
- 	code/prominence.cpp 
- 	code/prominence_task.cpp 
- 	code/tile.cpp 
- 	code/tile_cache.cpp 
- 	code/tile_loading_policy.cpp 
- 	code/tree_builder.cpp 
- )
- 
- target_link_libraries(
- 	prominence
- 	pointlib 
- 	loaderlib 
- 	coordlib
- 	pthread
- )
- 
- add_executable(
- 	merge_divide_trees
- 	code/divide_tree.cpp
- 	code/easylogging++.cc
- 	code/island_tree.cpp
- 	code/kml_writer.cpp
- 	code/line_tree.cpp
- 	code/merge_divide_trees.cpp
- 	code/tile.cpp
- )
- 
- target_link_libraries(
- 	merge_divide_trees
- 	pointlib  
- 	coordlib
- )
- 
- add_executable(
- 	filter_points
- 	code/easylogging++.cc
- 	code/filter.cpp
- 	code/filter_points.cpp
- )
- 
- target_link_libraries(
- 	filter_points
- 	pointlib  
- )
- 
- add_executable(
- 	compute_parents
- 	code/divide_tree.cpp
- 	code/easylogging++.cc
- 	code/island_tree.cpp
- 	code/kml_writer.cpp
- 	code/line_tree.cpp
- 	code/compute_parents.cpp
- )
- 
- target_link_libraries(
- 	compute_parents
- 	pointlib
- 	coordlib
- )
+# add_executable(
+# 	prominence
+# 	code/divide_tree.cpp
+# 	code/domain_map.cpp 
+# 	code/easylogging++.cc 
+# 	code/filter.cpp 
+# 	code/file_format.cpp 
+# 	code/fabdem_loader.cpp
+# 	code/island_tree.cpp 
+# 	code/kml_writer.cpp 
+# 	code/line_tree.cpp 
+# 	code/point_map.cpp 
+# 	code/prominence.cpp 
+# 	code/prominence_task.cpp 
+# 	code/tile.cpp 
+# 	code/tile_cache.cpp 
+# 	code/tile_loading_policy.cpp 
+# 	code/tree_builder.cpp 
+# )
+# 
+# target_link_libraries(
+# 	prominence
+# 	pointlib 
+# 	loaderlib 
+# 	coordlib
+# 	pthread
+# )
+# 
+# add_executable(
+# 	merge_divide_trees
+# 	code/divide_tree.cpp
+# 	code/easylogging++.cc
+# 	code/island_tree.cpp
+# 	code/kml_writer.cpp
+# 	code/line_tree.cpp
+# 	code/merge_divide_trees.cpp
+# 	code/tile.cpp
+# )
+# 
+# target_link_libraries(
+# 	merge_divide_trees
+# 	pointlib  
+# 	coordlib
+# )
+# 
+# add_executable(
+# 	filter_points
+# 	code/easylogging++.cc
+# 	code/filter.cpp
+# 	code/filter_points.cpp
+# )
+# 
+# target_link_libraries(
+# 	filter_points
+# 	pointlib  
+# )
+# 
+# add_executable(
+# 	compute_parents
+# 	code/divide_tree.cpp
+# 	code/easylogging++.cc
+# 	code/island_tree.cpp
+# 	code/kml_writer.cpp
+# 	code/line_tree.cpp
+# 	code/compute_parents.cpp
+# )
+# 
+# target_link_libraries(
+# 	compute_parents
+# 	pointlib
+# 	coordlib
+# )
 
 # Build libraries
 foreach(X IN LISTS BUILD_LIBS)
