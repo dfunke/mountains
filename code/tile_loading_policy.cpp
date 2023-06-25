@@ -1,18 +1,18 @@
 /*
  * MIT License
- * 
+ *
  * Copyright (c) 2017 Andrew Kirmse
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,30 +24,26 @@
 
 #include "tile_loading_policy.h"
 
+#include "easylogging++.h"
 #include "fabdem_loader.h"
 #include "flt_loader.h"
 #include "glo_loader.h"
 #include "hgt_loader.h"
+#include "sldem_loader.h"
 #include "tile.h"
-#include "easylogging++.h"
 
 using std::string;
 
 BasicTileLoadingPolicy::BasicTileLoadingPolicy(const string &directory,
                                                const FileFormat &format)
-    : mDirectory(directory),
-      mFileFormat(format),
-      mNeighborEdgeLoadingEnabled(false),
-      mUtmZone(-1) {
-}
+    : mDirectory(directory), mFileFormat(format),
+      mNeighborEdgeLoadingEnabled(false), mUtmZone(-1) {}
 
 void BasicTileLoadingPolicy::enableNeighborEdgeLoading(bool enabled) {
   mNeighborEdgeLoadingEnabled = enabled;
 }
 
-void BasicTileLoadingPolicy::setUtmZone(int utmZone) {
-  mUtmZone = utmZone;
-}
+void BasicTileLoadingPolicy::setUtmZone(int utmZone) { mUtmZone = utmZone; }
 
 Tile *BasicTileLoadingPolicy::loadTile(float minLat, float minLng) const {
   Tile *tile = loadInternal(minLat, minLng);
@@ -71,17 +67,19 @@ Tile *BasicTileLoadingPolicy::loadTile(float minLat, float minLng) const {
   //
   if (mNeighborEdgeLoadingEnabled) {
     switch (mFileFormat.value()) {
-    case FileFormat::Value::HGT3:  // Fall through
+    case FileFormat::Value::HGT3:      // Fall through
     case FileFormat::Value::HGT_MARS:  // Fall through
+    case FileFormat::Value::HGT_MARS1: // Fall through
     case FileFormat::Value::HGT1:
     case FileFormat::Value::NED19:
     case FileFormat::Value::NED13_ZIP:
     case FileFormat::Value::NED1_ZIP:
+    case FileFormat::Value::SLDEM:
     case FileFormat::Value::THREEDEP_1M:
       copyPixelsFromNeighbors(tile, minLat, minLng);
       break;
 
-    case FileFormat::Value::GLO30:  // fall through
+    case FileFormat::Value::GLO30: // fall through
     case FileFormat::Value::FABDEM: {
       // GLO30 "helpfully" removes the last row and column from each tile,
       // so we need to stick them back on.
@@ -90,7 +88,7 @@ Tile *BasicTileLoadingPolicy::loadTile(float minLat, float minLng) const {
       tile = newTile;
       break;
     }
-      
+
     default:
       LOG(ERROR) << "Unsupported tile file format";
       return nullptr;
@@ -107,38 +105,43 @@ Tile *BasicTileLoadingPolicy::loadInternal(float minLat, float minLng) const {
   case FileFormat::Value::HGT3:
   case FileFormat::Value::HGT1:
   case FileFormat::Value::HGT_MARS:
+  case FileFormat::Value::HGT_MARS1:
     loader = new HgtLoader(mFileFormat);
     break;
+  case FileFormat::Value::SLDEM:
+    loader = new SldemLoader(mFileFormat);
+    break;
 
-  case FileFormat::Value::NED13_ZIP:  // fall through
+  case FileFormat::Value::NED13_ZIP: // fall through
   case FileFormat::Value::NED19:
   case FileFormat::Value::NED1_ZIP:
   case FileFormat::Value::THREEDEP_1M:
     loader = new FltLoader(mFileFormat, mUtmZone);
     break;
-    
+
   case FileFormat::Value::GLO30:
     loader = new GloLoader();
-    break;    
+    break;
 
   case FileFormat::Value::FABDEM:
     loader = new FabdemLoader();
-    break;    
+    break;
 
   default:
     LOG(ERROR) << "Unsupported tile file format";
     return nullptr;
   }
-    
+
   Tile *tile = loader->loadTile(mDirectory, minLat, minLng);
-  
+
   delete loader;
   return tile;
 }
 
-Tile *BasicTileLoadingPolicy::copyPixelsFromNeighbors(Tile *tile, float minLat, float minLng) const {
+Tile *BasicTileLoadingPolicy::copyPixelsFromNeighbors(Tile *tile, float minLat,
+                                                      float minLng) const {
   auto tileSpan = mFileFormat.degreesAcross();
-  
+
   // Bottom neighbor
   float bottomLat = minLat - tileSpan;
   Tile *neighbor = loadInternal(bottomLat, minLng);
@@ -151,9 +154,9 @@ Tile *BasicTileLoadingPolicy::copyPixelsFromNeighbors(Tile *tile, float minLat, 
 
   float rightLng = minLng + tileSpan;
   if (rightLng == 180) {
-    rightLng = -180;  // antimeridian
+    rightLng = -180; // antimeridian
   }
-  neighbor = loadInternal(minLat, rightLng);  // right neighbor
+  neighbor = loadInternal(minLat, rightLng); // right neighbor
   if (neighbor != nullptr) {
     for (int i = 0; i < tile->height(); ++i) {
       tile->set(tile->width() - 1, i, neighbor->get(0, i));
@@ -163,7 +166,9 @@ Tile *BasicTileLoadingPolicy::copyPixelsFromNeighbors(Tile *tile, float minLat, 
   return tile;
 }
 
-Tile *BasicTileLoadingPolicy::appendPixelsFromNeighbors(Tile *tile, float minLat, float minLng) const {
+Tile *BasicTileLoadingPolicy::appendPixelsFromNeighbors(Tile *tile,
+                                                        float minLat,
+                                                        float minLng) const {
   // First copy over existing samples
   int oldWidth = tile->width();
   int oldHeight = tile->height();
@@ -187,19 +192,19 @@ Tile *BasicTileLoadingPolicy::appendPixelsFromNeighbors(Tile *tile, float minLat
 
   auto tileSpan = mFileFormat.degreesAcross();
   float bottomLat = minLat - tileSpan;
-  Tile *neighbor = loadInternal(bottomLat, minLng);  // bottom neighbor
+  Tile *neighbor = loadInternal(bottomLat, minLng); // bottom neighbor
   if (neighbor != nullptr) {
     for (int i = 0; i < oldWidth; ++i) {
       samples[oldHeight * newWidth + i] = neighbor->get(i, 0);
     }
     delete neighbor;
   }
-  
+
   float rightLng = minLng + tileSpan;
   if (rightLng == 180) {
-    rightLng = -180;  // antimeridian
+    rightLng = -180; // antimeridian
   }
-  neighbor = loadInternal(minLat, rightLng);  // right neighbor
+  neighbor = loadInternal(minLat, rightLng); // right neighbor
   if (neighbor != nullptr) {
     for (int i = 0; i < oldHeight; ++i) {
       samples[i * newWidth + oldWidth] = neighbor->get(0, i);
@@ -213,7 +218,7 @@ Tile *BasicTileLoadingPolicy::appendPixelsFromNeighbors(Tile *tile, float minLat
     samples[newHeight * newWidth - 1] = neighbor->get(0, 0);
     delete neighbor;
   }
-  
+
   Tile *newTile = new Tile(newWidth, newHeight, samples, tile->format());
   return newTile;
 }

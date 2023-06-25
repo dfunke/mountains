@@ -48,8 +48,13 @@ int FileFormat::rawSamplesAcross() const {
     return 9001;
   case Value::THREEDEP_1M:
     return 10012;
+  case Value::HGT_MARS1:
+    return 297;
   case Value::HGT_MARS:
-    return 7622;
+    //return 7622;
+    return 4446;
+  case Value::SLDEM:
+    return 15360;
   default:
     // In particular, fail on GLO, because this number is variable with
     // latitude.
@@ -74,11 +79,15 @@ int FileFormat::inMemorySamplesAcross() const {
     return 9001;
   case Value::THREEDEP_1M:
     return 10001;
+  case Value::HGT_MARS1:
+    return 297;
   case Value::HGT_MARS:
-    return 7622;
+    return 4446;
   case Value::GLO30: // Fall through
   case Value::FABDEM:
     return 3601;
+  case Value::SLDEM:
+    return 15360;
   default:
     LOG(ERROR) << "Couldn't compute tile size of unknown file format";
     exit(1);
@@ -99,11 +108,16 @@ float FileFormat::degreesAcross() const {
     return 1.0f;
   case Value::HGT04:
     return 1.0f;
+  case Value::HGT_MARS1:
+    return 1.0f;
   case Value::HGT_MARS:
-    return 25.71428571f;
+    //return 25.71428571f;
+    return 15.f;
   case Value::GLO30: // Fall through
   case Value::FABDEM:
     return 1.0f;
+  case Value::SLDEM:
+    return 30.0f;
   case Value::THREEDEP_1M:
     // This is a misnomer, as these tiles are in UTM coordinates.  The "degrees"
     // across means one x or y unit per tile (where each tile is 10000m in UTM).
@@ -129,7 +143,12 @@ double FileFormat::getRadius() const {
   case Value::FABDEM:
     return 6371.01 * 1000.0;
   case Value::HGT_MARS:
-    return 3390 * 1000.0;
+  case Value::HGT_MARS1:
+    return 3396190.0;
+  case Value::SLDEM:
+    return 1737.4 * 1000.0;
+  default:
+    return 0;
   }
 }
 
@@ -144,13 +163,13 @@ CoordinateSystem *FileFormat::coordinateSystemForOrigin(float lat, float lng,
   case Value::HGT04:
   case Value::GLO30:
   case Value::HGT_MARS:
+  case Value::HGT_MARS1:
+  case Value::SLDEM:
   case Value::FABDEM: {
     // The -1 removes overlap with neighbors
 
-    float samplesPerDegreeLat =
-        (inMemorySamplesAcross() - 1) / degreesAcross();
-    float samplesPerDegreeLng =
-        (inMemorySamplesAcross() - 1) / degreesAcross();
+    float samplesPerDegreeLat = (inMemorySamplesAcross() - 1) / degreesAcross();
+    float samplesPerDegreeLng = (inMemorySamplesAcross() - 1) / degreesAcross();
     return new DegreeCoordinateSystem(lat, lng, lat + degreesAcross(),
                                       lng + degreesAcross(),
                                       samplesPerDegreeLat, samplesPerDegreeLng);
@@ -209,8 +228,16 @@ FileFormat *FileFormat::fromName(const string &name) {
           Value::HGT_MARS,
       },
       {
+          "HGT_MARS1",
+          Value::HGT_MARS1,
+      },
+      {
           "3DEP-1M",
           Value::THREEDEP_1M,
+      },
+      {
+          "SLDEM",
+          Value::SLDEM,
       },
   };
 

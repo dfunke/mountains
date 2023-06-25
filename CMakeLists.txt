@@ -64,6 +64,7 @@ set(
 	code/glo_loader.cpp 
 	code/hgt_loader.cpp 
 	code/tiff_loader.cpp 
+	code/sldem_loader.cpp
 )
 set(COORDLIB_OBJS
 	code/coordinate_system.cpp 
@@ -90,6 +91,7 @@ add_library(
 	code/glo_loader.cpp
 	code/hgt_loader.cpp
 	code/tiff_loader.cpp 
+	code/sldem_loader.cpp
 )
 
 target_link_libraries(
@@ -152,6 +154,7 @@ add_executable(
 	code/fabdem_loader.cpp
 	code/converter.cpp
 	code/hgt_writer.cpp
+	code/sldem_writer.cpp
 )
 
 target_link_libraries(
@@ -225,6 +228,7 @@ add_executable(
 	code/isolation_finder_sl/sweepline_datastruct.cpp
 	code/isolation_finder_sl/sweepline_primitives.cpp
 	code/isolation_finder_sl/tile_cell.cpp
+	code/sldem_writer.cpp
 )
 
 target_link_libraries(

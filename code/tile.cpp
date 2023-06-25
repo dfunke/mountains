@@ -101,6 +101,18 @@ void Tile::saveAsImage(std::string dir, float lat, float lng)
   fprintf(imageFile, "P6\n");                   // P6 filetype
   fprintf(imageFile, "%d %d\n", width, height); // dimensions
   fprintf(imageFile, "255\n");                  // Max pixel
+  Elevation minElev = 1e10;
+
+  for (int j = 0; j < height; ++j)
+  {
+    for (int i = 0; i < width; ++i)
+    {
+      if (get(i,j) > NODATA_ELEVATION && get(i,j) < minElev) {
+        minElev = get(i,j);
+      }
+    }
+  }
+  Elevation maxElev = mMaxElevation - minElev;
 
   //unsigned char pix[width * height * 3];
   uint64_t size = width * height * 3.0;
@@ -112,10 +124,11 @@ void Tile::saveAsImage(std::string dir, float lat, float lng)
     for (int j = 0; j < height; ++j)
     {
       Elevation elev = get(i, j);
+      elev -= minElev;
       if (elev < 0) {
         elev = 0;
       }
-      float ratio = (2.f * elev) / (1.f * mMaxElevation);
+      float ratio = (2.f * elev) / (1.f * maxElev);
 
       int b = std::max(0, (int)(255 * (1 - ratio)));
       int r = std::max(0, (int)(255 * (ratio - 1)));

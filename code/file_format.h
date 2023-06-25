@@ -38,12 +38,14 @@ public:
     HGT1, // SRTM (30m, 1 arcsecond)
     HGT04, // HGT (12m, 0.4 arcsecond)
     HGT_MARS, // HGT (200 m, 296.3735 arcsecond)
+    HGT_MARS1, // HGT (200 m, 296.3735 arcsecond)
     NED19,     // FLT file containing NED 1/9 arcsecond data
     NED13_ZIP, // ZIP file containing FLT NED 1/3 arcsecond data
     NED1_ZIP,  // ZIP file containing FLT NED 1 arcsecond data
     THREEDEP_1M,  // FLT file containing one-meter LIDAR from 3D Elevation Program (3DEP)
     GLO30,  // Copernicus GLO-30 30m data
     FABDEM, // Tree-free Copernicus GLO-30 30m data
+    SLDEM,  // Moon-dem between 60 deg South and 60 deg Nort from 2015 with 128 pixel per degree.
   };
 
   FileFormat() = default;

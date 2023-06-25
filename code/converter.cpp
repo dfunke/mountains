@@ -33,17 +33,20 @@ int convertMars() {
   int16_t inbuf[width];
 
   printf("Finished loading tiff-file\n");
-  std::string dir = "/home/pc/tmp";
+  std::string dir = "/home/pc/Data1/Mars/dem15";
   // Split Tile into rectangles
   //int splitX = 14;
   //int splitY = 7;
-  //int splitX = 14;
-  //int splitY = 7;
-  int splitX = 2;
-  int splitY = 1;
+  //int splitX = 12;
+  //int splitY = 6;
+  int splitX = 24;
+  int splitY = 12;
+  //int splitX = 360;
+  //int splitY = 180;
   uint64_t newWidth = width / splitX;
   uint64_t newHeight = height / splitY;
   HgtWriter *writer = new HgtWriter(format);
+  std::cout << newWidth+1 << "," << newHeight+1 << std::endl;
   for (int i = 0; i < splitX; ++i) {
     for (int j = 0; j < splitY; ++j) {
       printf("Create tile %d, %d\n", i, j);
@@ -66,17 +69,17 @@ int convertMars() {
             offX = width-1;
           }
           uint64_t sampleIdx = y * (newWidth + 1) + x;
-          samples[sampleIdx] = static_cast<Elevation>(swapByteOrder16(inbuf[offX]));
+          samples[sampleIdx] = static_cast<Elevation>(inbuf[offX]);
           //std::cout << samples[y*newWidth + x] << std::endl;
         }
       }
       Tile *t = new Tile(newWidth+1, newHeight+1, samples, format);
-      writer->writeTile(dir, i * (180.f / splitY) - 90.f, j * (360.f / splitX) - 180.f, t);
-      t->saveAsImage("/home/pc/tmp",  i * (180.f / splitY) - 90.f, j * (360.f / splitX) - 180.f);
+      writer->writeTile(dir, (splitY - j) * (180.f / splitY) - 90.f, i * (360.f / splitX) - 180.f, t);
+      //t->saveAsImage("/home/pc/tmp",  i * (180.f / splitY) - 90.f, j * (360.f / splitX) - 180.f);
       delete t;
     }
   }
-  free(inbuf);
+//free(inbuf);
   TIFFClose(tif);
   return 0;
 }

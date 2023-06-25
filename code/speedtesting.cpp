@@ -1,5 +1,6 @@
 #include "coordinate_system.h"
 #include "easylogging++.h"
+#include "file_format.h"
 #include "isolation_finder_sl/isolation_sl_processor.h"
 #include "isolation_task.h"
 #include "point_map.h"
@@ -387,6 +388,36 @@ int conductRandomSampleComparrisonTests() {
     std::cout << oldTime << "," << newTime << std::endl;
     writeToTestResults(std::pow(2,n), oldTime, newTime);
   }
+  return 0;
+}
+
+int maarsSpeedTesting() {
+  double times = 0;
+  int testRuns = 3;
+  float bounds[4] = {-90.f, 90.f, -180.f, 180.f};
+  FileFormat fileFormat(FileFormat::Value::HGT_MARS);
+  for (int i = 0; i < testRuns; ++i) {
+    double time = runTest(fileFormat, bounds, false);
+    std::cout << "," << time << std::endl;
+    times += time;
+  }
+  times /= testRuns;
+  writeToTestResults(98, 0, times);
+  return 0;
+}
+
+int moonSpeedTesting() {
+  double times = 0;
+  int testRuns = 3;
+  float bounds[4] = {-60.f, 60.f, -180.f, 180.f};
+  FileFormat fileFormat(FileFormat::Value::SLDEM);
+  for (int i = 0; i < testRuns; ++i) {
+    double time = runTest(fileFormat, bounds, false);
+    std::cout << "," << time << std::endl;
+    times += time;
+  }
+  times /= testRuns;
+  writeToTestResults(48, 0, times);
   return 0;
 }
 

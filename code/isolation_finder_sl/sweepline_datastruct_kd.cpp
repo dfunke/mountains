@@ -54,7 +54,7 @@ IsolationRecord SweeplineDatastructKD::calcPeak(const SlEvent *node)
     ir.foundHigherGround = true;
     ir.closestHigherGround = *shortestPoint;
     if (mToOffsets == nullptr) {
-      ir.distance = ir.closestHigherGround.distanceEllipsoid(*node);
+      ir.distance = ir.closestHigherGround.distance(*node);
     } else {
       ir.distance = ir.closestHigherGround.distance(*node);
     }
