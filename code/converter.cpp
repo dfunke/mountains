@@ -33,7 +33,7 @@ int convertMars() {
   int16_t inbuf[width];
 
   printf("Finished loading tiff-file\n");
-  std::string dir = "/home/pc/Data1/Mars/dem15";
+  std::string dir = "/home/pc/Data1/Mars/dem15-img";
   // Split Tile into rectangles
   //int splitX = 14;
   //int splitY = 7;
@@ -74,8 +74,9 @@ int convertMars() {
         }
       }
       Tile *t = new Tile(newWidth+1, newHeight+1, samples, format);
-      writer->writeTile(dir, (splitY - j) * (180.f / splitY) - 90.f, i * (360.f / splitX) - 180.f, t);
-      //t->saveAsImage("/home/pc/tmp",  i * (180.f / splitY) - 90.f, j * (360.f / splitX) - 180.f);
+      //writer->writeTile(dir, 75.f - j * (180.f / splitY), i * (360.f / splitX) - 180.f, t);
+      t->saveAsImage(dir, 75.f - j * (180.f / splitY), i * (360.f / splitX) - 180.f);
+      std::cout << 75.f - j * (180.f / splitY) << ", " << i * (360.f / splitX) - 180.f << std::endl;
       delete t;
     }
   }

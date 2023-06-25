@@ -31,7 +31,7 @@ add_subdirectory(external/ips4o)
 set(
 	BUILD_TARGETS
 	isolation
-	#converter
+	converter
 )
 
 set(
@@ -144,26 +144,26 @@ target_link_libraries(
 	ips4o
 )
 
-#add_executable(
-#    converter
-#	code/easylogging++.cc
-#	code/file_format.cpp 
-#	code/tile.cpp 
-#	code/tile_cache.cpp 
-#	code/tile_loading_policy.cpp
-#	code/fabdem_loader.cpp
-#	code/converter.cpp
-#	code/hgt_writer.cpp
-#	code/sldem_writer.cpp
-#)
-#
-#target_link_libraries(
-#    converter PRIVATE
-#	pointlib 
-#	loaderlib 
-#	coordlib
-#	tiff
-#)
+add_executable(
+    converter
+	code/easylogging++.cc
+	code/file_format.cpp 
+	code/tile.cpp 
+	code/tile_cache.cpp 
+	code/tile_loading_policy.cpp
+	code/fabdem_loader.cpp
+	code/converter.cpp
+	code/hgt_writer.cpp
+	code/sldem_writer.cpp
+)
+
+target_link_libraries(
+    converter PRIVATE
+	pointlib 
+	loaderlib 
+	coordlib
+	tiff
+)
 
 
 add_executable(
