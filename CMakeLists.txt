@@ -31,7 +31,7 @@ add_subdirectory(external/ips4o)
 set(
 	BUILD_TARGETS
 	isolation
-	converter
+	#converter
 )
 
 set(

@@ -23,9 +23,9 @@ public:
   // Find the bucket for the tile represented by minLat and minLng
   ConcurrentIsolationResults *findBucket(int minLat, int minLng);
 
-  // process all unbound peaks which
-  void proccessUnbound();
-
+  // process all unbound peaks, returns highest point (bound infinit)
+  IsolationResult proccessUnbound();
+ 
 private:
   TileCell *mRoot;
   // Results which have currently no upper bound.

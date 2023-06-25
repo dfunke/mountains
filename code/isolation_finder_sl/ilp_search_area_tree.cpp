@@ -39,7 +39,7 @@ void ILPSearchAreaTree::registerTile(int minLat, int minLng,
   mRoot->registerTile(minLat, minLng, maxElev);
 }
 
-void ILPSearchAreaTree::proccessUnbound() {
+IsolationResult ILPSearchAreaTree::proccessUnbound() {
   SlEvent *queue =
       new SlEvent[mUnboundResults.mResults.size() + mTileEvents.size()];
   int idx = 0;
@@ -63,12 +63,14 @@ void ILPSearchAreaTree::proccessUnbound() {
   //    mMinLat, mMaxLat, mMinLng, mMaxLng,
   //    (mMaxLat - mMinLat) * (mMaxLng - mMinLng),
   //    [=](float lat, float lng) { return Offsets(); });
+  SlEvent highPoint = queue[0];
   // run sweepline
   for (int i = 0; i < idx; i++) {
     switch (queue[i].getType()) {
     case PEAK: {
       IsolationRecord nearestTile = sld->calcPeak(queue + i);
       if (!nearestTile.foundHigherGround) {
+          highPoint = queue[i];
         // std::cout << "Did not find higher ground for: " <<
         // queue[i].latitude() << ", " << queue[i].longitude() << std::endl;
         continue;
@@ -94,4 +96,9 @@ void ILPSearchAreaTree::proccessUnbound() {
   }
   delete [] queue;
   delete sld;
+  IsolationResult highPointRes;
+  highPointRes.peak = highPoint;
+  highPointRes.peakElevation = highPoint.getElev();
+  highPointRes.isolationKm = -1;
+  return highPointRes;
 }
