@@ -9,6 +9,7 @@
 #include "isolation_finder_sl.h"
 #include "ilp_search_area_tree.h"
 
+#include <iostream>
 #include <algorithm>
 #include <unordered_set>
 #include <vector>
@@ -44,7 +45,7 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
   vector<std::future<void>> voidFutures;
   // Create Buckets and build TileTree
   vector<IsolationFinderSl *> finders;
-  //std::cout << "Start building tile-tree" << std::endl;
+  std::cout << "Start building tile-tree" << std::endl;
   vector<IsolationFinderSl *> *pFinders = &finders;
   // create finders
   for (int j = lngMin; j < lngMax; ++j) {
@@ -66,11 +67,12 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
   }
 
   // Proccess all unbound peaks
-  mSearchTree->proccessUnbound();
+  IsolationResult highPoint = mSearchTree->proccessUnbound();
+  std::cout << "High point:" << highPoint.peak.latitude() << "," << highPoint.peak.longitude() << std::endl;
   int i = 0;
   vector<std::future<IsolationResults>> futureResults;
   vector<IsolationResults> results;
-  //std::cout << "Start exact calculations" << std::endl;
+  std::cout << "Start exact calculations" << std::endl;
   maxheap<IsolationResult> q(&compare);
   // Start exact calculations
   for (auto finder : finders) {
@@ -86,7 +88,7 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
     }
     newResults.mResults.clear();
   }
-  //std::cout << "Start merging" << std::endl;
+  std::cout << "Start merging" << std::endl;
   //   Merge results
   IsolationResults finalResults;
   TileCell newRoot(latMin, lngMin, latMax - latMin, lngMax - lngMin);
@@ -102,7 +104,7 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
   }
   delete mSearchTree;
   delete threadPool;
-  //std::cout << "Sort final results by isolation" << std::endl;
+  std::cout << "Sort final results by isolation" << std::endl;
   std::sort(finalResults.mResults.begin(), finalResults.mResults.end(),
             [](IsolationResult const &lhs, IsolationResult const &rhs) {
               return lhs.isolationKm > rhs.isolationKm;
@@ -135,5 +137,6 @@ IsolationResults IsolationSlProcessor::findIsolations(int numThreads,
   //        finalFinalResults.mResults.push_back(r);
   //    }
   //}
+  finalResults.mResults.push_back(highPoint);
   return finalResults;
 }
