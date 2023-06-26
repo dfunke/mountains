@@ -141,4 +141,5 @@ void Tile::saveAsImage(std::string dir, float lat, float lng)
   }
   fwrite(pix, 1, size, imageFile);
   fclose(imageFile);
+  free(pix);
 }

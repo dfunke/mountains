@@ -54,7 +54,8 @@ int FileFormat::rawSamplesAcross() const {
     //return 7622;
     return 4446;
   case Value::SLDEM:
-    return 15360;
+    //return 15360;
+    return 7681;
   default:
     // In particular, fail on GLO, because this number is variable with
     // latitude.
@@ -87,7 +88,8 @@ int FileFormat::inMemorySamplesAcross() const {
   case Value::FABDEM:
     return 3601;
   case Value::SLDEM:
-    return 15360;
+    //return 15360;
+    return 7681;
   default:
     LOG(ERROR) << "Couldn't compute tile size of unknown file format";
     exit(1);
@@ -117,7 +119,7 @@ float FileFormat::degreesAcross() const {
   case Value::FABDEM:
     return 1.0f;
   case Value::SLDEM:
-    return 30.0f;
+    return 15.0f;
   case Value::THREEDEP_1M:
     // This is a misnomer, as these tiles are in UTM coordinates.  The "degrees"
     // across means one x or y unit per tile (where each tile is 10000m in UTM).

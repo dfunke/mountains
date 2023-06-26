@@ -142,24 +142,24 @@ Tile *BasicTileLoadingPolicy::copyPixelsFromNeighbors(Tile *tile, float minLat,
                                                       float minLng) const {
   auto tileSpan = mFileFormat.degreesAcross();
 
-  // Bottom neighbor
-  float bottomLat = minLat - tileSpan;
+  // top neighbor
+  float bottomLat = minLat + tileSpan;
   Tile *neighbor = loadInternal(bottomLat, minLng);
   if (neighbor != nullptr) {
     for (int i = 0; i < tile->width(); ++i) {
-      tile->set(i, tile->height() - 1, neighbor->get(i, 0));
+      tile->set(i, 0, neighbor->get(i, tile->height()-1));
     }
     delete neighbor;
   }
 
-  float rightLng = minLng + tileSpan;
-  if (rightLng == 180) {
-    rightLng = -180; // antimeridian
+  float rightLng = minLng - tileSpan;
+  if (rightLng < -180) {
+    rightLng += 360; // antimeridian
   }
   neighbor = loadInternal(minLat, rightLng); // right neighbor
   if (neighbor != nullptr) {
     for (int i = 0; i < tile->height(); ++i) {
-      tile->set(tile->width() - 1, i, neighbor->get(0, i));
+      tile->set(0, i, neighbor->get(tile->width() - 1, i));
     }
     delete neighbor;
   }

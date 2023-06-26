@@ -10,10 +10,10 @@ void SldemWriter::writeTile(const std::string &directory, float minLat,
   snprintf(buf, sizeof(buf), "SLDEM2015_512_%02d%c_%02d%c_%03d_%03d_FLOAT.IMG",
            abs(static_cast<int>(minLat)),
            (minLat >= 0) ? 'N' : 'S',
-           abs(static_cast<int>(minLat+30)),
+           abs(static_cast<int>(minLat+15)),
            (minLat+30 > 0) ? 'N' : 'S',
            abs(static_cast<int>(minLng+180)),
-           abs(static_cast<int>(minLng+210))
+           abs(static_cast<int>(minLng+180 + 15))
            );
   string filename(buf);
   //string filename = "/home/pc/Data1/Moon/SLDEM2015_256_0N_60N_000_120_FLOAT.IMG";

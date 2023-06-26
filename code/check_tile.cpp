@@ -128,79 +128,102 @@ int compare() {
   return 0;
 }
 
-int main(int argc, char **argv) {
+int proccessMoonData() {
+  string terrain_directory("/home/pc/Data1/Moon/dem15");
+  FileFormat fileFormat(FileFormat::Value::SLDEM);
+  BasicTileLoadingPolicy policy(terrain_directory.c_str(), fileFormat);
+  //policy.enableNeighborEdgeLoading(true);
+  TileCache *cache = new TileCache(&policy, 1);
+  std::shared_ptr<CoordinateSystem> coordinateSystem(
+      fileFormat.coordinateSystemForOrigin(12.f, 25.f));
 
-  //string terrain_directory("/home/pc/Data1/Mars/dem25");
-  //START_EASYLOGGINGPP(argc, argv);
-  //FileFormat fileFormat(FileFormat::Value::HGT_MARS);
-  //BasicTileLoadingPolicy policy(terrain_directory.c_str(), fileFormat);
-  //TileCache *cache = new TileCache(&policy, 1);
-  //std::shared_ptr<CoordinateSystem> coordinateSystem(
-  //    fileFormat.coordinateSystemForOrigin(12.f, 25.f));
-  //
-  //Tile *t = cache->loadWithoutCaching(12, 25, *coordinateSystem);
-  //t->saveAsImage("/home/pc/tmp", 12.f, 25.f);
-  //delete t;
-  //return 0;
-  //int latMin = 0;
-  //int lngMin = 0;
-  //SldemWriter *writer = new SldemWriter(fileFormat);
-  //bool isSecondHalve = false;
+  int latMin = 0;
+  int lngMin = 0;
+  SldemWriter *writer = new SldemWriter(fileFormat);
+  bool isSecondHalve = false;
   //int sideLength = 15360;
-  //Elevation *samples = (float*)malloc(sizeof(float)*sideLength*sideLength);
-  //for (latMin = -60; latMin <= 60; latMin += 30) {
-  //  for (lngMin = -180; lngMin < 180; lngMin += 45) {
-  //    std::shared_ptr<CoordinateSystem> coordinateSystem(
-  //        fileFormat.coordinateSystemForOrigin(latMin + 0.f, lngMin + 0.f));
-  //    Tile *t = cache->loadWithoutCaching(latMin, lngMin, *coordinateSystem);
-  //    if (isSecondHalve) {
-  //      // add first third to right part of sample
-  //      for (int x = 0; x < sideLength/2; x++) {
-  //        for (int y = 0; y < sideLength; y++) {
-  //          samples[y*15360 + x + sideLength/2] = t->get(x,y);
-  //        }
-  //      }
-  //      // write sample
-  //      Tile *toWrite = new Tile(sideLength, sideLength, samples, FileFormat::Value::SLDEM);
-  //      //writer->writeTile("/home/pc/tmp", latMin, lngMin-15, toWrite);
-  //      toWrite->saveAsImage("/home/pc/tmp", latMin, lngMin-15);
-  //      std::cout << "Wrote tile: " << latMin << ", " << lngMin-15 << std::endl;
-  //      // the rest is a new tile
-  //      for (int x = sideLength/2; x < sideLength + (sideLength/2); x++) {
-  //        for (int y = 0; y < sideLength; y++) {
-  //          samples[y*15360 + x - sideLength/2] = t->get(x,y);
-  //        }
-  //      }
-  //      toWrite = new Tile(sideLength, sideLength, samples, FileFormat::Value::SLDEM);
-  //      //writer->writeTile("/home/pc/tmp", latMin, lngMin+15, toWrite);
-  //      toWrite->saveAsImage("/home/pc/tmp", latMin, lngMin+15);
-  //      std::cout << "Wrote tile: " << latMin << ", " << lngMin+15 << std::endl;
-  //    } else {
-  //      // Write first part
-  //      for (int x = 0; x < sideLength; x++) {
-  //        for (int y = 0; y < sideLength; y++) {
-  //          samples[y*15360 + x] = t->get(x,y);
-  //        }
-  //      }
-  //      Tile *toWrite = new Tile(sideLength, sideLength, samples, FileFormat::Value::SLDEM);
-  //      //writer->writeTile("/home/pc/tmp", latMin, lngMin, toWrite);
-  //      toWrite->saveAsImage("/home/pc/tmp", latMin, lngMin);
-  //      std::cout << "Wrote tile: " << latMin << ", " << lngMin << std::endl;
-  //      // save second part for later
-  //      for (int x = sideLength; x < sideLength + sideLength/2; x++) {
-  //        for (int y = 0; y < sideLength; y++) {
-  //          samples[y*15360 + x - sideLength] = t->get(x,y);
-  //        }
-  //      }
-  //    }
-  //    isSecondHalve = !isSecondHalve;
-  //    delete t;
-  //  }
-  //}
-  //return 0;
+  int sideLength = 7681;
+  Elevation *samples = (float*)malloc(sizeof(float)*sideLength*sideLength);
+  for (latMin = -60; latMin < 60; latMin += 15) {
+    for (lngMin = -180; lngMin < 180; lngMin += 15) {
+      std::shared_ptr<CoordinateSystem> coordinateSystem(
+          fileFormat.coordinateSystemForOrigin(latMin + 0.f, lngMin + 0.f));
+      Tile *t = cache->loadWithoutCaching(latMin, lngMin, *coordinateSystem);
+      //writer->writeTile("/home/pc/tmp", latMin, lngMin, t);
+      t->saveAsImage("/home/pc/tmp", latMin, lngMin);
+      std::cout << latMin << "," << lngMin << std::endl;
+      //for (int offX = 0; offX < 2; ++offX) {
+      //  for (int offY = 0; offY < 2; ++offY) {
+      //    float lat = latMin + (1-offY) * 15;
+      //    float lng = lngMin + offX * 15;
+      //    for (int x = 0; x < (sideLength-1); ++x) {
+      //      for (int y = 0; y < (sideLength-1); ++y) {
+      //        samples[(y+1) * sideLength + x+1] = t->get(x + offX * (sideLength-1), y + offY * (sideLength-1));
+      //      }
+      //    }
+      //    Tile *newTile = new Tile(sideLength, sideLength, samples, fileFormat);
+      //    for (int x = 0; x < sideLength; x++) {
+      //      newTile->set(x, 0, -32768);
+      //      newTile->set(0, x, -32768);
+      //    }
+      //    writer->writeTile("/home/pc/tmp", lat , lng, newTile);
+      //    //newTile->saveAsImage("/home/pc/tmp", lat, lng);
+      //    std::cout << lat << "," << lng << std::endl;
+      //  }
+      //}
+      //if (isSecondHalve) {
+      //  // add first third to right part of sample
+      //  for (int x = 0; x < sideLength/2; x++) {
+      //    for (int y = 0; y < sideLength; y++) {
+      //      samples[y*15360 + x + sideLength/2] = t->get(x,y);
+      //    }
+      //  }
+      //  // write sample
+      //  Tile *toWrite = new Tile(sideLength, sideLength, samples, FileFormat::Value::SLDEM);
+      //  writer->writeTile("/home/pc/tmp", latMin, lngMin-15, toWrite);
+      //  //toWrite->saveAsImage("/home/pc/tmp", latMin, lngMin-15);
+      //  std::cout << "Wrote tile: " << latMin << ", " << lngMin-15 << std::endl;
+      //  // the rest is a new tile
+      //  for (int x = sideLength/2; x < sideLength + (sideLength/2); x++) {
+      //    for (int y = 0; y < sideLength; y++) {
+      //      samples[y*15360 + x - sideLength/2] = t->get(x,y);
+      //    }
+      //  }
+      //  toWrite = new Tile(sideLength, sideLength, samples, FileFormat::Value::SLDEM);
+      //  writer->writeTile("/home/pc/tmp", latMin, lngMin+15, toWrite);
+      //  //toWrite->saveAsImage("/home/pc/tmp", latMin, lngMin+15);
+      //  std::cout << "Wrote tile: " << latMin << ", " << lngMin+15 << std::endl;
+      //} else {
+      //  // Write first part
+      //  for (int x = 0; x < sideLength; x++) {
+      //    for (int y = 0; y < sideLength; y++) {
+      //      samples[y*15360 + x] = t->get(x,y);
+      //    }
+      //  }
+      //  Tile *toWrite = new Tile(sideLength, sideLength, samples, FileFormat::Value::SLDEM);
+      //  writer->writeTile("/home/pc/tmp", latMin, lngMin, toWrite);
+      //  //toWrite->saveAsImage("/home/pc/tmp", latMin, lngMin);
+      //  std::cout << "Wrote tile: " << latMin << ", " << lngMin << std::endl;
+      //  // save second part for later
+      //  for (int x = sideLength; x < sideLength + sideLength/2; x++) {
+      //    for (int y = 0; y < sideLength; y++) {
+      //      samples[y*15360 + x - sideLength] = t->get(x,y);
+      //    }
+      //  }
+      //}
+      //isSecondHalve = !isSecondHalve;
+      delete t;
+    }
+  }
+  return 0;
+}
+
+int main(int argc, char **argv) {
+  START_EASYLOGGINGPP(argc, argv);
 
   //return compare();
   // return mergeOldResults();
+  return proccessMoonData();
 
   int ch;
   string terrain_directory("/home/pc/Data1/Mars/dem15");
