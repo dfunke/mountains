@@ -34,15 +34,15 @@ using std::ceil;
 using std::floor;
 using std::string;
 
-static const string baseFolder = "/data02/funke/SRTM/viewfinderpanoramas.org/dem3"; 
-static const string baseFolderDem1 = "/data02/funke/SRTM/viewfinderpanoramas.org/dem1"; 
-static const string testFolder = "/data02/funke/SRTM/SRTM"; 
-static const string testResultFile = "/home/huening/testresults-world-dem3-randomsample.txt";
+//static const string baseFolder = "/data02/funke/SRTM/viewfinderpanoramas.org/dem3"; 
+//static const string baseFolderDem1 = "/data02/funke/SRTM/viewfinderpanoramas.org/dem1"; 
+//static const string testFolder = "/data02/funke/SRTM/SRTM"; 
+//static const string testResultFile = "/home/huening/testresults-world-dem3-randomsample.txt";
 
-// static const string baseFolder = "/home/pc/Data1/SRTM-DEM3";
-// static const string baseFolderDem1 = "/home/pc/SRTM-DEM1";
-// static const string testFolder = "/home/pc/SRTM";
-// static const string testResultFile = "/home/pc/tmp/testresults.txt";
+static const string baseFolder = "/home/pc/Data1/Mars/dem15";
+static const string baseFolderDem1 = "/home/pc/SRTM-DEM1";
+static const string testFolder = "/home/pc/Data1/Mars/dem15";
+static const string testResultFile = "/home/pc/tmp/testresults.txt";
 
 struct DynamicTestCase {
   Offsets centerTile;
@@ -391,7 +391,7 @@ int conductRandomSampleComparrisonTests() {
   return 0;
 }
 
-int maarsSpeedTesting() {
+int marsSpeedTesting() {
   double times = 0;
   int testRuns = 3;
   float bounds[4] = {-90.f, 90.f, -180.f, 180.f};
@@ -423,7 +423,8 @@ int moonSpeedTesting() {
 
 int main(int argc, char **argv) {
   START_EASYLOGGINGPP(argc, argv);
-  return conductRandomSampleComparrisonTests();
+  return marsSpeedTesting();
+  //return conductRandomSampleComparrisonTests();
   // return conductSpeedComparrisonTests();
   // return testCaseWithDem1Data();
   TestCase testCase = getNorthAmerika();
