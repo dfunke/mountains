@@ -292,7 +292,7 @@ IsolationResults IsolationFinderSl::runSweepline(float mMinIsolationKm,
 }
 
 void IsolationFinderSl::addPeakToBucket(const LatLng &peakLocation,
-                                        int elevation, float isolationKm) {
+                                        Elevation elevation, float isolationKm) {
   float *isolationPoint = new float;
   *isolationPoint = isolationKm;
   mIlpSearchTree->distributeToTiles(peakLocation, elevation, isolationPoint);

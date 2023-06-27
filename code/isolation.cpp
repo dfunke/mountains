@@ -131,7 +131,7 @@ int main(int argc, char **argv) {
   }
   FileFormat fileFormat = *fileFormatPtr;
   BasicTileLoadingPolicy policy(terrain_directory, fileFormat);
-  policy.enableNeighborEdgeLoading(true);
+  //policy.enableNeighborEdgeLoading(true);
   const int CACHE_SIZE = 50;
   auto cache = std::make_unique<TileCache>(&policy, CACHE_SIZE);
 

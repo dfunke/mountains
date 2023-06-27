@@ -11,7 +11,7 @@ class ConcurrentIsolationResults {
 public:
   ConcurrentIsolationResults() {}
 
-  void addResult(const LatLng &peakLocation, int elevationMeters,
+  void addResult(const LatLng &peakLocation, Elevation elevationMeters,
                  float isolationKm);
 
   std::size_t size() const;
