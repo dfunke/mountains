@@ -30,7 +30,9 @@
 #include <algorithm>
 
 //static const float kEarthRadiusMeters = 6371.01 * 1000.0;
-static const float kEarthRadiusMeters = 3396190.f;
+//static const float kEarthRadiusMeters = 3396190.f;
+//
+static const float kEarthRadiusMeters = 1737.4 * 1000.0;
 static const float kMinLatRadians = (float) -M_PI / 2;
 static const float kMaxLatRadians = (float) M_PI / 2;
 static const float kMinLngRadians = (float) -M_PI;
