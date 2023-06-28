@@ -7,6 +7,7 @@
 #include "tile_loading_policy.h"
 
 #include "sldem_writer.h"
+#include "hgt_writer.h"
 
 #include <chrono>
 #include <cmath>
@@ -129,7 +130,7 @@ int compare() {
 }
 
 int proccessMoonData() {
-  string terrain_directory("/home/pc/Data1/Moon/dem15");
+  string terrain_directory("/data02/funke/SRTM/Moon/dem15");
   FileFormat fileFormat(FileFormat::Value::SLDEM);
   BasicTileLoadingPolicy policy(terrain_directory.c_str(), fileFormat);
   //policy.enableNeighborEdgeLoading(true);
@@ -139,7 +140,7 @@ int proccessMoonData() {
 
   int latMin = 0;
   int lngMin = 0;
-  SldemWriter *writer = new SldemWriter(fileFormat);
+  HgtWriter *writer = new HgtWriter(fileFormat);
   bool isSecondHalve = false;
   //int sideLength = 15360;
   int sideLength = 7681;
@@ -149,8 +150,8 @@ int proccessMoonData() {
       std::shared_ptr<CoordinateSystem> coordinateSystem(
           fileFormat.coordinateSystemForOrigin(latMin + 0.f, lngMin + 0.f));
       Tile *t = cache->loadWithoutCaching(latMin, lngMin, *coordinateSystem);
-      //writer->writeTile("/home/pc/tmp", latMin, lngMin, t);
-      t->saveAsImage("/home/pc/tmp", latMin, lngMin);
+      writer->writeTile("/data02/funke/SRTM/Moon/hgt", latMin, lngMin, t);
+      //t->saveAsImage("/data02/funke/SRTM/Moon/hgt", latMin, lngMin);
       std::cout << latMin << "," << lngMin << std::endl;
       //for (int offX = 0; offX < 2; ++offX) {
       //  for (int offY = 0; offY < 2; ++offY) {

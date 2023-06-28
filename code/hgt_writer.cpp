@@ -1,5 +1,8 @@
 #include "hgt_writer.h"
 #include "easylogging++.h"
+#include "primitives.h"
+
+#include <cmath>
 
 #include <string>
 
@@ -34,6 +37,7 @@ void HgtWriter::writeTile(const std::string &directory, float minLat,
     int y = i / t->width();
     // std::cout << x << " " << y << " " << y * t->width() + x  << std::endl;
     Elevation elev = t->get(x, y);
+    int16 intElev = static_cast<int16>(std::floor(elev + 0.5f));
     if (elev == Tile::NODATA_ELEVATION) {
       outbuf[i] = swapByteOrder16(HGT_NODATA_ELEVATION);
     } else {

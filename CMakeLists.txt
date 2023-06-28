@@ -229,6 +229,7 @@ add_executable(
 	code/isolation_finder_sl/sweepline_primitives.cpp
 	code/isolation_finder_sl/tile_cell.cpp
 	code/sldem_writer.cpp
+	code/hgt_writer.cpp
 )
 
 target_link_libraries(
