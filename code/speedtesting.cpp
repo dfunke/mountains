@@ -36,7 +36,7 @@ using std::string;
 
 static const string baseFolder = "/data02/funke/SRTM/viewfinderpanoramas.org/dem3"; 
 static const string baseFolderDem1 = "/data02/funke/SRTM/viewfinderpanoramas.org/dem1"; 
-static const string testFolder = "/data02/funke/SRTM/Moon/dem15"; 
+static const string testFolder = "/data02/funke/SRTM/Moon/hgt"; 
 static const string testResultFile = "/home/huening/testresults-moon.txt";
 
 //static const string baseFolder = "/home/pc/Data1/Mars/dem15";

@@ -106,12 +106,12 @@ Tile *BasicTileLoadingPolicy::loadInternal(float minLat, float minLng) const {
   case FileFormat::Value::HGT1:
   case FileFormat::Value::HGT_MARS:
   case FileFormat::Value::HGT_MARS1:
-  //case FileFormat::Value::SLDEM:
+  case FileFormat::Value::SLDEM:
     loader = new HgtLoader(mFileFormat);
     break;
-  case FileFormat::Value::SLDEM:
-    loader = new SldemLoader(mFileFormat);
-    break;
+  //case FileFormat::Value::SLDEM:
+  //  loader = new SldemLoader(mFileFormat);
+  //  break;
 
   case FileFormat::Value::NED13_ZIP: // fall through
   case FileFormat::Value::NED19:
