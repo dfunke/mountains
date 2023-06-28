@@ -134,22 +134,25 @@ void TileCell::checkAndSplit() {
   if (mSmaller == nullptr) {
     int offsetLat = (int)mTopLeft.latitude() - (int)mBottomRight.latitude();
     int offsetLng = (int)mTopLeft.longitude() - (int)mBottomRight.longitude();
+    // Make sure to just split at tile edges.
+    // Assumes square tiles
     if (offsetLat > offsetLng) {
+      int centerLat = std::floor(offsetLat / ( 2 *mArcsecondsAcross)) * mArcsecondsAcross;
       mSmaller = new TileCell(
           (int)mBottomRight.latitude(), (int)mBottomRight.longitude(),
-          offsetLat / 2 + (offsetLat % 2), offsetLng, mArcsecondsAcross);
-      mBigger = new TileCell((int)mBottomRight.latitude() + offsetLat / 2 +
-                                 (offsetLat % 2),
-                             (int)mBottomRight.longitude(), offsetLat / 2,
+          centerLat, offsetLng, mArcsecondsAcross);
+        
+      mBigger = new TileCell((int)mBottomRight.latitude() + centerLat,
+                             (int)mBottomRight.longitude(), offsetLat - centerLat,
                              offsetLng, mArcsecondsAcross);
     } else {
+      int centerLng = std::floor(offsetLng / ( 2 *mArcsecondsAcross)) * mArcsecondsAcross;
       mSmaller = new TileCell(
           (int)mBottomRight.latitude(), (int)mBottomRight.longitude(),
-          offsetLat, offsetLng / 2 + (offsetLng % 2), mArcsecondsAcross);
+          offsetLat, centerLng, mArcsecondsAcross);
       mBigger = new TileCell((int)mBottomRight.latitude(),
-                             (int)mBottomRight.longitude() + offsetLng / 2 +
-                                 (offsetLng % 2),
-                             offsetLat, offsetLng / 2, mArcsecondsAcross);
+                             (int)mBottomRight.longitude() + centerLng,
+                             offsetLat, offsetLng - centerLng, mArcsecondsAcross);
     }
     // Split
   }
