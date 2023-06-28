@@ -53,6 +53,7 @@ public:
   // elevation and return true, otherwise return false.
   bool getMaxElevation(float lat, float lng, Elevation *elev);
   
+  double mLoadingTime;
 private:
 
   Lock mLock;

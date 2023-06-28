@@ -27,6 +27,8 @@
 #include "coordinate_system.h"
 #include "easylogging++.h"
 
+#include <chrono>
+
 #include <assert.h>
 
 using std::string;
@@ -75,7 +77,9 @@ Tile *TileCache::getOrLoad(float minLat, float minLng,
 
 Tile *TileCache::loadWithoutCaching(float minLat, float minLng,
                                     const CoordinateSystem &coordinateSystem) {
+  std::chrono::high_resolution_clock::time_point p1 = std::chrono::high_resolution_clock::now();
   Tile *tile = mLoadingPolicy->loadTile(minLat, minLng);
+  mLoadingTime += std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::high_resolution_clock::now() - p1).count();
   if (tile == nullptr) {
     return nullptr;
   }
