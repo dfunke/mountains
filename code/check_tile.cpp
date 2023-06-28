@@ -130,13 +130,12 @@ int compare() {
 }
 
 int proccessMoonData() {
-  string terrain_directory("/data02/funke/SRTM/Moon/dem15");
+  string terrain_directory("/data02/funke/SRTM/Moon/hgt");
+  //string terrain_directory("/home/pc/Data1/Moon/hgt");
   FileFormat fileFormat(FileFormat::Value::SLDEM);
   BasicTileLoadingPolicy policy(terrain_directory.c_str(), fileFormat);
   //policy.enableNeighborEdgeLoading(true);
   TileCache *cache = new TileCache(&policy, 1);
-  std::shared_ptr<CoordinateSystem> coordinateSystem(
-      fileFormat.coordinateSystemForOrigin(12.f, 25.f));
 
   int latMin = 0;
   int lngMin = 0;
@@ -144,15 +143,28 @@ int proccessMoonData() {
   bool isSecondHalve = false;
   //int sideLength = 15360;
   int sideLength = 7681;
-  Elevation *samples = (float*)malloc(sizeof(float)*sideLength*sideLength);
+  int newSide = (sideLength-1)/3 + 1;
+  Elevation *samples = (float*)malloc(sizeof(float)*newSide*newSide);
   for (latMin = -60; latMin < 60; latMin += 15) {
     for (lngMin = -180; lngMin < 180; lngMin += 15) {
       std::shared_ptr<CoordinateSystem> coordinateSystem(
           fileFormat.coordinateSystemForOrigin(latMin + 0.f, lngMin + 0.f));
       Tile *t = cache->loadWithoutCaching(latMin, lngMin, *coordinateSystem);
-      writer->writeTile("/data02/funke/SRTM/Moon/hgt", latMin, lngMin, t);
+      for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+          for (int y = 0; y < newSide; ++y) {
+            for (int x = 0; x < newSide; ++x) {
+              samples[y*newSide + x] = t->get(i * (newSide-1) + x, j * (newSide-1) + y);
+            }
+          }
+          Tile *newTile = new Tile(newSide, newSide, samples, fileFormat);
+          writer->writeTile("/data02/funke/SRTM/Moon/hgt5", latMin + (10 -j * 5), lngMin + i * 5, newTile);
+          //newTile->saveAsImage("/home/pc/tmp", latMin + (10 -j * 5), lngMin + i * 5);
+          std::cout << latMin + j * 5 << "," << lngMin + i * 5 << std::endl;
+        }
+      }
+      //writer->writeTile("/data02/funke/SRTM/Moon/hgt", latMin, lngMin, t);
       //t->saveAsImage("/data02/funke/SRTM/Moon/hgt", latMin, lngMin);
-      std::cout << latMin << "," << lngMin << std::endl;
       //for (int offX = 0; offX < 2; ++offX) {
       //  for (int offY = 0; offY < 2; ++offY) {
       //    float lat = latMin + (1-offY) * 15;

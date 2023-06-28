@@ -28,7 +28,8 @@ void HgtWriter::writeTile(const std::string &directory, float minLat,
     return;
   }
 
-  int num_samples = mFormat.rawSamplesAcross() * mFormat.rawSamplesAcross();
+  //int num_samples = mFormat.rawSamplesAcross() * mFormat.rawSamplesAcross();
+  int num_samples = t->width() * t->height();
 
   int16 *outbuf = (int16 *)malloc(sizeof(int16) * num_samples);
 
