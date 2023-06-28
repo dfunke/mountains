@@ -89,6 +89,7 @@ Tile *TileCache::loadWithoutCaching(float minLat, float minLng,
   // look suspiciously like spikes, but actually be valid (because the
   // true peak height may stand out quite a bit from the terrain in
   // the tile).
+  /*
   static const Elevation MAX_LEGAL_ELEVATION_DIFF = 1000;
   for (int y = 0; y < tile->height(); ++y) {
     for (int x = 0; x < tile->width(); ++x) {
@@ -127,7 +128,7 @@ Tile *TileCache::loadWithoutCaching(float minLat, float minLng,
         }
       }
     }
-  }
+  }*/
 
   VLOG(1) << "Loaded tile at " << minLat << " " << minLng << " with max elevation " << tile->maxElevation();
 

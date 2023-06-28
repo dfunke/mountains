@@ -17,7 +17,7 @@ public:
   void registerTile(int minLat, int minLng, Elevation maxElev);
 
   // Distribute the peak to tiles which could contain a closer higher-ground
-  void distributeToTiles(const LatLng &peakLocation, int elevation,
+  void distributeToTiles(const LatLng &peakLocation, Elevation elevation,
                            float *isolationKm);
 
   // Find the bucket for the tile represented by minLat and minLng

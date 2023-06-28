@@ -54,6 +54,10 @@ Tile *SldemLoader::loadTile(const std::string &directory, float minLat, float mi
             filename.c_str(), samples_read, num_samples);
     free(inbuf);
   } else {
+    for (int i = 0; i < samples_read; ++i) {
+      // convert km to m
+      inbuf[i] = inbuf[i] * 1000;
+    }
     // SRTM data is in big-endian order; convert to Elevation
     retval = new Tile(mFormat.inMemorySamplesAcross(), mFormat.inMemorySamplesAcross(), inbuf, FileFormat::Value::SLDEM);
     //retval->saveAsImage("/home/pc/tmp", minLat, minLng);

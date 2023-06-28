@@ -10,7 +10,7 @@
 #include <cmath>
 
 using std::floor;
-float EPSILON = 0.0000001;
+float EPSILON = 0.001;
 
 TileCell::TileCell(int minLat, int minLng, int offsetLat, int offsetLng,
                    float arcsecondsAcross) {
@@ -54,7 +54,7 @@ void TileCell::registerTile(int minLat, int minLng, Elevation maxElev) {
   }
 }
 
-void TileCell::distributeToTiles(const LatLng &peakLocation, int elevation,
+void TileCell::distributeToTiles(const LatLng &peakLocation, Elevation elevation,
                                  float isolationKm) {
   if (isLeaf()) {
     if (mBucket == nullptr) {
@@ -134,10 +134,6 @@ void TileCell::checkAndSplit() {
   if (mSmaller == nullptr) {
     int offsetLat = (int)mTopLeft.latitude() - (int)mBottomRight.latitude();
     int offsetLng = (int)mTopLeft.longitude() - (int)mBottomRight.longitude();
-    if (offsetLat == 1 && offsetLng == 1) {
-      // is a leaf!
-      return;
-    }
     if (offsetLat > offsetLng) {
       mSmaller = new TileCell(
           (int)mBottomRight.latitude(), (int)mBottomRight.longitude(),

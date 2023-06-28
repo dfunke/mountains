@@ -17,7 +17,7 @@ ILPSearchAreaTree::ILPSearchAreaTree(int minLat, int minLng, int offsetLat,
 ILPSearchAreaTree::~ILPSearchAreaTree() { delete mRoot; }
 
 void ILPSearchAreaTree::distributeToTiles(const LatLng &peakLocation,
-                                          int elevation, float *isolationKm) {
+                                          Elevation elevation, float *isolationKm) {
   if (*isolationKm > 0) {
     mRoot->distributeToTiles(peakLocation, elevation, *isolationKm);
   } else {

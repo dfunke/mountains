@@ -15,7 +15,7 @@ public:
 
   void registerTile(int minLat, int minLng, Elevation maxElev);
 
-  void distributeToTiles(const LatLng &peakLocation, int elevation,
+  void distributeToTiles(const LatLng &peakLocation, Elevation elevation,
                            float isolationKm);
 
   ConcurrentIsolationResults *findBucket(int mMinLat, int mMinLng);

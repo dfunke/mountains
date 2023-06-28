@@ -69,7 +69,7 @@ private:
 
   void setup(const Tile* tile, const ConcurrentIsolationResults* prevResults);
 
-  void addPeakToBucket(const LatLng &peakLocation, int elevation, float isolationKm);
+  void addPeakToBucket(const LatLng &peakLocation, Elevation elevation, float isolationKm);
 
   IsolationResults runSweepline(float mMinIsolationKm, bool fast);
 

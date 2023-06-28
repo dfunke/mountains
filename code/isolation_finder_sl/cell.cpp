@@ -1,6 +1,7 @@
 #include "cell.h"
 #include "cell_memory_manager.h"
 #include "spherical_math_util.h"
+#include <iostream>
 
 #include <algorithm>
 
@@ -294,7 +295,11 @@ void Cell::shortestDistance(const SlEvent *point, float *currShortest, LatLng *s
         continue;
       }
       float d = searchDistance(point, *this->content[i]);
-      if (d < *currShortest && !content[i]->equal(*point)) {
+//      if (content[i]->equal(*point)) {
+//         std::cout << "Found equal!" << std::endl;
+//        continue;
+//      }
+      if (d < *currShortest) {
         *currShortest = d;
         *shortestPoint = LatLng(this->content[i]->latitude(), this->content[i]->longitude());
       }
@@ -341,7 +346,11 @@ void Cell::fastShortestDistance(const SlEvent *point, float* currShortest, LatLn
         continue;
       }
       float d = fastSearchDistance(point->getOffsets(), this->content[i]->getOffsets(), lngDistanceScale);
-      if (d < *currShortest && !content[i]->equal(*point)) {
+//      if (content[i]->equal(*point)) {
+//         std::cout << "Found equal!" << std::endl;
+//        continue;
+//      }
+      if (d < *currShortest) {
         *currShortest = d;
         *shortestPoint = LatLng(this->content[i]->latitude(), this->content[i]->longitude());
       }
