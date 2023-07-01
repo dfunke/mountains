@@ -57,36 +57,6 @@ IsolationFinderSl::~IsolationFinderSl() {
   delete mCoordinateSystem;
 }
 
-inline Elevation getMinSorrounding(const Tile *tile, const Offsets offset,
-                                   int skipVal) {
-  Elevation minSorrounding = tile->get(offset);
-  if (minSorrounding == tile->NODATA_ELEVATION) {
-    // Ignore remaining no data elevation
-    return tile->NODATA_ELEVATION;
-  }
-  Elevation elev = tile->get(Offsets(offset.x() + skipVal, offset.y()));
-  if (elev < minSorrounding && elev != tile->NODATA_ELEVATION) {
-    minSorrounding = elev;
-  }
-  elev = tile->get(Offsets(offset.x(), offset.y() + skipVal));
-  if (elev < minSorrounding && elev != tile->NODATA_ELEVATION) {
-    minSorrounding = elev;
-  }
-  if (offset.x() - skipVal >= 0) {
-    elev = tile->get(Offsets(offset.x() - skipVal, offset.y()));
-    if (elev < minSorrounding && elev != tile->NODATA_ELEVATION) {
-      minSorrounding = elev;
-    }
-  }
-  if (offset.y() - skipVal >= 0) {
-    elev = tile->get(Offsets(offset.x(), offset.y() - skipVal));
-    if (elev < minSorrounding && elev != tile->NODATA_ELEVATION) {
-      minSorrounding = elev;
-    }
-  }
-  return minSorrounding;
-}
-
 void IsolationFinderSl::setup(const Tile *tile,
                               const ConcurrentIsolationResults *prevResults) {
   // Tiles overlap one pixel on all sides
@@ -161,8 +131,9 @@ void IsolationFinderSl::setup(const Tile *tile,
 
       // Get minimum of sorounding elevations
 
-      Elevation minSorrounding =
-          getMinSorrounding(tile, currentOffsets, skipVal);
+      //Elevation minSorrounding =
+      //    getMinSorrounding(tile, currentOffsets, skipVal);
+      Elevation minSorrounding = tile->minSorrounding(i,j, skipVal);
 
       if (minSorrounding < tile->get(currentOffsets)) {
         mEventQueue[idx].initialize(

@@ -70,6 +70,10 @@ public:
     return mFormat;
   }
 
+  // Return min sorrounding point x and y.
+  // Returns NODATA_ELEVATION on edges.
+  Elevation minSorrounding(int x, int y, int space) const;
+
   void saveAsImage(std::string dir, float lat, float lng);
 
   // Flip elevations so that depressions and mountains are swapped.

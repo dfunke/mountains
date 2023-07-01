@@ -33,6 +33,8 @@ private:
   ConcurrentIsolationResults mUnboundResults;
   tbb::concurrent_vector<SlEvent> mTileEvents;
   int mMinLat, mMinLng, mMaxLat, mMaxLng;
+  float mDegreeAccross;
+  Tile* mTileRes;
 };
 
 #endif // _ILP_SEARCH_AREA_TREE_H_

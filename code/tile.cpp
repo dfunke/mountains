@@ -143,3 +143,34 @@ void Tile::saveAsImage(std::string dir, float lat, float lng)
   fclose(imageFile);
   free(pix);
 }
+
+Elevation Tile::minSorrounding(int x, int y, int space) const {
+  if (x - space < 0 ||
+      y - space < 0 ||
+      x + space >= mHeight ||
+      y + space >= mWidth ) {
+    return NODATA_ELEVATION;
+  }
+  Elevation minSorrounding = get(x,y);
+  if (minSorrounding == NODATA_ELEVATION) {
+    // Ignore remaining no data elevation
+    return NODATA_ELEVATION;
+  }
+  Elevation elev = get(x + space, y);
+  if (elev < minSorrounding && elev != NODATA_ELEVATION) {
+    minSorrounding = elev;
+  }
+  elev = get(x, y + space);
+  if (elev < minSorrounding && elev != NODATA_ELEVATION) {
+    minSorrounding = elev;
+  }
+  elev = get(x - space, y);
+  if (elev < minSorrounding && elev != NODATA_ELEVATION) {
+    minSorrounding = elev;
+  }
+  elev = get(x, y - space);
+  if (elev < minSorrounding && elev != NODATA_ELEVATION) {
+    minSorrounding = elev;
+  }
+  return minSorrounding;
+}
