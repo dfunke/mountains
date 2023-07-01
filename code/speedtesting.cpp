@@ -426,7 +426,7 @@ int moonSpeedTesting() {
 
 int main(int argc, char **argv) {
   START_EASYLOGGINGPP(argc, argv);
-  return moonSpeedTesting();
+  return marsSpeedTesting();
   //return conductRandomSampleComparrisonTests();
   // return conductSpeedComparrisonTests();
   // return testCaseWithDem1Data();

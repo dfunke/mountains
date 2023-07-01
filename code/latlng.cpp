@@ -30,9 +30,9 @@
 #include <algorithm>
 
 //static const float kEarthRadiusMeters = 6371.01 * 1000.0;
-//static const float kEarthRadiusMeters = 3396190.f;
+static const float kEarthRadiusMeters = 3396190.f;
 //
-static const float kEarthRadiusMeters = 1737.4 * 1000.0;
+//static const float kEarthRadiusMeters = 1737.4 * 1000.0;
 static const float kMinLatRadians = (float) -M_PI / 2;
 static const float kMaxLatRadians = (float) M_PI / 2;
 static const float kMinLngRadians = (float) -M_PI;
@@ -53,8 +53,8 @@ float LatLng::distance(const LatLng &other) const {
   a += term * term * cosf(lat1) * cosf(lat2);
   float c = 2 * atan2f(sqrtf(a), sqrtf(1-a));
   
-  const float earthRadius = 6371000;
-  return c * earthRadius;
+  //const float earthRadius = 6371000;
+  return c * kEarthRadiusMeters;
 }
 
 float LatLng::distanceEllipsoid(const LatLng &other) const {
