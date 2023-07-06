@@ -51,9 +51,9 @@ N59E006.hgt
 #### NED
 
 The National Elevation Dataset (NED) covers the U.S. at various resolutions:
-- NED1 has 1-arcsecond (~90 foot) samples
-- NED13 has 1/3-arcsecond (~30 foot) samples
-- NED19 has 1/9 arcsecond (~10 foot) samples. 
+- NED1 has 1-arcsecond (~30.9 meters) samples
+- NED13 has 1/3-arcsecond (~10.3 meters) samples
+- NED19 has 1/9 arcsecond (~3.4 meters) samples. 
 
 ##### NED1 and NED13
 
